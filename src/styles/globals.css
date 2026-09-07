@@ -1,0 +1,1469 @@
+@import "./tokens.css";
+
+/* ------------------------------------------------------------------ nền tảng */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  /* Không trang nào được cuộn ngang; bảng dài tự cuộn trong khối của nó. */
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0 0 var(--s-4);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.015em;
+  font-weight: 640;
+}
+
+h1 {
+  font-size: var(--fs-3xl);
+}
+h2 {
+  font-size: var(--fs-2xl);
+}
+h3 {
+  font-size: var(--fs-xl);
+}
+
+p {
+  margin: 0 0 var(--s-4);
+  max-width: var(--prose-max);
+}
+
+a {
+  color: var(--forest);
+  text-decoration-color: color-mix(in srgb, var(--forest) 35%, transparent);
+  text-underline-offset: 3px;
+  transition: color var(--motion-fast) var(--ease);
+}
+
+a:hover {
+  color: var(--forest-600);
+  text-decoration-color: currentColor;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/*
+ * Focus ring phải đọc được trên MỌI nền của hệ: nền giấy, dải xanh đậm, và nút
+ * vàng chanh. Hai lớp - một sáng, một tối - đảm bảo điều đó ở cả hai chủ đề.
+ */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.on-band :focus-visible {
+  outline-color: var(--lime);
+}
+
+/* Bỏ qua điều hướng - hiện ra khi nhận focus bằng bàn phím. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: var(--s-3) var(--s-5);
+  background: var(--forest);
+  color: #fff;
+  border-radius: 0 0 var(--r-sm) 0;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------- bố cục */
+
+.wrap {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--s-6);
+}
+
+@media (min-width: 768px) {
+  .wrap {
+    padding-inline: var(--s-8);
+  }
+}
+
+.section {
+  padding-block: var(--s-12);
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding-block: var(--s-14);
+  }
+}
+
+.band {
+  background: var(--band);
+  color: var(--on-band);
+}
+
+.band h1,
+.band h2,
+.band h3 {
+  color: var(--on-band);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.grid {
+  display: grid;
+  gap: var(--s-6);
+}
+
+.grid-2 {
+  grid-template-columns: 1fr;
+}
+.grid-3 {
+  grid-template-columns: 1fr;
+}
+.grid-4 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .grid-2,
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.eyebrow {
+  font-size: var(--fs-sm);
+  font-weight: 620;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--s-3);
+}
+
+.band .eyebrow {
+  color: var(--on-band-muted);
+}
+
+.lede {
+  font-size: var(--fs-lg);
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+.band .lede {
+  color: var(--on-band-muted);
+}
+
+/* --------------------------------------------------------------- thành phần */
+
+.card {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--s-6);
+  box-shadow: var(--shadow-1);
+}
+
+.card--flat {
+  box-shadow: none;
+}
+
+.card--hover {
+  transition:
+    transform var(--motion) var(--ease),
+    box-shadow var(--motion) var(--ease),
+    border-color var(--motion) var(--ease);
+}
+
+.card--hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+  border-color: var(--line-strong);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 3px var(--s-3);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  background: var(--paper-sunken);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+.badge--lime {
+  background: var(--lime);
+  color: var(--on-lime);
+  border-color: var(--lime-deep);
+}
+
+.badge--info {
+  background: var(--info-bg);
+  color: var(--info);
+  border-color: transparent;
+}
+
+.badge--warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: transparent;
+}
+
+.badge--success {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: transparent;
+}
+
+/*
+ * Nhãn "đang chạy mock". Đặt ở đây, dùng ở mọi nơi có adapter chưa kết nối, để
+ * không có màn hình nào lỡ trình bày chức năng mock như chức năng thật.
+ */
+.mock-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 3px var(--s-3);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px dashed currentColor;
+}
+
+/* -------------------------------------------------------------------- nút */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-6);
+  min-height: 46px;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 620;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--motion-fast) var(--ease),
+    color var(--motion-fast) var(--ease),
+    border-color var(--motion-fast) var(--ease),
+    transform var(--motion-fast) var(--ease);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Hành động chính: vàng chanh trên chữ xanh rất đậm, 10.4:1. */
+.btn--primary {
+  background: var(--lime);
+  color: var(--on-lime);
+  border-color: var(--lime-deep);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--lime-deep);
+}
+
+.btn--solid {
+  background: var(--forest);
+  color: var(--paper);
+  border-color: var(--forest);
+}
+
+.btn--solid:hover:not(:disabled) {
+  background: var(--forest-600);
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--forest);
+  border-color: var(--line-strong);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--forest);
+  background: color-mix(in srgb, var(--forest) 7%, transparent);
+}
+
+.on-band .btn--secondary {
+  color: var(--on-band);
+  border-color: color-mix(in srgb, var(--on-band) 40%, transparent);
+}
+
+.on-band .btn--secondary:hover:not(:disabled) {
+  border-color: var(--on-band);
+  background: color-mix(in srgb, var(--on-band) 12%, transparent);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: transparent;
+  padding-inline: var(--s-4);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--paper-sunken);
+}
+
+.btn--danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.btn--sm {
+  min-height: 38px;
+  padding: var(--s-2) var(--s-4);
+  font-size: var(--fs-sm);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* Vòng quay chờ dùng chung cho mọi nút ở trạng thái loading. */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------------------------------------------ biểu mẫu */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-bottom: var(--s-5);
+}
+
+.field label {
+  font-size: var(--fs-sm);
+  font-weight: 620;
+  color: var(--ink);
+}
+
+.field input,
+.field select,
+.field textarea {
+  font: inherit;
+  font-size: var(--fs-md);
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: var(--s-3) var(--s-4);
+  min-height: 46px;
+  width: 100%;
+  transition:
+    border-color var(--motion-fast) var(--ease),
+    box-shadow var(--motion-fast) var(--ease);
+}
+
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: var(--lh-body);
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover {
+  border-color: var(--forest);
+}
+
+.field input:disabled,
+.field select:disabled,
+.field textarea:disabled {
+  background: var(--paper-sunken);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.field .hint {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.field .error {
+  font-size: var(--fs-sm);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.field[data-invalid="true"] input,
+.field[data-invalid="true"] select,
+.field[data-invalid="true"] textarea {
+  border-color: var(--danger);
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--s-4);
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin-top: 2px;
+  flex: none;
+  accent-color: var(--forest);
+}
+
+/* ------------------------------------------------------------------ thông báo */
+
+.alert {
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  font-size: var(--fs-md);
+  margin-bottom: var(--s-5);
+}
+
+.alert p:last-child {
+  margin-bottom: 0;
+}
+
+.alert--error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+.alert--success {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 30%, transparent);
+}
+
+.alert--info {
+  background: var(--info-bg);
+  color: var(--info);
+  border-color: color-mix(in srgb, var(--info) 30%, transparent);
+}
+
+.alert--warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 30%, transparent);
+}
+
+/* Trạng thái rỗng - bắt buộc có ở mọi danh sách. */
+.empty {
+  text-align: center;
+  padding: var(--s-10) var(--s-6);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  color: var(--muted);
+  background: var(--paper-sunken);
+}
+
+.empty h3 {
+  color: var(--ink);
+  margin-bottom: var(--s-2);
+}
+
+/* ------------------------------------------------------------------ tiến độ */
+
+.meter {
+  display: block;
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lime);
+  transition: width var(--motion-slow) var(--ease);
+}
+
+/* Chưa đủ bằng chứng thì KHÔNG vẽ một thanh đặc như thể đã đo được. */
+.meter[data-unknown="true"] > span {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--line-strong),
+    var(--line-strong) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* ------------------------------------------------------------------- bảng */
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+}
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  min-width: 640px;
+}
+
+table.data th,
+table.data td {
+  text-align: left;
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+table.data th {
+  font-weight: 650;
+  color: var(--muted);
+  background: var(--paper-sunken);
+}
+
+table.data tr:last-child td {
+  border-bottom: none;
+}
+
+/* ------------------------------------------------------- hiệu ứng vào màn */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: reveal var(--motion-slow) var(--ease) forwards;
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------- footer */
+
+.site-footer {
+  display: grid;
+  gap: var(--s-9);
+  padding-block: var(--s-12) var(--s-8);
+  grid-template-columns: 1fr;
+}
+
+.site-footer__brand {
+  max-width: 42ch;
+}
+
+.site-footer__cols {
+  display: grid;
+  gap: var(--s-7);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.site-footer__cols div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.site-footer__h {
+  font-size: var(--fs-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-band-muted);
+  margin: 0;
+}
+
+.site-footer__cols a {
+  color: var(--on-band);
+  text-decoration: none;
+  font-size: var(--fs-sm);
+}
+
+.site-footer__cols a:hover {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+.site-footer__social {
+  display: flex;
+  gap: var(--s-4);
+  padding-bottom: var(--s-6);
+}
+
+.site-footer__legal {
+  border-top: 1px solid color-mix(in srgb, var(--on-band) 18%, transparent);
+  padding-block: var(--s-6) var(--s-9);
+  color: var(--on-band-muted);
+  font-size: var(--fs-sm);
+}
+
+.site-footer__legal p {
+  max-width: 78ch;
+  margin-bottom: var(--s-2);
+}
+
+.site-footer__pending {
+  color: var(--lime);
+  font-weight: 560;
+}
+
+@media (min-width: 900px) {
+  .site-footer {
+    grid-template-columns: 1.1fr 1.6fr;
+    gap: var(--s-12);
+  }
+}
+
+/* `.band` là lớp thực tế dùng trên các dải nền đậm; các quy tắc `.on-band`
+   phía trên giữ lại cho khối cần đảo màu mà không đổi nền. */
+.band :focus-visible {
+  outline-color: var(--lime);
+}
+
+.band .btn--secondary {
+  color: var(--on-band);
+  border-color: color-mix(in srgb, var(--on-band) 40%, transparent);
+}
+
+.band .btn--secondary:hover:not(:disabled) {
+  border-color: var(--on-band);
+  background: color-mix(in srgb, var(--on-band) 12%, transparent);
+}
+
+.band a {
+  color: var(--lime);
+}
+
+.band .card {
+  background: color-mix(in srgb, var(--on-band) 7%, transparent);
+  border-color: color-mix(in srgb, var(--on-band) 16%, transparent);
+  box-shadow: none;
+}
+
+.band .card h3,
+.band .card p {
+  color: var(--on-band);
+}
+
+/* ================================================================== TRANG CHỦ */
+
+.hero {
+  padding-block: var(--s-10) var(--s-12);
+  background:
+    radial-gradient(1100px 460px at 88% -8%, color-mix(in srgb, var(--lime) 30%, transparent), transparent 70%),
+    radial-gradient(900px 420px at -6% 12%, color-mix(in srgb, var(--forest) 12%, transparent), transparent 65%);
+}
+
+.hero__inner {
+  display: grid;
+  gap: var(--s-9);
+  align-items: center;
+  grid-template-columns: 1fr;
+}
+
+.hero__h1 {
+  font-size: var(--fs-hero);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--s-5);
+  max-width: 15ch;
+}
+
+.hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-7);
+}
+
+.hero__fine {
+  margin-top: var(--s-5);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.hero-art {
+  min-width: 0;
+}
+
+.hero-art__note {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  max-width: none;
+}
+
+@media (min-width: 960px) {
+  .hero {
+    padding-block: var(--s-13) var(--s-14);
+  }
+  .hero__inner {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: var(--s-12);
+  }
+}
+
+/* ----------------------------------------------------------- hành trình học */
+
+.journey {
+  list-style: none;
+  margin: var(--s-9) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-6);
+}
+
+.journey__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-5);
+  align-items: start;
+  padding-bottom: var(--s-6);
+  border-bottom: 1px solid var(--line);
+}
+
+.journey__item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.journey__n {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--forest);
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.journey__item h3 {
+  margin-bottom: var(--s-2);
+  font-size: var(--fs-lg);
+}
+
+.journey__item p {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .journey {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-7) var(--s-10);
+  }
+}
+
+/* ------------------------------------------------------------ thẻ cấp độ */
+
+.level-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.level-card h3 {
+  font-size: var(--fs-lg);
+  margin-bottom: var(--s-4);
+}
+
+.level-card__hours {
+  margin-top: auto;
+  padding-top: var(--s-4);
+  font-size: var(--fs-sm);
+  color: var(--on-band-muted);
+}
+
+/* Danh sách có dấu tích. */
+.tick {
+  list-style: none;
+  margin: 0 0 var(--s-4);
+  padding: 0;
+  display: grid;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+}
+
+.tick li {
+  padding-left: 24px;
+  position: relative;
+  line-height: var(--lh-snug);
+}
+
+.tick li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lime);
+  border: 1px solid var(--lime-deep);
+}
+
+/* ------------------------------------------------------------- chu trình dạy */
+
+.cycle {
+  list-style: none;
+  margin: var(--s-9) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-5);
+  counter-reset: cycle;
+}
+
+.cycle__item {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--s-5);
+}
+
+.cycle__n {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--forest);
+  color: var(--paper);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  margin-bottom: var(--s-3);
+}
+
+.cycle__item h3 {
+  font-size: var(--fs-md);
+  margin-bottom: var(--s-2);
+}
+
+.cycle__item p {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .cycle {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1040px) {
+  .cycle {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ agent */
+
+.limits {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  border-top: 1px dashed var(--line-strong);
+  padding-top: var(--s-3);
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------------ gói học */
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.plan-card__price strong {
+  font-size: var(--fs-2xl);
+  letter-spacing: -0.02em;
+}
+
+.plan-card__price span {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.plan-card__note {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  margin: 0;
+}
+
+.plan-card .tick {
+  flex: 1;
+}
+
+/* ---------------------------------------------------------------------- FAQ */
+
+.faq {
+  margin-top: var(--s-8);
+  border-top: 1px solid var(--line);
+  max-width: 82ch;
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq__item summary {
+  cursor: pointer;
+  padding: var(--s-5) var(--s-9) var(--s-5) 0;
+  font-weight: 620;
+  font-size: var(--fs-lg);
+  position: relative;
+  list-style: none;
+}
+
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item summary::after {
+  content: "+";
+  position: absolute;
+  right: var(--s-2);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--fs-xl);
+  color: var(--forest);
+  font-weight: 400;
+}
+
+.faq__item[open] summary::after {
+  content: "–";
+}
+
+.faq__item p {
+  color: var(--muted);
+  padding-bottom: var(--s-5);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------- CTA */
+
+.cta-final {
+  background: var(--paper-sunken);
+  border-top: 1px solid var(--line);
+}
+
+/* ------------------------------------------------------------- trang cấp độ */
+
+.level-detail__head h2 {
+  margin-top: var(--s-4);
+  max-width: 22ch;
+}
+
+/* -------------------------------------------------------------- thẻ agent */
+
+.agent-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.agent-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin-bottom: var(--s-2);
+}
+
+.agent-card__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  flex: none;
+}
+
+.agent-card__role {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.agent-card__tools {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+/* ================================================================== KHU AUTH */
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100dvh;
+}
+
+.auth-shell__aside {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--s-9);
+  padding: var(--s-9) var(--s-8);
+}
+
+.auth-shell__main {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-5) var(--s-6) var(--s-10);
+}
+
+.auth-shell__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-bottom: var(--s-8);
+}
+
+.auth-shell__back {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.auth-shell__back:hover {
+  color: var(--forest);
+}
+
+.auth-shell__card {
+  width: 100%;
+  max-width: 460px;
+  margin-inline: auto;
+}
+
+.auth-shell__card h1 {
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--s-3);
+}
+
+.auth-shell__foot {
+  margin-top: var(--s-6);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
+  .auth-shell__aside {
+    display: flex;
+  }
+  .auth-shell__main {
+    justify-content: center;
+    padding: var(--s-9) var(--s-10);
+  }
+}
+
+/* ========================================================= KHU HỌC / QUẢN TRỊ */
+
+.app-nav {
+  background: var(--paper-raised);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.app-nav__inner {
+  max-width: 1320px;
+  margin-inline: auto;
+  padding: var(--s-3) var(--s-6);
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.app-nav__brand {
+  color: var(--forest);
+  text-decoration: none;
+  flex: none;
+}
+
+.app-nav__list {
+  display: none;
+  gap: var(--s-2);
+  flex: 1;
+  min-width: 100%;
+  order: 3;
+  flex-direction: column;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
+  margin-top: var(--s-2);
+}
+
+.app-nav__list[data-open="true"] {
+  display: flex;
+}
+
+.app-nav__link {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-pill);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--fs-sm);
+  font-weight: 560;
+}
+
+.app-nav__link:hover {
+  background: var(--paper-sunken);
+  color: var(--forest);
+}
+
+.app-nav__link[aria-current="page"] {
+  background: var(--forest);
+  color: var(--paper);
+}
+
+.app-nav__link--soon {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.app-nav__user {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-left: auto;
+}
+
+.app-nav__who {
+  display: none;
+  flex-direction: column;
+  line-height: 1.2;
+  font-size: var(--fs-xs);
+  text-align: right;
+}
+
+.app-nav__who span {
+  color: var(--muted);
+}
+
+@media (min-width: 960px) {
+  .app-nav__burger {
+    display: none;
+  }
+  .app-nav__list {
+    display: flex;
+    flex-direction: row;
+    min-width: 0;
+    order: 0;
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+  .app-nav__who {
+    display: flex;
+  }
+}
+
+.app-main {
+  max-width: 1320px;
+  margin-inline: auto;
+  padding: var(--s-8) var(--s-6) var(--s-12);
+}
+
+.page-head {
+  margin-bottom: var(--s-8);
+}
+
+.page-head h1 {
+  margin-bottom: var(--s-2);
+}
+
+.page-head p {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+/* ---------------------------------------------------------- thẻ kỹ năng */
+
+.skill-row {
+  display: grid;
+  gap: var(--s-3);
+  align-items: center;
+  grid-template-columns: 88px 1fr auto;
+  padding-block: var(--s-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.skill-row:last-child {
+  border-bottom: none;
+}
+
+.skill-row__name {
+  font-weight: 620;
+  font-size: var(--fs-sm);
+}
+
+.skill-row__value {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.stat-grid {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin-bottom: var(--s-8);
+}
+
+.stat {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--s-5);
+}
+
+.stat__label {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin-bottom: var(--s-2);
+}
+
+.stat__value {
+  font-size: var(--fs-2xl);
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.stat__note {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  margin-top: var(--s-2);
+  margin-bottom: 0;
+}
+
+/* Thẻ dạng cột: badge không được kéo giãn hết chiều ngang. `align-items:stretch`
+   là mặc định của flex column, và nó biến một nhãn nhỏ thành một dải dài. */
+.level-card > .badge,
+.plan-card > .badge,
+.agent-card > .badge {
+  align-self: flex-start;
+}
+
+/* Giờ học: mặc định màu chữ phụ của nền sáng, đảo lại khi nằm trong dải đậm. */
+.level-card__hours {
+  color: var(--muted);
+}
+
+.band .level-card__hours {
+  color: var(--on-band-muted);
+}
+
+/* Nhãn nút trong thanh điều hướng không xuống dòng: ở 390px "Bắt đầu" từng vỡ
+   thành hai dòng và làm thanh header cao gấp đôi. Nút trong nội dung thì KHÔNG
+   khoá như vậy - nhãn dài ở 390px sẽ đẩy trang tràn ngang. */
+.site-header .btn,
+.app-nav .btn {
+  white-space: nowrap;
+}
+
+.btn {
+  max-width: 100%;
+  text-align: center;
+}
+
+/* ============================================================ HEADER CÔNG KHAI */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  min-height: 68px;
+}
+
+.site-header__brand {
+  color: var(--forest);
+  text-decoration: none;
+  flex: none;
+}
+
+.site-header__nav {
+  display: none;
+  gap: var(--s-5);
+  margin-inline-start: var(--s-4);
+}
+
+.site-header__link {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--fs-sm);
+  font-weight: 560;
+  padding: var(--s-2) 0;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.site-header__link:hover {
+  color: var(--forest);
+  border-bottom-color: var(--lime-deep);
+}
+
+.site-header__link[aria-current="page"] {
+  color: var(--forest);
+  border-bottom-color: var(--forest);
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-inline-start: auto;
+  min-width: 0;
+}
+
+/* Hai lớp, vì .btn cũng đặt display và cũng chỉ có một lớp. */
+.site-header .site-header__signin {
+  display: none;
+}
+
+.site-header__mobile {
+  border-top: 1px solid var(--line);
+  background: var(--paper-raised);
+  padding-block: var(--s-4);
+}
+
+.site-header__mobile-link {
+  display: block;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 560;
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 900px) {
+  .site-header .site-header__nav,
+  .site-header .site-header__signin {
+    display: flex;
+  }
+  .site-header .site-header__burger,
+  .site-header .site-header__mobile {
+    display: none;
+  }
+}

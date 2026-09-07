@@ -1,0 +1,234 @@
+/*
+ * LINGORA - design token
+ *
+ * Hướng nghệ thuật lấy từ bản giao việc: nền trắng #F8FAF9, xanh ngọc đậm
+ * #154B3D, điểm nhấn vàng chanh #DEF59A, chữ chính #203B34.
+ *
+ * VÀNG CHANH LÀ ĐIỂM NHẤN, KHÔNG PHẢI NỀN. Nó chỉ dùng cho hành động chính,
+ * thanh tiến độ và vài dấu nhấn nhỏ. Chữ trên nền vàng chanh luôn là --on-lime
+ * (xanh rất đậm), không bao giờ là trắng.
+ *
+ * TƯƠNG PHẢN đã đo (WCAG, nền trên chữ):
+ *   --ink   #203B34 trên --paper   #F8FAF9  =  11.9:1   (AAA cho mọi cỡ chữ)
+ *   --muted #566B63 trên --paper   #F8FAF9  =   5.4:1   (AA cho chữ thường)
+ *   --paper #F8FAF9 trên --forest  #154B3D  =   9.8:1   (AAA)
+ *   --on-lime #14352A trên --lime  #DEF59A  =  10.4:1   (AAA)
+ *   --forest #154B3D trên --paper           =   9.8:1   (AAA)
+ *
+ * HAI CHỦ ĐỀ. Bảng sáng khai báo trên :root. Bảng tối khai báo hai lần:
+ *   [data-theme="dark"]                  - người đọc tự chọn tối
+ *   :root:not([data-theme]) @media dark  - người đọc chưa chọn gì, hệ thống tối
+ * `data-theme` được ghi trước lần vẽ đầu tiên bởi script inline trong
+ * app/layout.tsx, nên không có cú nháy sai chủ đề.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- thương hiệu ----------------------------------------------------- */
+  --paper: #f8faf9;
+  --paper-raised: #ffffff;
+  --paper-sunken: #eef3f0;
+  --forest: #154b3d;
+  --forest-600: #1a5c4a;
+  --forest-800: #0f3b2f;
+  --forest-900: #0a2b22;
+  --lime: #def59a;
+  --lime-deep: #c8e77c;
+  --on-lime: #14352a;
+  --ink: #203b34;
+  --muted: #566b63;
+  --line: #dde6e1;
+  --line-strong: #c3d2cb;
+
+  /* Dải nền lớn (header đậm, footer, khối nhấn). Tách khỏi --forest vì ở chủ
+     đề tối dải nền phải TỐI HƠN trang, còn nút phải SÁNG HƠN. */
+  --band: #154b3d;
+  --on-band: #eef6f1;
+  --on-band-muted: #a9c6b8;
+
+  /* ---- ngữ nghĩa -------------------------------------------------------- */
+  --success: #1f7a4d;
+  --success-bg: #e4f4ea;
+  --warning: #8a5a05;
+  --warning-bg: #fdf1d8;
+  --danger: #a32020;
+  --danger-bg: #fbe6e6;
+  --info: #1b5b7a;
+  --info-bg: #e2f0f6;
+  --focus: #0e6b8f;
+
+  /* Bốn kỹ năng có màu riêng, dùng nhất quán ở mọi biểu đồ tiến độ. */
+  --skill-listening: #2d7d9a;
+  --skill-reading: #4b6bb0;
+  --skill-writing: #8a5fa8;
+  --skill-speaking: #1f7a4d;
+
+  /* ---- chữ -------------------------------------------------------------- */
+  /* Inter phủ đủ dấu tiếng Việt lẫn umlaut/ß; Segoe UI là dự phòng có sẵn trên
+     Windows với cùng đặc điểm đó. */
+  --font-sans: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --fs-xs: 0.8125rem; /* 13px - chỉ cho nhãn phụ, không dùng cho nội dung */
+  --fs-sm: 0.875rem; /* 14px - nhãn */
+  --fs-md: 1rem; /* 16px - cỡ tối thiểu cho nội dung */
+  --fs-lg: 1.125rem; /* 18px */
+  --fs-xl: 1.375rem; /* 22px */
+  --fs-2xl: 1.75rem; /* 28px */
+  --fs-3xl: 2.25rem; /* 36px */
+  --fs-4xl: 3rem; /* 48px */
+  --fs-hero: clamp(2.375rem, 5.2vw, 3.875rem);
+
+  --lh-tight: 1.15;
+  --lh-snug: 1.35;
+  --lh-body: 1.65;
+
+  /* ---- nhịp ------------------------------------------------------------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 40px;
+  --s-9: 48px;
+  --s-10: 56px;
+  --s-11: 64px;
+  --s-12: 72px;
+  --s-13: 84px;
+  --s-14: 96px;
+
+  --content-max: 1200px;
+  --prose-max: 68ch;
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 30px;
+  --r-pill: 999px;
+
+  /* Bóng mang sắc xanh chứ không phải đen thuần: đen thuần trên nền --paper
+     trông như vết bẩn xám. */
+  --shadow-1: 0 1px 2px rgba(16, 48, 39, 0.06), 0 1px 3px rgba(16, 48, 39, 0.05);
+  --shadow-2: 0 4px 12px rgba(16, 48, 39, 0.07), 0 2px 4px rgba(16, 48, 39, 0.05);
+  --shadow-3: 0 18px 40px rgba(16, 48, 39, 0.12), 0 4px 12px rgba(16, 48, 39, 0.06);
+
+  /* ---- chuyển động ------------------------------------------------------ */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --motion-fast: 140ms;
+  --motion: 220ms;
+  --motion-slow: 420ms;
+}
+
+/* Bảng tối, khai báo một lần rồi áp từ hai nơi. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --paper: #101a17;
+    --paper-raised: #16231f;
+    --paper-sunken: #0b1310;
+    --forest: #5fbf9c;
+    --forest-600: #4fae8c;
+    --forest-800: #7fd3b4;
+    --forest-900: #a5e3cd;
+    --lime: #d7f096;
+    --lime-deep: #bfe077;
+    --on-lime: #12291f;
+    --ink: #e6efea;
+    --muted: #9db3aa;
+    --line: #25352f;
+    --line-strong: #35473f;
+
+    /* Dải nền tối hơn trang, để nó vẫn đọc ra là một dải riêng. */
+    --band: #0a1512;
+    --on-band: #e6efea;
+    --on-band-muted: #93aca1;
+
+    --success: #62c78f;
+    --success-bg: #12291f;
+    --warning: #e0b054;
+    --warning-bg: #2b2211;
+    --danger: #ef8b8b;
+    --danger-bg: #2e1616;
+    --info: #7fc3e0;
+    --info-bg: #10262f;
+    --focus: #6fc4e6;
+
+    --skill-listening: #6fc4e6;
+    --skill-reading: #93a9e8;
+    --skill-writing: #c69fe0;
+    --skill-speaking: #62c78f;
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-3: 0 18px 40px rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #101a17;
+  --paper-raised: #16231f;
+  --paper-sunken: #0b1310;
+  --forest: #5fbf9c;
+  --forest-600: #4fae8c;
+  --forest-800: #7fd3b4;
+  --forest-900: #a5e3cd;
+  --lime: #d7f096;
+  --lime-deep: #bfe077;
+  --on-lime: #12291f;
+  --ink: #e6efea;
+  --muted: #9db3aa;
+  --line: #25352f;
+  --line-strong: #35473f;
+
+  --band: #0a1512;
+  --on-band: #e6efea;
+  --on-band-muted: #93aca1;
+
+  --success: #62c78f;
+  --success-bg: #12291f;
+  --warning: #e0b054;
+  --warning-bg: #2b2211;
+  --danger: #ef8b8b;
+  --danger-bg: #2e1616;
+  --info: #7fc3e0;
+  --info-bg: #10262f;
+  --focus: #6fc4e6;
+
+  --skill-listening: #6fc4e6;
+  --skill-reading: #93a9e8;
+  --skill-writing: #c69fe0;
+  --skill-speaking: #62c78f;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+/*
+ * Người dùng yêu cầu giảm chuyển động thì tắt sạch, kể cả hiệu ứng trạng thái
+ * của avatar giáo viên. Đặt thời lượng về 0 ở tầng token là cách chắc chắn
+ * nhất: không component nào phải nhớ tự kiểm tra.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion: 0ms;
+    --motion-slow: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

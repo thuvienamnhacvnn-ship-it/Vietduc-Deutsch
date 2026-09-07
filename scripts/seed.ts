@@ -1,0 +1,193 @@
+/**
+ * DỮ LIỆU DEMO. Tách riêng khỏi mọi đường chạy của ứng dụng và chỉ tạo ra khi
+ * ai đó chủ động chạy `npm run seed`.
+ *
+ * Những gì script này tạo:
+ *   - một tài khoản quản trị và một tài khoản học viên để thử luồng
+ *   - khung khóa học A1-B2 và các mục tiêu "có thể làm"
+ *   - ba gói học VỚI GIÁ THAM KHẢO, cờ approved_for_sale = false
+ *
+ * Giá ở đây không phải giá kinh doanh. Bản giao việc nói rõ giá ví dụ không được
+ * tự biến thành giá chính thức, nên cờ duyệt bán để false và giao diện tự dán
+ * nhãn "giá tham khảo" cho tới khi chủ dự án bật nó trong cổng quản trị.
+ *
+ * Mật khẩu demo in ra màn hình, không nằm trong bất kỳ tệp nào được commit.
+ */
+import { randomBytes } from "node:crypto";
+import { eq } from "drizzle-orm";
+import { getDb } from "../src/lib/db";
+import {
+  courses,
+  objectives,
+  planVersions,
+  plans,
+  learnerProfiles,
+  users,
+} from "../src/lib/db/schema";
+import { hashPassword } from "../src/lib/auth/password";
+import { CURRICULUM } from "../src/content/curriculum";
+
+function demoPassword(): string {
+  // Đủ dài để không phải mật khẩu yếu nếu ai đó lỡ để tài khoản demo trên máy
+  // dùng chung, và khác nhau mỗi lần seed.
+  return `lingora-${randomBytes(6).toString("hex")}`;
+}
+
+async function main() {
+  const db = await getDb();
+
+  /* ------------------------------------------------------------ tài khoản */
+
+  const accounts = [
+    { email: "admin@lingora.demo", name: "Quản trị demo", role: "admin" as const },
+    { email: "hocvien@lingora.demo", name: "Học viên demo", role: "learner" as const },
+  ];
+
+  const credentials: string[] = [];
+  for (const account of accounts) {
+    const existing = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, account.email))
+      .limit(1);
+
+    if (existing[0]) {
+      console.log(`  giữ nguyên ${account.email} (đã có)`);
+      continue;
+    }
+
+    const password = demoPassword();
+    const created = await db
+      .insert(users)
+      .values({
+        email: account.email,
+        name: account.name,
+        role: account.role,
+        passwordHash: await hashPassword(password),
+        // Xác minh sẵn: tài khoản demo không nên phụ thuộc vào email adapter.
+        emailVerifiedAt: new Date(),
+      })
+      .returning({ id: users.id });
+
+    await db.insert(learnerProfiles).values({ userId: created[0]!.id });
+    credentials.push(`  ${account.email}  ${password}`);
+  }
+
+  /* -------------------------------------------------------------- khóa học */
+
+  for (const level of CURRICULUM) {
+    const slug = `tieng-duc-${level.level.toLowerCase()}`;
+    const existing = await db
+      .select({ id: courses.id })
+      .from(courses)
+      .where(eq(courses.slug, slug))
+      .limit(1);
+    if (existing[0]) continue;
+
+    const created = await db
+      .insert(courses)
+      .values({ slug, level: level.level, title: `Tiếng Đức ${level.level}`, summary: level.summary })
+      .returning({ id: courses.id });
+
+    // Mục tiêu "có thể làm" là cơ sở để đo độ phủ nội dung về sau.
+    let i = 0;
+    for (const canDo of level.canDo) {
+      i += 1;
+      await db.insert(objectives).values({
+        code: `${level.level}-CAN-${String(i).padStart(2, "0")}`,
+        level: level.level,
+        // Mục tiêu ở khung này là mục tiêu giao tiếp tổng hợp; kỹ năng cụ thể
+        // được gán khi biên soạn bài học thật.
+        skill: "speaking",
+        canDoVi: canDo,
+        canDoDe: "",
+      });
+    }
+    void created;
+  }
+
+  /* -------------------------------------------------------------- gói học */
+
+  const demoPlans = [
+    {
+      slug: "co-ban",
+      name: "Cơ bản",
+      priceCents: 2900,
+      billingPeriod: "monthly",
+      trialDays: 7,
+      features: ["Học một cấp độ", "8 buổi lớp AI mỗi tháng", "Bài tập và ôn tập không giới hạn"],
+      limits: { classSessions: 8, sttMinutes: 240, ttsChars: 200000 },
+      scope: "one_level",
+    },
+    {
+      slug: "tieu-chuan",
+      name: "Tiêu chuẩn",
+      priceCents: 4900,
+      billingPeriod: "monthly",
+      trialDays: 7,
+      features: [
+        "Toàn bộ A1 đến B2",
+        "20 buổi lớp AI mỗi tháng",
+        "Chấm bài viết chi tiết",
+        "Đánh giá lại theo yêu cầu",
+      ],
+      limits: { classSessions: 20, sttMinutes: 600, ttsChars: 500000 },
+      scope: "all_levels",
+    },
+    {
+      slug: "chuyen-sau",
+      name: "Chuyên sâu",
+      priceCents: 8900,
+      billingPeriod: "monthly",
+      trialDays: 0,
+      features: [
+        "Toàn bộ A1 đến B2",
+        "45 buổi lớp AI mỗi tháng",
+        "Luyện phỏng vấn Ausbildung",
+        "Báo cáo tiến bộ hằng tháng",
+      ],
+      limits: { classSessions: 45, sttMinutes: 1400, ttsChars: 1200000 },
+      scope: "all_levels",
+    },
+  ];
+
+  for (const p of demoPlans) {
+    const existing = await db.select({ id: plans.id }).from(plans).where(eq(plans.slug, p.slug)).limit(1);
+    if (existing[0]) continue;
+
+    const created = await db
+      .insert(plans)
+      .values({ slug: p.slug, name: p.name, active: true })
+      .returning({ id: plans.id });
+
+    await db.insert(planVersions).values({
+      planId: created[0]!.id,
+      version: 1,
+      priceCents: p.priceCents,
+      currency: "EUR",
+      billingPeriod: p.billingPeriod,
+      trialDays: p.trialDays,
+      limits: p.limits,
+      features: p.features,
+      scope: p.scope,
+      // Điểm mấu chốt: chưa được duyệt bán.
+      approvedForSale: false,
+    });
+  }
+
+  console.log("\nĐã nạp dữ liệu demo.");
+  if (credentials.length > 0) {
+    console.log("\nTài khoản demo (mật khẩu chỉ hiện một lần, không lưu ở đâu cả):");
+    console.log(credentials.join("\n"));
+  }
+  console.log(
+    "\nGói học được nạp với GIÁ THAM KHẢO và approved_for_sale = false.\n" +
+      "Giao diện sẽ dán nhãn đúng như vậy cho tới khi chủ dự án duyệt giá thật.",
+  );
+  process.exit(0);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
