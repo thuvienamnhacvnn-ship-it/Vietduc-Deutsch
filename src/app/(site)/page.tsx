@@ -98,11 +98,11 @@ export default async function HomePage() {
       {/* ------------------------------------------------------ LỚP HỌC AI */}
       <section className="section" id="lop-hoc">
         <div className="wrap">
-          <p className="eyebrow">Lớp học AI hoạt động thế nào</p>
+          <p className="eyebrow">Trong một buổi học</p>
           <h2>Một buổi học đi qua tám bước</h2>
           <p className="lede">
-            Không phải một ô chat. Có giáo viên dẫn, có bảng giảng chạy theo bài, có lượt nói của
-            bạn và có phần sửa lỗi tập trung.
+            Không phải một ô chat. Có người dẫn bài, có bảng giảng chạy theo nội dung đang dạy, có
+            lượt nói của bạn và có phần sửa lỗi tập trung.
           </p>
 
           <ol className="cycle">
@@ -122,22 +122,19 @@ export default async function HomePage() {
       {/* -------------------------------------------------------- GIÁO VIÊN AI */}
       <section className="section" id="doi-ngu" style={{ background: "var(--paper-sunken)" }}>
         <div className="wrap">
-          <p className="eyebrow">Đội ngũ AI</p>
-          <h2>Bảy vai trò, mỗi vai trò có ranh giới rõ</h2>
+          <p className="eyebrow">Đội ngũ</p>
+          <h2>Những người sẽ dạy bạn</h2>
           <p className="lede">
-            Chúng tôi ghi luôn cả những việc mỗi vai trò KHÔNG được làm — vì đó mới là điều đáng
-            biết khi bạn giao việc học của mình cho một hệ thống.
+            Mỗi người một việc, một cách dạy. Chúng tôi ghi luôn cả những việc từng người{" "}
+            <strong>không</strong> được làm — đó mới là điều đáng biết khi bạn giao việc học của
+            mình cho ai đó.
           </p>
 
           <div className="grid grid-3" style={{ marginTop: "var(--s-9)" }}>
             {AGENTS.slice(0, 6).map((a) => (
               <article key={a.key} className="card card--hover">
-                <span className="badge" style={{ borderColor: a.accent, color: a.accent }}>
-                  AI
-                </span>
-                <h3 style={{ marginTop: "var(--s-3)" }}>
-                  {a.name ? `${a.name} — ${a.title}` : a.title}
-                </h3>
+                <h3>{a.name ? `${a.name} — ${a.title}` : a.title}</h3>
+                <p className="persona">{a.persona}</p>
                 <p>{a.does}</p>
                 <p className="limits">
                   <strong>Không làm:</strong> {a.limits}
@@ -148,7 +145,7 @@ export default async function HomePage() {
 
           <p style={{ marginTop: "var(--s-8)" }}>
             <Link href="/giao-vien-ai" className="btn btn--secondary">
-              Xem cả bảy vai trò
+              Xem cả đội ngũ
             </Link>
           </p>
         </div>

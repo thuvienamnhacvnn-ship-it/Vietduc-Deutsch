@@ -6,8 +6,8 @@
 export const brand = {
   name: "Lingora",
   tagline: {
-    vi: "Học tiếng Đức A1–B2 cùng giáo viên AI",
-    de: "Deutsch A1–B2 mit KI-Lehrkräften lernen",
+    vi: "Học tiếng Đức A1–B2 cùng giáo viên đồng hành",
+    de: "Deutsch A1–B2 mit persönlicher Begleitung lernen",
   },
   /**
    * Tiêu đề hero. Ngắn có chủ đích: ở 1440px một câu dài sẽ vỡ thành sáu dòng
@@ -19,8 +19,8 @@ export const brand = {
   },
   /** Câu hứa học tập đầy đủ. Nói được điều gì, không hứa đỗ thi. */
   promise: {
-    vi: "Từ câu chào đầu tiên đến buổi phỏng vấn Ausbildung — bạn nói, giáo viên AI nghe và trả lời.",
-    de: "Vom ersten Gruß bis zum Ausbildungsgespräch — Sie sprechen, die KI-Lehrkraft hört zu und antwortet.",
+    vi: "Từ câu chào đầu tiên đến buổi phỏng vấn Ausbildung — bạn nói, cô Anna nghe và trả lời.",
+    de: "Vom ersten Gruß bis zum Ausbildungsgespräch — Sie sprechen, Anna hört zu und antwortet.",
   },
   email: "hallo@lingora.de",
   /**

@@ -8,8 +8,8 @@ import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
   { href: "/chuong-trinh", label: "Chương trình" },
-  { href: "/lop-hoc-ai", label: "Lớp học AI" },
-  { href: "/giao-vien-ai", label: "Giáo viên AI" },
+  { href: "/lop-hoc-ai", label: "Lớp học" },
+  { href: "/giao-vien-ai", label: "Đội ngũ" },
   { href: "/hoc-phi", label: "Học phí" },
   { href: "/cau-hoi", label: "Câu hỏi" },
 ];

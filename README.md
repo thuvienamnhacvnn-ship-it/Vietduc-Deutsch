@@ -7,7 +7,7 @@ metadata, email và logo.
 
 > **Trạng thái:** giai đoạn 0 và 1 hoàn tất — nền tảng, giao diện, tài khoản và
 > cơ sở dữ liệu chạy thật. Mọi dịch vụ ngoài (Claude, STT, TTS, email, thanh
-> toán) đang chạy adapter **mock có nhãn**. Chưa mở bán, chưa thu tiền.
+> toán, đăng nhập Google) đang chạy adapter **mock có nhãn**. Chưa mở bán, chưa thu tiền.
 > Đọc `PROJECT_STATE.md` và `ACCEPTANCE.md` để biết chính xác cái gì đã chạy.
 
 ## Yêu cầu
@@ -43,7 +43,9 @@ không được lưu trong tệp nào.
 | `npm run db:push` | áp migration SQL trong `drizzle/` |
 | `npm run seed` | nạp dữ liệu demo có nhãn |
 | `npm run logo` | sinh lại bộ nhận diện vào `public/brand/` |
-| `node tests/smoke.mjs` | 37 kiểm tra end-to-end trên server đang chạy |
+| `npm test` | chạy cả hai bộ test end-to-end (server phải đang chạy) |
+| `node tests/smoke.mjs` | 37 kiểm tra nền tảng và phân quyền |
+| `node tests/google.mjs` | 24 kiểm tra luồng đăng nhập Google |
 
 ## Đổi schema
 
@@ -87,8 +89,9 @@ code nào.
 
 ## Nguyên tắc của dự án này
 
-- **AI phải được nhận diện là AI.** Không nhân vật nào giả làm giáo viên người
-  thật.
+- **Nói rõ ai đang dạy.** Anna, Lukas, Mia có tên và tính cách để người học thấy
+  có ai đó đồng hành, nhưng không chỗ nào được để người học hiểu nhầm họ là
+  người thật. Lời khai báo chuẩn ở `AI_DISCLOSURE` (`src/content/agents.ts`).
 - **Thiếu dữ liệu thì nói là thiếu.** Kỹ năng chưa đủ bằng chứng hiển thị là
   chưa đánh giá được, không có điểm suy đoán.
 - **Mock không bao giờ được trình bày như thật.** Adapter mock tự khai và giao

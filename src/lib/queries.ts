@@ -5,10 +5,12 @@ import { getDb } from "@/lib/db";
 import {
   entitlements,
   learnerProfiles,
+  oauthAccounts,
   planVersions,
   plans,
   reviewItems,
   skillScores,
+  users,
   SKILLS,
   type Level,
   type Skill,
@@ -143,6 +145,31 @@ export async function profileFor(userId: number) {
 
   const created = await db.insert(learnerProfiles).values({ userId }).returning();
   return created[0]!;
+}
+
+/**
+ * Cách người học đăng nhập: có mật khẩu không, và đã nối tài khoản Google nào.
+ * Trang hồ sơ cần biết để nói đúng - một tài khoản tạo bằng Google không có mật
+ * khẩu, và bảo họ "đổi mật khẩu" sẽ là hướng dẫn sai.
+ */
+export async function signInMethodsFor(userId: number) {
+  const db = await getDb();
+  const [me] = await db
+    .select({ hasPassword: users.passwordHash })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const linked = await db
+    .select({
+      provider: oauthAccounts.provider,
+      email: oauthAccounts.email,
+      createdAt: oauthAccounts.createdAt,
+    })
+    .from(oauthAccounts)
+    .where(eq(oauthAccounts.userId, userId));
+
+  return { hasPassword: Boolean(me?.hasPassword), linked };
 }
 
 /** Số mục tới hạn ôn hôm nay. */

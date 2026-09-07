@@ -124,7 +124,7 @@ export default async function LearnHome() {
           </div>
           {!voiceReady && (
             <p className="mock-tag" style={{ marginTop: "var(--s-4)" }}>
-              Lớp học giọng nói: chưa kết nối dịch vụ, đang ở chế độ mô phỏng
+              Giọng nói: chưa kết nối dịch vụ, đang ở chế độ mô phỏng
             </p>
           )}
         </section>

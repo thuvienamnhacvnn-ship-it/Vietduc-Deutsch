@@ -56,7 +56,7 @@ export function RegisterForm({ next }: { next: string }) {
         required
         autoComplete="name"
         error={error?.fields?.name}
-        hint="Giáo viên AI sẽ gọi bạn bằng tên này."
+        hint="Anna sẽ gọi bạn bằng tên này trong lớp."
       />
 
       <Field

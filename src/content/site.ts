@@ -26,7 +26,7 @@ export const JOURNEY = [
   {
     n: "04",
     title: "Vào lớp và nói",
-    body: "Buổi học có giáo viên dẫn, bảng giảng chạy theo bài, và bạn nói bằng micro. Gõ chữ cũng được nếu hôm nay bạn không tiện nói.",
+    body: "Anna dẫn buổi học, bảng giảng chạy theo bài, và bạn nói bằng micro. Gõ chữ cũng được nếu hôm nay bạn không tiện nói.",
   },
   {
     n: "05",
@@ -37,8 +37,8 @@ export const JOURNEY = [
 
 export const FAQ = [
   {
-    q: "Giáo viên ở đây là người thật hay AI?",
-    a: "Là AI, và chúng tôi nói rõ điều đó ở mọi chỗ. Anna, Lukas, Mia là các vai trò AI có tên gọi để bạn dễ nhớ ai làm việc gì. Không có buổi học nào do người thật dạy được trình bày như AI, và ngược lại.",
+    q: "Giáo viên ở đây là người thật hay trí tuệ nhân tạo?",
+    a: "Anna, Lukas, Mia và các vai trò khác là giáo viên trí tuệ nhân tạo, không phải người thật. Chúng tôi đặt tên và tính cách cho họ để bạn dễ nhớ ai làm việc gì và để buổi học có người đồng hành, chứ không phải để bạn tưởng đó là người. Trong lớp luôn có dòng nhắc điều này.",
   },
   {
     q: "Học xong có chứng chỉ không?",
@@ -65,8 +65,8 @@ export const FAQ = [
 /** Điều thẳng thắn về giới hạn - đặt ngay trên trang chủ, không giấu trong FAQ. */
 export const HONESTY = [
   {
-    title: "AI, và nói rõ là AI",
-    body: "Không có nhân vật nào giả làm giáo viên người thật. Trong lớp luôn có dòng nhắc bạn đang học với giáo viên AI.",
+    title: "Nói rõ ai đang dạy bạn",
+    body: "Anna, Lukas và Mia là giáo viên trí tuệ nhân tạo. Họ có tên và tính cách để đồng hành cùng bạn, nhưng chúng tôi không bao giờ để bạn hiểu nhầm đó là người thật.",
   },
   {
     title: "Không cam kết đỗ thi",

@@ -17,8 +17,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div>
           <h2 style={{ fontSize: "var(--fs-2xl)", maxWidth: "16ch" }}>{brand.headline.vi}</h2>
           <p className="lede">
-            Bốn kỹ năng được kiểm riêng, lộ trình dựng từ kết quả thật, và mọi giáo viên ở đây đều
-            là AI — chúng tôi nói rõ điều đó ở mọi màn hình.
+            Bốn kỹ năng được kiểm riêng, lộ trình dựng từ kết quả thật của bạn, và một người đồng
+            hành nhớ hôm trước bạn học tới đâu.
           </p>
         </div>
         <p style={{ fontSize: "var(--fs-sm)", color: "var(--on-band-muted)", marginBottom: 0 }}>

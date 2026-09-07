@@ -7,6 +7,11 @@
  * diện (yêu cầu AUTH trong ACCEPTANCE.md).
  *
  *   node tests/smoke.mjs [baseUrl]
+ *
+ * LƯU Ý: chạy tệp này ngay sau tests/google.mjs có thể chạm trần rate limit của
+ * /api/auth/dang-ky (5 lần trong 10 phút cho mỗi IP) và làm một kiểm tra báo
+ * FAIL. Đó là rate limit hoạt động đúng, không phải hỏng. Chờ vài phút hoặc
+ * chạy hai tệp cách nhau.
  */
 
 const BASE = process.argv[2] ?? process.env.LINGORA_APP_URL ?? "http://localhost:3055";

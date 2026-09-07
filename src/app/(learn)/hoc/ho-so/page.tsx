@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth/guard";
-import { profileFor } from "@/lib/queries";
+import { profileFor, signInMethodsFor } from "@/lib/queries";
 import { ProfileForm } from "@/components/ProfileForm";
 
 export const metadata: Metadata = { title: "Hồ sơ học viên" };
 
 export default async function ProfilePage() {
   const user = await requireUser("/hoc/ho-so");
-  const profile = await profileFor(user.id);
+  const [profile, signIn] = await Promise.all([
+    profileFor(user.id),
+    signInMethodsFor(user.id),
+  ]);
 
   return (
     <>
@@ -32,6 +35,7 @@ export default async function ProfilePage() {
           }}
           email={user.email}
           name={user.name}
+          signIn={signIn}
         />
       </div>
     </>

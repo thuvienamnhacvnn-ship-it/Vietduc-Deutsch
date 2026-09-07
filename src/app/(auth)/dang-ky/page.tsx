@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { getSessionUser } from "@/lib/auth/session";
 
@@ -23,6 +24,8 @@ export default async function RegisterPage({
         Miễn phí. Sau khi tạo tài khoản bạn làm bài kiểm tra bốn kỹ năng để hệ thống biết bắt đầu từ
         đâu.
       </p>
+
+      <GoogleButton next={next} />
 
       <RegisterForm next={next} />
 

@@ -151,7 +151,7 @@ export const CURRICULUM: LevelPlan[] = [
   },
 ];
 
-/** Chu trình dạy trong một buổi học - dùng ở trang "Lớp học AI hoạt động thế nào". */
+/** Chu trình dạy trong một buổi học - dùng ở trang "Lớp học hoạt động thế nào". */
 export const TEACHING_CYCLE = [
   {
     step: "Gợi nhớ",

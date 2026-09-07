@@ -17,8 +17,8 @@ export function HeroArt() {
       >
         <title id="hero-art-title">Một lượt hội thoại trong lớp học Lingora</title>
         <desc id="hero-art-desc">
-          Giáo viên AI hỏi &quot;Wo wohnst du?&quot;, học viên trả lời &quot;Ich wohne in
-          Berlin&quot;, kèm gợi ý ngữ pháp và thanh trạng thái micro.
+          Cô Anna hỏi &quot;Wo wohnst du?&quot;, học viên trả lời &quot;Ich wohne in Berlin&quot;,
+          kèm gợi ý ngữ pháp và thanh trạng thái micro.
         </desc>
 
         {/* nền mềm */}
@@ -48,7 +48,7 @@ export function HeroArt() {
           />
         </g>
         <text x="122" y="72" fontSize="13" fontWeight="650" fill="var(--muted)">
-          Anna · giáo viên AI
+          Anna · giáo viên chính
         </text>
 
         {/* bong bóng của giáo viên */}
@@ -115,8 +115,7 @@ export function HeroArt() {
       </svg>
 
       <p className="hero-art__note">
-        <span className="badge badge--lime">AI</span> Mọi giáo viên ở đây là AI. Giao diện luôn nói
-        rõ điều đó.
+        Anna nhớ hôm trước bạn học tới đâu, và bắt đầu buổi mới từ chính chỗ đó.
       </p>
     </div>
   );

@@ -51,7 +51,12 @@ export const users = pgTable(
     /** Luôn lưu ở dạng viết thường; so sánh khi đăng nhập cũng viết thường. */
     email: varchar("email", { length: 255 }).notNull(),
     name: varchar("name", { length: 120 }).notNull(),
-    passwordHash: text("password_hash").notNull(),
+    /**
+     * NULL với tài khoản chỉ đăng nhập bằng nhà cung cấp ngoài (Google). Những
+     * tài khoản đó không có mật khẩu để so khớp, và luồng đăng nhập bằng mật
+     * khẩu phải từ chối họ chứ không được so với chuỗi rỗng.
+     */
+    passwordHash: text("password_hash"),
     role: varchar("role", { length: 20 }).$type<Role>().notNull().default("learner"),
     emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
     status: varchar("status", { length: 20 }).notNull().default("active"),
@@ -107,10 +112,45 @@ export const consents = pgTable(
       .notNull(),
     granted: boolean("granted").notNull(),
     documentVersion: varchar("document_version", { length: 20 }).notNull(),
+    /**
+     * Người dùng đồng ý bằng cách nào: tick ô trong biểu mẫu đăng ký, hay bấm
+     * nút "Tiếp tục với Google" ngay dưới dòng thông báo điều khoản. Hai cách
+     * này có sức nặng khác nhau khi rà soát, nên phải phân biệt được về sau chứ
+     * không gộp làm một.
+     */
+    method: varchar("method", { length: 30 })
+      .$type<"form_checkbox" | "oauth_notice">()
+      .notNull()
+      .default("form_checkbox"),
     grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
     ip: varchar("ip", { length: 60 }),
   },
   (t) => [index("consents_user_idx").on(t.userId, t.kind)],
+);
+
+/**
+ * Liên kết tài khoản với nhà cung cấp đăng nhập ngoài.
+ *
+ * Khóa nhận dạng là `provider_account_id` (trường `sub` của Google), KHÔNG phải
+ * email: người dùng đổi được địa chỉ Gmail, còn `sub` thì không đổi. Dùng email
+ * làm khóa sẽ khiến một tài khoản đổi tên miền biến thành hai người khác nhau.
+ */
+export const oauthAccounts = pgTable(
+  "oauth_accounts",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 30 }).$type<"google">().notNull(),
+    providerAccountId: varchar("provider_account_id", { length: 190 }).notNull(),
+    /** Email lúc liên kết, chỉ để hiển thị và đối soát. Không dùng để đăng nhập. */
+    email: varchar("email", { length: 255 }).notNull(),
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+    createdAt: now(),
+  },
+  (t) => [
+    uniqueIndex("oauth_accounts_provider_uq").on(t.provider, t.providerAccountId),
+    index("oauth_accounts_user_idx").on(t.userId),
+  ],
 );
 
 export const learnerProfiles = pgTable(

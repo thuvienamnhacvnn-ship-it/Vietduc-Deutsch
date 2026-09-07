@@ -15,7 +15,7 @@ export function SiteFooter() {
             <Logo />
           </span>
           <p className="lede" style={{ marginTop: "var(--s-4)", fontSize: "var(--fs-md)" }}>
-            {brand.tagline.vi}. Giảng dạy bởi giáo viên AI.
+            {brand.tagline.vi}.
           </p>
         </div>
 
@@ -23,8 +23,8 @@ export function SiteFooter() {
           <div>
             <h3 className="site-footer__h">Học</h3>
             <Link href="/chuong-trinh">Chương trình A1–B2</Link>
-            <Link href="/lop-hoc-ai">Lớp học AI</Link>
-            <Link href="/giao-vien-ai">Đội ngũ AI</Link>
+            <Link href="/lop-hoc-ai">Lớp học</Link>
+            <Link href="/giao-vien-ai">Đội ngũ giảng dạy</Link>
             <Link href="/hoc-phi">Học phí</Link>
           </div>
           <div>

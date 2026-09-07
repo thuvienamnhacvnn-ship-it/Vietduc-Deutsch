@@ -21,7 +21,17 @@ export const config = {
  * Chế độ thật của từng adapter. Giao diện đọc hàm này để dán nhãn; báo cáo
  * nghiệm thu đọc nó để phân biệt PASS với BLOCKED.
  */
-export function adapterMode(service: "llm" | "stt" | "tts" | "avatar" | "mail" | "payments" | "storage"): AdapterMode {
+export function adapterMode(
+  service:
+    | "llm"
+    | "stt"
+    | "tts"
+    | "avatar"
+    | "mail"
+    | "payments"
+    | "storage"
+    | "oauth_google",
+): AdapterMode {
   switch (service) {
     case "llm":
       return has("ANTHROPIC_API_KEY") ? "live" : "mock";
@@ -38,6 +48,8 @@ export function adapterMode(service: "llm" | "stt" | "tts" | "avatar" | "mail" |
       return has("PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET", "PAYPAL_WEBHOOK_ID") ? "live" : "mock";
     case "storage":
       return process.env.LINGORA_STORAGE_DRIVER === "s3" && has("LINGORA_S3_BUCKET") ? "live" : "mock";
+    case "oauth_google":
+      return has("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET") ? "live" : "mock";
   }
 }
 
@@ -51,5 +63,6 @@ export function adapterStatus() {
     mail: adapterMode("mail"),
     payments: adapterMode("payments"),
     storage: adapterMode("storage"),
+    oauth_google: adapterMode("oauth_google"),
   };
 }

@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TEACHING_CYCLE } from "@/content/curriculum";
 import { adapterStatus } from "@/lib/config";
+import { AI_DISCLOSURE } from "@/content/agents";
 
 export const metadata: Metadata = {
-  title: "Lớp học AI hoạt động thế nào",
+  title: "Lớp học hoạt động thế nào",
   description:
-    "Một buổi học Lingora: giáo viên AI dẫn bài, bảng giảng chạy theo bài, bạn nói bằng micro hoặc gõ chữ.",
+    "Một buổi học Lingora: Anna dẫn bài, bảng giảng chạy theo nội dung, bạn nói bằng micro hoặc gõ chữ.",
 };
 
 const IN_CLASS = [
@@ -44,11 +45,11 @@ export default function AiClassPage() {
     <>
       <section className="section" style={{ paddingBottom: "var(--s-8)" }}>
         <div className="wrap">
-          <p className="eyebrow">Lớp học AI</p>
+          <p className="eyebrow">Lớp học</p>
           <h1>Lớp học, không phải một ô chat</h1>
           <p className="lede">
-            Có giáo viên dẫn bài, có bảng giảng đồng bộ với nội dung đang dạy, có lượt nói của bạn
-            và có phần sửa lỗi tập trung vào một hai điểm mỗi lần.
+            Anna dẫn bài, bảng giảng chạy đồng bộ với nội dung đang dạy, bạn nói bằng micro, và
+            phần sửa lỗi tập trung vào một hai điểm mỗi lần thay vì bắt bẻ liên tục.
           </p>
 
           {!voiceReady && (
@@ -66,6 +67,12 @@ export default function AiClassPage() {
 
       <section className="section" style={{ background: "var(--paper-sunken)", paddingTop: "var(--s-9)" }}>
         <div className="wrap">
+          <div className="alert alert--info" style={{ maxWidth: "72ch" }} role="note">
+            <p style={{ marginBottom: 0 }}>
+              {AI_DISCLOSURE} Dòng nhắc này cũng xuất hiện ngay khi bạn bước vào lớp.
+            </p>
+          </div>
+
           <h2>Tám bước của một buổi học</h2>
           <ol className="cycle">
             {TEACHING_CYCLE.map((s, i) => (
@@ -104,7 +111,7 @@ export default function AiClassPage() {
           <p className="lede">
             Micro ghi âm, hệ thống phát hiện khi bạn nói xong, chuyển giọng thành chữ, đưa vào mô
             hình cùng ngữ cảnh bài học, nhận câu trả lời theo dòng, đọc thành tiếng, rồi hiện phụ
-            đề và đổi trạng thái avatar.
+            đề và đổi trạng thái chân dung giáo viên.
           </p>
           <p className="lede">
             Mỗi khâu là một dịch vụ riêng. Chúng tôi không nói mô hình ngôn ngữ tự lo hết — nó chỉ
@@ -117,7 +124,7 @@ export default function AiClassPage() {
           </p>
           <p style={{ marginTop: "var(--s-7)" }}>
             <Link href="/giao-vien-ai" className="btn btn--secondary">
-              Xem đội ngũ AI
+              Xem đội ngũ giảng dạy
             </Link>
           </p>
         </div>

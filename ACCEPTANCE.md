@@ -16,10 +16,15 @@ npx drizzle-kit generate     # đã có sẵn drizzle/0000_*.sql, chỉ chạy k
 npm run db:push
 npm run seed
 npm run dev                  # cửa sổ khác
-node tests/smoke.mjs         # 37 kiểm tra
+node tests/smoke.mjs         # 37 kiểm tra nền tảng và phân quyền
+node tests/google.mjs        # 24 kiểm tra luồng đăng nhập Google
 ```
 
-Kết quả lần chạy gần nhất: **37 PASS, 0 FAIL**.
+Kết quả lần chạy gần nhất: **37 PASS** (smoke) và **24 PASS** (google), 0 FAIL.
+
+Lưu ý: chạy hai tệp test liền nhau có thể chạm trần rate limit đăng ký
+(5 lần/10 phút/IP) và làm một kiểm tra báo FAIL. Đó là rate limit hoạt động
+đúng; chờ vài phút rồi chạy lại.
 
 ## AUTH — tài khoản và phân quyền
 
@@ -41,7 +46,31 @@ Kết quả lần chạy gần nhất: **37 PASS, 0 FAIL**.
 | AUTH-14 | Token đặt lại/xác minh giả bị từ chối | smoke hai mục "token ... giả bị từ chối" | PASS |
 | AUTH-15 | Xác minh email qua liên kết thật | Adapter mail đang ở chế độ mock: liên kết ghi vào `data/outbox/`. Luồng chạy đủ, nhưng chưa có email thật nào được gửi | MOCK PASS |
 | AUTH-16 | Đổi mật khẩu thu hồi mọi phiên khác | code: `api/auth/dat-lai-mat-khau` revoke toàn bộ `sessions` của user. Chưa có test tự động | NOT STARTED |
-| AUTH-17 | Rate limit auth | Cài đặt trong `lib/rate-limit.ts`, đang giữ trong bộ nhớ tiến trình. Chưa đo bằng test | NOT STARTED |
+| AUTH-17 | Rate limit auth | Cài đặt trong `lib/rate-limit.ts`, đang giữ trong bộ nhớ tiến trình. Chưa đo bằng test riêng, nhưng đã quan sát được khi chạy hai bộ test liền nhau | NOT STARTED |
+
+## GOOGLE — đăng nhập nhanh bằng tài khoản Google
+
+Toàn bộ chạy qua **bản mô phỏng có nhãn** (chưa có khóa OAuth), nhưng đi đúng
+đường thật: cùng cookie state, cùng route callback, cùng code tạo tài khoản và
+tạo phiên. Chỉ khác một chỗ là màn hình chọn tài khoản.
+
+| ID | Kiểm tra | Cách kiểm | Trạng thái |
+|---|---|---|---|
+| GG-01 | Bước 1 chuyển hướng và đặt cookie state | `tests/google.mjs` "GET /api/auth/google chuyển hướng", "có đặt cookie state" | MOCK PASS |
+| GG-02 | `tiep` trỏ ra tên miền ngoài không được chấp nhận (chống open redirect) | google.mjs "tham số tiep trỏ ra ngoài" | PASS |
+| GG-03 | Đăng ký một chạm: tạo user + hồ sơ + consent + phiên | google.mjs "callback chuyển về khu học", "có phiên đăng nhập ngay sau đó" | MOCK PASS |
+| GG-04 | Đăng nhập lại cùng tài khoản Google không tạo tài khoản thứ hai | google.mjs "cùng email Google thì vào đúng tài khoản cũ" | MOCK PASS |
+| GG-05 | Tài khoản tạo bằng Google không đăng nhập được bằng mật khẩu | google.mjs "không đăng nhập bằng mật khẩu được" | PASS |
+| GG-06 | Nối Google vào tài khoản email đã có, mật khẩu cũ vẫn dùng được | google.mjs hai mục "nối vào đúng tài khoản đó" và "mật khẩu cũ vẫn dùng được" | MOCK PASS |
+| GG-07 | **State không khớp thì bị chặn** (CSRF) | google.mjs "state không khớp thì bị chặn" | PASS |
+| GG-08 | Callback không có cookie thì bị từ chối | google.mjs "callback không có cookie" | PASS |
+| GG-09 | **Cookie state dùng một lần**, phát lại bị từ chối | google.mjs "dùng lại cùng cookie state lần hai" | PASS |
+| GG-10 | Người dùng bấm Hủy ở Google thì báo đúng lý do | google.mjs "bấm Hủy ở Google" | PASS |
+| GG-11 | Màn hình mô phỏng tự khai không phải Google, và 404 khi thiếu state | google.mjs hai mục cuối | PASS |
+| GG-12 | Giao diện có nút Google và nhãn "bản mô phỏng" | google.mjs mục "Giao diện" | PASS |
+| GG-13 | PKCE (S256) gửi đúng lên Google | Code có, nhưng chỉ kiểm được khi có khóa thật — bản mô phỏng không kiểm `code_verifier` | BLOCKED |
+| GG-14 | Kiểm `iss`, `aud`, `exp`, `nonce`, `email_verified` của id_token | Code có trong `verifyIdToken`. Chỉ chạy ở chế độ live | BLOCKED |
+| GG-15 | Nút Google bị vô hiệu ở production khi thiếu khóa | Logic trong `mockEnabled()`. Chưa kiểm trên môi trường production thật | NOT STARTED |
 
 ## DATA — dữ liệu và hồ sơ
 
@@ -86,7 +115,7 @@ Kết quả lần chạy gần nhất: **37 PASS, 0 FAIL**.
 ## Ghi chú trung thực
 
 - **Không có dịch vụ ngoài nào đang kết nối.** LLM, STT, TTS, avatar, email,
-  thanh toán và lưu trữ đều chạy adapter mock. `/api/suc-khoe` và trang
+  thanh toán, lưu trữ và đăng nhập Google đều chạy adapter mock. `/api/suc-khoe` và trang
   `/quan-tri` in ra đúng trạng thái này; giao diện dán nhãn ở mọi chỗ liên quan.
 - **Chưa có bài học nào được xuất bản**, nên chưa thể nghiệm thu bất kỳ mục nào
   thuộc nhóm LEARN.

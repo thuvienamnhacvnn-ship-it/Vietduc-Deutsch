@@ -27,6 +27,8 @@ Trạng thái: `DONE` (đã chạy thật) · `MOCK` (chạy bằng mock/sandbox
 | ID | Yêu cầu | GĐ | Trạng thái |
 |---|---|---|---|
 | B-01 | Đăng ký + xác minh email + đăng nhập + quên mật khẩu + đăng xuất | 1 | DONE |
+| B-09 | Đăng nhập nhanh bằng Google (OAuth 2.0 + PKCE), một chạm với Gmail đang đăng nhập sẵn | 1 | MOCK |
+| B-10 | Nối tài khoản Google vào tài khoản email đã có; tài khoản tạo bằng Google không có mật khẩu | 1 | DONE |
 | B-02 | Quản lý phiên (cookie httpOnly, hết hạn, thu hồi) | 1 | DONE |
 | B-03 | Vai trò: learner, editor, support, admin | 1 | DONE |
 | B-04 | Learner profile: mục tiêu, múi giờ, sở thích học, accessibility, lịch khả dụng | 1 | DONE |

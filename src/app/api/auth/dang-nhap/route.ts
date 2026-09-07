@@ -45,13 +45,14 @@ export async function POST(request: Request) {
     .limit(1);
 
   const user = rows[0];
-  // So khớp cả khi không tìm thấy tài khoản, để thời gian phản hồi không tiết lộ
-  // email nào tồn tại.
-  const ok = user
+  // So khớp cả khi không tìm thấy tài khoản HOẶC tài khoản không có mật khẩu
+  // (chỉ đăng nhập bằng Google), để thời gian phản hồi không tiết lộ email nào
+  // tồn tại và tài khoản nào dùng cách đăng nhập gì.
+  const ok = user?.passwordHash
     ? await verifyPassword(password, user.passwordHash)
     : await verifyPassword(password, "scrypt$00$00");
 
-  if (!user || !ok || user.status !== "active") {
+  if (!user || !user.passwordHash || !ok || user.status !== "active") {
     await audit({ action: "auth.login_failed", entity: "users", entityId: email, ip, actorKind: "system" });
     return Response.json(
       { error: { code: "invalid_credentials", message: "Email hoặc mật khẩu không đúng." } },

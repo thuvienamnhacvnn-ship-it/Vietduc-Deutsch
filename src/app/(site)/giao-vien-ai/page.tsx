@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { AGENTS, MEMORY_NOTE } from "@/content/agents";
+import { AGENTS, AI_DISCLOSURE, MEMORY_NOTE } from "@/content/agents";
 
 export const metadata: Metadata = {
-  title: "Giáo viên AI",
+  title: "Đội ngũ giảng dạy",
   description:
-    "Bảy vai trò AI của Lingora: mỗi vai trò làm gì, không được làm gì, và đọc được dữ liệu nào của bạn.",
+    "Bảy vai trò của Lingora: ai dạy gì, không được làm gì, và đọc được dữ liệu nào của bạn.",
 };
 
 export default function AgentsPage() {
@@ -13,12 +13,17 @@ export default function AgentsPage() {
       <section className="section" style={{ paddingBottom: "var(--s-8)" }}>
         <div className="wrap">
           <p className="eyebrow">Đội ngũ</p>
-          <h1>Bảy vai trò AI, và ranh giới của từng vai trò</h1>
+          <h1>Ai sẽ dạy bạn, và ranh giới của từng người</h1>
           <p className="lede">
-            Tất cả đều là AI. Chúng tôi đặt tên cho vài vai trò để bạn dễ nhớ ai làm việc gì, không
-            phải để chúng trông giống người thật. Mỗi thẻ dưới đây ghi cả việc vai trò đó không
-            được phép làm — đó là phần thường bị giấu đi.
+            Mỗi người một việc và một cách dạy. Mỗi thẻ dưới đây ghi cả việc người đó{" "}
+            <strong>không</strong> được phép làm — phần thường bị giấu đi, và cũng là phần đáng đọc
+            nhất.
           </p>
+
+          <div className="alert alert--info" style={{ maxWidth: "72ch" }} role="note">
+            <p style={{ marginBottom: 0 }}>{AI_DISCLOSURE} Chúng tôi đặt tên và tính cách cho họ
+            để buổi học có người đồng hành, không phải để bạn hiểu nhầm.</p>
+          </div>
         </div>
       </section>
 
@@ -38,13 +43,11 @@ export default function AgentsPage() {
                   <h2 style={{ fontSize: "var(--fs-lg)", marginBottom: 2 }}>
                     {a.name ?? a.title}
                   </h2>
-                  <p className="agent-card__role">{a.name ? a.title : "Vai trò hệ thống"}</p>
+                  <p className="agent-card__role">{a.name ? a.title : "Vai trò hậu trường"}</p>
                 </div>
-                <span className="badge badge--info" style={{ marginLeft: "auto" }}>
-                  AI
-                </span>
               </div>
 
+              <p className="persona">{a.persona}</p>
               <p>{a.does}</p>
 
               <p className="limits">

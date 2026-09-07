@@ -3,7 +3,7 @@ import { FAQ } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "Câu hỏi thường gặp",
-  description: "Giáo viên AI, chứng chỉ, thời gian học, micro và dữ liệu cá nhân.",
+  description: "Ai dạy bạn, chứng chỉ, thời gian học, micro và dữ liệu cá nhân.",
 };
 
 export default function FaqPage() {

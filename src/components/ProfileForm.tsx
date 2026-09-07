@@ -42,14 +42,21 @@ const ACCESSIBILITY = [
 /** Múi giờ hay dùng. Trình bày ngắn gọn thay vì danh sách 400 dòng của IANA. */
 const TIMEZONES = ["Europe/Berlin", "Asia/Ho_Chi_Minh", "Europe/Prague", "Europe/Warsaw", "UTC"];
 
+export type SignInMethods = {
+  hasPassword: boolean;
+  linked: { provider: string; email: string; createdAt: string | Date }[];
+};
+
 export function ProfileForm({
   initial,
   email,
   name,
+  signIn,
 }: {
   initial: ProfileValues;
   email: string;
   name: string;
+  signIn: SignInMethods;
 }) {
   const [values, setValues] = useState<ProfileValues>(initial);
   const [busy, setBusy] = useState(false);
@@ -106,9 +113,26 @@ export function ProfileForm({
 
       <div className="card card--flat" style={{ marginBottom: "var(--s-7)" }}>
         <h2 style={{ fontSize: "var(--fs-md)" }}>Tài khoản</h2>
-        <p style={{ color: "var(--muted)", fontSize: "var(--fs-sm)", marginBottom: 0 }}>
+        <p style={{ color: "var(--muted)", fontSize: "var(--fs-sm)" }}>
           {name} · {email}
         </p>
+
+        <h3 style={{ fontSize: "var(--fs-sm)", marginBottom: "var(--s-2)" }}>Cách bạn đăng nhập</h3>
+        <ul className="tick" style={{ marginBottom: 0 }}>
+          {signIn.linked.map((account) => (
+            <li key={account.provider}>
+              Google — {account.email}
+            </li>
+          ))}
+          {signIn.hasPassword ? (
+            <li>Email và mật khẩu</li>
+          ) : (
+            <li>
+              Chưa đặt mật khẩu. Muốn đăng nhập được cả bằng mật khẩu thì dùng{" "}
+              <a href="/quen-mat-khau">Quên mật khẩu</a> để đặt một mật khẩu mới cho tài khoản này.
+            </li>
+          )}
+        </ul>
       </div>
 
       <Field label="Bạn học tiếng Đức để làm gì?" name="goal">

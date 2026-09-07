@@ -56,6 +56,38 @@ Trạng thái hôm nay: **toàn bộ đang ở `mock`**. Chưa có khóa dịch 
 - Cần từ chủ dự án: pháp nhân, tài khoản nhận tiền, thông tin thuế, chính sách
   hủy và hoàn tiền đã được duyệt.
 
+## Đăng nhập bằng Google
+
+- Adapter: `src/lib/adapters/oauth-google.ts`
+- Biến: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- Luồng: Authorization Code + PKCE, chuyển hướng phía server. `client_secret`
+  không bao giờ ra tới trình duyệt và không phải nạp script của Google vào trang.
+- Người dùng đã đăng nhập Gmail sẵn thì Google tự chọn tài khoản đó và quay về
+  gần như tức thì. Cố ý không đặt `prompt=select_account` vì nó sẽ ép thêm một
+  bước chọn cho người chỉ có một tài khoản.
+- Chỉ chấp nhận tài khoản có `email_verified = true`. Email chưa được Google xác
+  minh không đủ để nối vào một tài khoản có sẵn.
+- Danh tính là trường `sub` của Google, không phải email: người dùng đổi được
+  địa chỉ Gmail, còn `sub` thì không.
+
+**Khi chưa có khóa:** ở máy phát triển, luồng chạy bằng màn hình mô phỏng nội bộ
+tại `/dang-nhap/google-mo-phong` — nó tự khai "Đây không phải Google" ngay trên
+đầu trang và không giống giao diện của Google. Ở production thì màn hình đó trả
+404 và nút Google bị vô hiệu kèm lý do. Không có màn hình giả nào chạy ở
+production, dù chỉ là nội bộ.
+
+**Các bước kích hoạt:**
+
+1. Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID,
+   loại **Web application**.
+2. Authorized redirect URIs: thêm `https://<tên miền>/api/auth/google/callback`
+   (và `http://localhost:3055/api/auth/google/callback` nếu muốn thử ở máy).
+3. Màn hình OAuth consent: điền tên ứng dụng, logo, liên kết Điều khoản và Riêng
+   tư. Scope chỉ cần `openid`, `email`, `profile` — đây là nhóm không cần Google
+   thẩm định, nên không phải chờ duyệt.
+4. Đặt `GOOGLE_CLIENT_ID` và `GOOGLE_CLIENT_SECRET` vào môi trường triển khai.
+5. Kiểm `GET /api/suc-khoe`: `adapters.oauth_google` phải chuyển thành `live`.
+
 ## Email giao dịch
 
 - Adapter: `src/lib/adapters/mail.ts`

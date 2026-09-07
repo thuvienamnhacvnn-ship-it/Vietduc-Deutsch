@@ -1467,3 +1467,63 @@ table.data tr:last-child td {
     display: none;
   }
 }
+
+/* ==================================================== ĐĂNG NHẬP NHÀ CUNG CẤP */
+
+.oauth-block {
+  margin-bottom: var(--s-6);
+}
+
+.oauth-btn {
+  gap: var(--s-3);
+  font-weight: 600;
+}
+
+.oauth-block__note,
+.oauth-block__hint {
+  margin: var(--s-3) 0 0;
+  font-size: var(--fs-xs);
+}
+
+.oauth-block__hint {
+  color: var(--muted);
+}
+
+.oauth-block__terms {
+  margin: var(--s-4) 0 0;
+  font-size: var(--fs-xs);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Dải "hoặc" ngăn giữa hai cách đăng nhập. */
+.oauth-block__or {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin-top: var(--s-7);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.oauth-block__or::before,
+.oauth-block__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Một câu về tính cách giáo viên, đặt ngay dưới tên. In nghiêng nhẹ để tách khỏi
+   phần mô tả công việc bên dưới mà không cần thêm tiêu đề. */
+.persona {
+  font-style: italic;
+  color: var(--forest);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  margin-bottom: var(--s-3);
+}
+
+.band .persona {
+  color: var(--lime);
+}

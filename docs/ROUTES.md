@@ -14,7 +14,8 @@ admin/editor/support. Trạng thái: `[x]` đã dựng - `[ ]` giai đoạn sau.
 | `/hoc-phi` | pub | Gói học; giá đọc từ `plan_versions` | [x] |
 | `/cau-hoi` | pub | FAQ | [x] |
 | `/dieu-khoan`, `/rieng-tu` | pub | Pháp lý - chờ người chịu trách nhiệm duyệt trước khi mở bán | [x] |
-| `/dang-ky`, `/dang-nhap`, `/quen-mat-khau`, `/dat-lai-mat-khau`, `/xac-minh` | pub | Auth | [x] |
+| `/dang-ky`, `/dang-nhap`, `/quen-mat-khau`, `/dat-lai-mat-khau`, `/xac-minh` | pub | Auth, kèm nút "Tiếp tục với Google" | [x] |
+| `/dang-nhap/google-mo-phong` | pub (chỉ dev) | Màn hình chọn tài khoản mô phỏng khi chưa có khóa Google; 404 ở production | [x] |
 | `/hoc` | auth | Dashboard: bài kế tiếp, tiến độ 4 kỹ năng, lịch, bài cần ôn, trạng thái gói | [x] |
 | `/hoc/ho-so` | auth | Hồ sơ học viên, mục tiêu, múi giờ, accessibility | [x] |
 | `/hoc/xep-lop` | auth | Kiểm tra xếp lớp 4 kỹ năng | [ ] GĐ2 |
@@ -40,6 +41,9 @@ bằng Zod. Rate limit tính theo IP và theo tài khoản.
 | POST | `/api/auth/dang-ky` | pub | `{email, password, name, acceptTerms, marketingContact?}` | `{ok, needsVerification}` | 5/10ph/IP | [x] |
 | POST | `/api/auth/dang-nhap` | pub | `{email, password}` | `{ok, role}` | 10/10ph/IP | [x] |
 | POST | `/api/auth/dang-xuat` | auth | - | `{ok}` | - | [x] |
+| GET | `/api/auth/google` | pub | `?tiep=<đường dẫn nội bộ>` | 302 sang Google, đặt cookie state + PKCE | 20/10ph/IP | [x] |
+| GET | `/api/auth/google/callback` | pub | `?code&state` từ Google | 302 vào `tiep`, hoặc `/dang-nhap?loi=...` | 20/10ph/IP | [x] |
+| POST | `/api/auth/google/mo-phong` | pub (chỉ dev) | `{email, name, state}` | 303 sang callback. 404 ở production | - | [x] |
 | POST | `/api/auth/xac-minh` | pub | `{token}` | `{ok}` | 10/10ph/IP | [x] |
 | POST | `/api/auth/gui-lai-xac-minh` | pub | `{email}` | `{ok}` luôn ok, không lộ email có tồn tại | 3/10ph/IP | [x] |
 | POST | `/api/auth/quen-mat-khau` | pub | `{email}` | `{ok}` luôn ok | 3/10ph/IP | [x] |

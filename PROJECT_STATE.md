@@ -13,18 +13,23 @@ Luôn kiểm tra code hiện tại trước khi kết luận điều gì đã c�
   `drizzle/0000_married_stature.sql`, áp bằng `npm run db:push`.
 - Đăng ký, xác minh email, đăng nhập, quên mật khẩu, đặt lại mật khẩu, đăng
   xuất, quản lý phiên.
+- **Đăng nhập nhanh bằng Google** (OAuth 2.0 Authorization Code + PKCE): một
+  chạm với tài khoản Gmail đang đăng nhập sẵn, tự nối vào tài khoản email đã có,
+  tài khoản tạo bằng Google không có mật khẩu. Chạy bằng adapter mô phỏng có
+  nhãn cho tới khi có khóa OAuth.
 - Bốn vai trò: learner, editor, support, admin. Phân quyền kiểm ở server cho cả
   trang lẫn API.
 - Hồ sơ học viên đọc/ghi được, kèm audit log.
 - Trang giới thiệu đủ khối, ba trang nội dung, hai trang pháp lý (bản nháp có
   nhãn), khu học viên, cổng quản trị.
 - Hệ thiết kế token, logo sinh bằng script, hai chủ đề sáng/tối.
-- 37 kiểm tra end-to-end trong `tests/smoke.mjs`, tất cả PASS.
+- 37 kiểm tra end-to-end trong `tests/smoke.mjs` và 24 kiểm tra luồng Google
+  trong `tests/google.mjs`, tất cả PASS.
 
 ## Đang chạy bằng mock có nhãn
 
 Toàn bộ adapter dịch vụ ngoài: LLM, STT, TTS, avatar, email, thanh toán, lưu
-trữ. Chúng khai `mode: "mock"` và giao diện hiển thị nhãn đó. Chi tiết và các
+trữ, đăng nhập Google. Chúng khai `mode: "mock"` và giao diện hiển thị nhãn đó. Chi tiết và các
 bước kích hoạt: `docs/INTEGRATIONS.md`.
 
 ## Chưa làm
@@ -55,6 +60,20 @@ Bản đồ chi tiết theo ID nằm trong `REQUIREMENTS.md`.
    tràn ngang ở 390px. Giờ chỉ áp cho nút trong thanh điều hướng.
 5. **Emoji trong heredoc của shell trên máy này làm vỡ lệnh** — viết tài liệu
    bằng ký tự thường.
+6. **Hai bộ test dùng chung hạn mức rate limit theo IP.** Chạy `tests/google.mjs`
+   rồi `tests/smoke.mjs` ngay sau đó có thể làm một kiểm tra đăng ký báo FAIL.
+   Đó là rate limit chạy đúng, không phải hỏng.
+
+## Quy tắc nội dung: nói rõ ai đang dạy
+
+Anna, Lukas, Mia được viết như nhân vật có tính cách, vì bản giao việc yêu cầu
+"tạo cảm giác có giáo viên đang đồng hành". Nhưng không chỗ nào được nói hay ám
+chỉ họ là người thật.
+
+Lời khai báo chuẩn nằm ở `AI_DISCLOSURE` trong `src/content/agents.ts` và xuất
+hiện ở đúng ba nơi: trang đội ngũ, trang lớp học, và FAQ cùng điều khoản. Trước
+đây nhãn "AI" bị dán lên mọi thẻ và mọi khối, làm giao diện lạnh như bảng thông
+báo mà không làm sự thật rõ hơn.
 
 ## Bước tiếp theo (giai đoạn 2)
 
@@ -72,6 +91,7 @@ Bản đồ chi tiết theo ID nằm trong `REQUIREMENTS.md`.
 | Việc | Chặn phần nào |
 |---|---|
 | Khóa Anthropic + hạn mức chi tiêu | toàn bộ giảng dạy và chấm bài (giai đoạn 3) |
+| OAuth client của Google (`GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`) | đăng nhập Google thật; hiện chạy mô phỏng ở máy dev, tắt hẳn ở production |
 | Nhà cung cấp STT và TTS tiếng Đức + khóa | lớp học giọng nói (giai đoạn 3) |
 | Nhà cung cấp email giao dịch + khóa | email xác minh thật (hiện ghi ra `data/outbox/`) |
 | Pháp nhân, tài khoản nhận tiền, thông tin thuế | mở bán (giai đoạn 5) |
