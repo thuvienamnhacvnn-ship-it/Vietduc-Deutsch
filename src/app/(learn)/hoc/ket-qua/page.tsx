@@ -117,7 +117,7 @@ export default async function ResultPage() {
                 {s.unknown ? (
                   <span className="badge badge--warning">chưa đánh giá được</span>
                 ) : (
-                  <span className="badge badge--lime">{s.level}</span>
+                  <span className="badge badge--gold">{s.level}</span>
                 )}
               </div>
               <p className="result-card__note">{SKILL_NOTE[s.skill]}</p>

@@ -30,7 +30,7 @@ export default function ProgramPage() {
         >
           <div className="wrap level-detail">
             <div className="level-detail__head">
-              <span className="badge badge--lime" style={{ fontSize: "var(--fs-lg)" }}>
+              <span className="badge badge--gold" style={{ fontSize: "var(--fs-lg)" }}>
                 {lvl.level}
               </span>
               <h2>{lvl.headline}</h2>

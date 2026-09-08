@@ -1,50 +1,50 @@
+import Image from "next/image";
+import type React from "react";
 import { brand } from "@/lib/brand";
 
 /**
- * Logo inline (không dùng <img>) để nó đổi màu theo chủ đề bằng `currentColor`
- * và không tốn thêm một request. Bản tệp trong /public/brand dùng cho những chỗ
- * cần ảnh thật: email, favicon, ảnh chia sẻ.
+ * Logo Việt Đức.
+ *
+ * Dùng chính tệp logo của khách (`public/brand/logo-ngang.png`) chứ không vẽ
+ * lại: đây là nhận diện đã có, vẽ lại gần giống là làm sai thương hiệu.
+ *
+ * Ngọn lửa có một mảng ĐEN lấy từ cờ Đức. Trên nền tối mảng đó biến mất, nên ở
+ * những chỗ nền đậm logo được đặt trên một tấm nền sáng bo góc - cách xử lý
+ * thông thường cho logo có chi tiết đen, và trung thực hơn là đổi màu logo.
  */
-export function Logo({ size = 30, withName = true }: { size?: number; withName?: boolean }) {
-  return (
-    <span
-      style={{ display: "inline-flex", alignItems: "center", gap: 10, color: "inherit" }}
-    >
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 80 80"
-        aria-hidden="true"
-        focusable="false"
-        style={{ flex: "none" }}
-      >
-        <path
-          d="M8 26 C8 15 16.5 6.5 27.5 6.5 L52.5 6.5 C63.5 6.5 72 15 72 26 L72 44
-             C72 55 63.5 63.5 52.5 63.5 L34 63.5 L21 74 L21 63 C13.5 61 8 53.5 8 44 Z"
-          fill="currentColor"
-        />
-        <path
-          d="M29 22 L29 44 L52 44"
-          fill="none"
-          stroke="var(--lime)"
-          strokeWidth="7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      {withName && (
-        <span
-          style={{
-            fontSize: "1.3rem",
-            fontWeight: 680,
-            letterSpacing: "-0.03em",
-            color: "inherit",
-          }}
-        >
-          {brand.name}
-        </span>
-      )}
-      <span className="sr-only">{brand.name}</span>
-    </span>
+export function Logo({
+  height = 34,
+  variant = "auto",
+}: {
+  height?: number;
+  /**
+   * `auto` - dùng trên nền giấy sáng, không cần tấm nền.
+   * `plate` - dùng trên nền đậm: logo nằm trên tấm nền sáng.
+   * `stacked` - bản dọc, cho khu đăng nhập và chân trang rộng.
+   */
+  variant?: "auto" | "plate" | "stacked";
+}) {
+  const stacked = variant === "stacked";
+  const src = stacked ? "/brand/logo-doc.png" : "/brand/logo-ngang.png";
+  // Tỉ lệ thật của hai tệp: ngang 1985x686, dọc 1349x1278.
+  const ratio = stacked ? 1349 / 1278 : 1985 / 686;
+
+  const image = (
+    <Image
+      src={src}
+      alt={`${brand.fullName} — ${brand.tagline.vi}`}
+      width={Math.round(height * ratio)}
+      height={height}
+      priority
+      className="logo-img"
+      /* Chiều cao đi qua biến CSS chứ không phải style cố định: có vậy media
+         query mới thu nhỏ được logo ở màn hẹp. Style inline luôn thắng CSS. */
+      style={{ "--logo-h": `${height}px` } as React.CSSProperties}
+    />
   );
+
+  if (variant === "plate") {
+    return <span className="logo-plate">{image}</span>;
+  }
+  return image;
 }

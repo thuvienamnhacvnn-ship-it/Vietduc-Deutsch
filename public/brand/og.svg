@@ -1,22 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#154B3D"/>
-  <circle cx="1040" cy="120" r="220" fill="#0F3B2F"/>
-  <circle cx="120" cy="560" r="180" fill="#0F3B2F"/>
-  
-    <g transform="translate(88 96) scale(1.5)">
-      <path d="M8 26 C8 15 16.5 6.5 27.5 6.5 L52.5 6.5 C63.5 6.5 72 15 72 26 L72 44
-               C72 55 63.5 63.5 52.5 63.5 L34 63.5 L21 74 L21 63 C13.5 61 8 53.5 8 44 Z"
-            fill="#154B3D"/>
-      <path d="M29 22 L29 44 L52 44" fill="none" stroke="#DEF59A" stroke-width="7"
-            stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
-  <text x="88" y="330" font-family="Inter, 'Segoe UI', system-ui, sans-serif"
-        font-size="86" font-weight="680" letter-spacing="-2" fill="#F8FAF9">Lingora</text>
-  <text x="88" y="400" font-family="Inter, 'Segoe UI', system-ui, sans-serif"
-        font-size="34" font-weight="500" fill="#DEF59A">Học tiếng Đức A1–B2 cùng giáo viên AI</text>
-  <foreignObject x="88" y="436" width="800" height="140">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8E1A1D"/>
+      <stop offset="100%" stop-color="#CA2427"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1060" cy="90" r="230" fill="#8E1A1D" opacity="0.55"/>
+
+  <g transform="translate(88 96) scale(2.2)">
+    
+    <path d="M40 6 C50 20 56 30 56 40 C56 51 47 58 36 58 C25 58 16 51 16 40
+             C16 31 22 22 32 12 C31 22 34 28 38 30 C40 24 40 14 40 6 Z"
+          fill="#E0AC5A" stroke="#C28E43" stroke-width="1.2"/>
+    <path d="M32 10 C40 22 44 30 44 39 C44 49 37 56 30 56 C22 56 16 49 16 40
+             C16 30 24 20 32 10 Z"
+          fill="#CA2427"/>
+    <path d="M30 26 l2.6 5.6 6.1 .7 -4.5 4.2 1.2 6 -5.4 -3 -5.4 3 1.2 -6
+             -4.5 -4.2 6.1 -.7 Z"
+          fill="#F9DA07"/>
+  </g>
+
+  <text x="88" y="360" font-family="Inter, 'Segoe UI', system-ui, sans-serif"
+        font-size="76" font-weight="700" letter-spacing="-1.5" fill="#FAF7F4">Việt Đức Group</text>
+  <text x="88" y="424" font-family="Inter, 'Segoe UI', system-ui, sans-serif"
+        font-size="34" font-weight="500" fill="#E0AC5A">Học tiếng Đức trực tuyến A1–B2</text>
+  <foreignObject x="88" y="456" width="820" height="130">
     <div xmlns="http://www.w3.org/1999/xhtml"
-         style="font-family:Inter,'Segoe UI',system-ui,sans-serif;font-size:26px;
-                line-height:1.5;color:#A9C6B8">Nói được tiếng Đức trong đời sống thật ở Đức — từ câu chào đầu tiên đến buổi phỏng vấn Ausbildung.</div>
+         style="font-family:Inter,'Segoe UI',system-ui,sans-serif;font-size:25px;
+                line-height:1.5;color:#F3CFCB">Từ câu chào đầu tiên đến buổi phỏng vấn Ausbildung — bạn nói, cô Anna nghe và trả lời.</div>
   </foreignObject>
 </svg>

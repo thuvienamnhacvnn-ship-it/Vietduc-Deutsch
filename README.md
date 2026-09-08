@@ -1,9 +1,11 @@
-# Lingora
+# Việt Đức — học tiếng Đức trực tuyến
 
-Nền tảng học tiếng Đức A1–B2 cho người Việt, giảng dạy bằng đội ngũ AI Agent.
+Nền tảng học tiếng Đức A1–B2 cho người Việt của **Việt Đức Group**, giảng dạy
+bằng đội ngũ AI Agent.
 
-"Lingora" là tên làm việc. Đổi nó ở `src/lib/brand.ts` là đổi toàn bộ giao diện,
-metadata, email và logo.
+Thương hiệu đổi tập trung ở `src/lib/brand.ts`. Hệ màu lấy trực tiếp từ tệp logo
+(`npx tsx scripts/lay-mau-logo.ts`) — xem `src/styles/tokens.css` và
+`docs/ASSETS.md`.
 
 > **Trạng thái:** giai đoạn 0 và 1 hoàn tất — nền tảng, giao diện, tài khoản và
 > cơ sở dữ liệu chạy thật. Mọi dịch vụ ngoài (Claude, STT, TTS, email, thanh
@@ -42,10 +44,12 @@ không được lưu trong tệp nào.
 | `npm run lint` | ESLint |
 | `npm run db:push` | áp migration SQL trong `drizzle/` |
 | `npm run seed` | nạp dữ liệu demo có nhãn |
-| `npm run logo` | sinh lại bộ nhận diện vào `public/brand/` |
+| `npm run logo` | sinh lại favicon và ảnh chia sẻ (logo chính là tệp của khách) |
+| `npx tsx scripts/lay-mau-logo.ts <png>` | đo màu và độ tương phản từ một tệp ảnh |
 | `npm test` | chạy cả hai bộ test end-to-end (server phải đang chạy) |
 | `node tests/smoke.mjs` | 37 kiểm tra nền tảng và phân quyền |
 | `node tests/google.mjs` | 24 kiểm tra luồng đăng nhập Google |
+| `node tests/xep-lop.mjs` | 27 kiểm tra bài kiểm tra trình độ |
 
 ## Đổi schema
 

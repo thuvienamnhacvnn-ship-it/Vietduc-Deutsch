@@ -33,8 +33,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F8FAF9" },
-    { media: "(prefers-color-scheme: dark)", color: "#101A17" },
+    { media: "(prefers-color-scheme: light)", color: "#FAF7F4" },
+    { media: "(prefers-color-scheme: dark)", color: "#17100F" },
   ],
 };
 
@@ -45,7 +45,7 @@ export const viewport: Viewport = {
  */
 const themeScript = `
 try {
-  var t = localStorage.getItem("lingora-theme");
+  var t = localStorage.getItem("vd-theme");
   if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
 } catch (e) {}
 `;

@@ -11,8 +11,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="auth-shell">
       <aside className="auth-shell__aside band">
-        <Link href="/" style={{ color: "var(--on-band)", textDecoration: "none" }}>
-          <Logo />
+        <Link href="/" style={{ textDecoration: "none" }} aria-label="Về trang chủ">
+          <Logo variant="plate" height={40} />
         </Link>
         <div>
           <h2 style={{ fontSize: "var(--fs-2xl)", maxWidth: "16ch" }}>{brand.headline.vi}</h2>

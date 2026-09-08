@@ -1,51 +1,87 @@
 /*
- * LINGORA - design token
+ * VIỆT ĐỨC - design token
  *
- * Hướng nghệ thuật lấy từ bản giao việc: nền trắng #F8FAF9, xanh ngọc đậm
- * #154B3D, điểm nhấn vàng chanh #DEF59A, chữ chính #203B34.
+ * Màu lấy TRỰC TIẾP từ tệp logo (`npx tsx scripts/lay-mau-logo.ts`), không phải
+ * ước lượng bằng mắt. Logo là ngọn lửa ghép từ cờ Việt Nam và cờ Đức:
  *
- * VÀNG CHANH LÀ ĐIỂM NHẤN, KHÔNG PHẢI NỀN. Nó chỉ dùng cho hành động chính,
- * thanh tiến độ và vài dấu nhấn nhỏ. Chữ trên nền vàng chanh luôn là --on-lime
- * (xanh rất đậm), không bao giờ là trắng.
+ *   #CA2427  đỏ cờ Việt Nam - chiếm diện tích lớn nhất trong logo
+ *   #0F0F0F  đen cờ Đức
+ *   #C28E43  vàng kim của chữ VIET DUC
+ *   #E0AC5A  vàng kim sáng hơn ở phần trên nét chữ
+ *   #F9DA07  vàng ngôi sao
+ *   #E37B26  cam của dải lửa
  *
- * TƯƠNG PHẢN đã đo (WCAG, nền trên chữ):
- *   --ink   #203B34 trên --paper   #F8FAF9  =  11.9:1   (AAA cho mọi cỡ chữ)
- *   --muted #566B63 trên --paper   #F8FAF9  =   5.4:1   (AA cho chữ thường)
- *   --paper #F8FAF9 trên --forest  #154B3D  =   9.8:1   (AAA)
- *   --on-lime #14352A trên --lime  #DEF59A  =  10.4:1   (AAA)
- *   --forest #154B3D trên --paper           =   9.8:1   (AAA)
+ * ĐỎ LÀ MÀU CHÍNH, theo yêu cầu của chủ dự án. Nó làm cấu trúc: nút chính, dải
+ * nền lớn, tiêu đề nhấn. Vàng kim là màu phụ - viền, huy hiệu, thanh tiến độ.
+ *
+ * TƯƠNG PHẢN đã đo (bằng scripts/lay-mau-logo.ts và công thức WCAG):
+ *   --ink   #241A17 trên --paper  #FAF7F4  = 15.9:1  AAA
+ *   --muted #6E5B54 trên --paper           =  6.0:1  AA
+ *   --brand #CA2427 trên --paper           =  5.2:1  AA
+ *   trắng trên --brand   #CA2427           =  5.5:1  AA   (nút chính)
+ *   trắng trên --brand-800 #8E1A1D         =  9.1:1  AAA  (dải nền)
+ *   --ink trên --gold    #C28E43           =  5.9:1  AA
+ *   --on-star trên --star #F9DA07          = 11.8:1  AAA
+ *
+ * VÀNG KIM KHÔNG BAO GIỜ MANG CHỮ TRẮNG: trắng trên #C28E43 chỉ 2.9:1. Chữ trên
+ * nền vàng luôn là --on-gold.
  *
  * HAI CHỦ ĐỀ. Bảng sáng khai báo trên :root. Bảng tối khai báo hai lần:
  *   [data-theme="dark"]                  - người đọc tự chọn tối
- *   :root:not([data-theme]) @media dark  - người đọc chưa chọn gì, hệ thống tối
- * `data-theme` được ghi trước lần vẽ đầu tiên bởi script inline trong
- * app/layout.tsx, nên không có cú nháy sai chủ đề.
+ *   :root:not([data-theme]) @media dark  - người đọc chưa chọn, hệ thống tối
+ * `data-theme` được ghi trước lần vẽ đầu bởi script inline trong app/layout.tsx.
+ *
+ * Ở chủ đề tối, đỏ #CA2427 chỉ đạt 3.4:1 trên nền tối nên KHÔNG dùng cho chữ;
+ * bảng tối thay bằng #F07B78 (7.0:1).
  */
 
 :root {
   color-scheme: light;
 
   /* ---- thương hiệu ----------------------------------------------------- */
-  --paper: #f8faf9;
+  /* Giấy hơi ấm, không phải trắng lạnh: đỏ và vàng kim đặt trên trắng xanh sẽ
+     trông như đèn báo lỗi. */
+  --paper: #faf7f4;
   --paper-raised: #ffffff;
-  --paper-sunken: #eef3f0;
-  --forest: #154b3d;
-  --forest-600: #1a5c4a;
-  --forest-800: #0f3b2f;
-  --forest-900: #0a2b22;
-  --lime: #def59a;
-  --lime-deep: #c8e77c;
-  --on-lime: #14352a;
-  --ink: #203b34;
-  --muted: #566b63;
-  --line: #dde6e1;
-  --line-strong: #c3d2cb;
+  --paper-sunken: #f3ebe4;
 
-  /* Dải nền lớn (header đậm, footer, khối nhấn). Tách khỏi --forest vì ở chủ
-     đề tối dải nền phải TỐI HƠN trang, còn nút phải SÁNG HƠN. */
-  --band: #154b3d;
-  --on-band: #eef6f1;
-  --on-band-muted: #a9c6b8;
+  --brand: #ca2427;
+  --brand-600: #b01f22;
+  --brand-800: #8e1a1d;
+  --brand-900: #6e1416;
+
+  /*
+   * Đỏ dùng làm MẶT PHẲNG (nút chính, dải nhấn, bong bóng hội thoại), tách khỏi
+   * --brand vốn là đỏ dùng cho CHỮ.
+   *
+   * Hai vai trò này đi ngược chiều nhau khi đổi chủ đề: chữ đỏ phải sáng lên
+   * trên nền tối mới đọc được, còn mặt phẳng đỏ mà sáng lên thì thành màu hồng
+   * và mất hẳn chất thương hiệu. --brand-fill vì vậy giữ nguyên là đỏ ở cả hai
+   * chủ đề, chỉ chỉnh nhẹ độ sáng.
+   */
+  --brand-fill: #ca2427;
+  --brand-fill-hover: #b01f22;
+  --on-brand-fill: #ffffff;
+
+  --gold: #c28e43;
+  --gold-light: #e0ac5a;
+  --gold-deep: #a27433;
+  --on-gold: #241a17;
+
+  /* Vàng ngôi sao: điểm nhấn nhỏ và thanh tiến độ. Rực hơn vàng kim nên chỉ
+     dùng ở diện tích nhỏ. */
+  --star: #f9da07;
+  --on-star: #2a1d02;
+
+  --ink: #241a17;
+  --muted: #6e5b54;
+  --line: #e9dfd7;
+  --line-strong: #d6c7bc;
+
+  /* Dải nền lớn (footer, khối nhấn). Đỏ sẫm để chữ trắng đạt AAA. */
+  --band: #8e1a1d;
+  --on-band: #fff3f0;
+  --on-band-muted: #e8b9b4;
 
   /* ---- ngữ nghĩa -------------------------------------------------------- */
   --success: #1f7a4d;
@@ -58,27 +94,26 @@
   --info-bg: #e2f0f6;
   --focus: #0e6b8f;
 
-  /* Bốn kỹ năng có màu riêng, dùng nhất quán ở mọi biểu đồ tiến độ. */
+  /* Bốn kỹ năng có màu riêng, dùng nhất quán ở mọi biểu đồ tiến độ. Cố ý KHÔNG
+     dùng đỏ ở đây: đỏ đã là màu thương hiệu, thêm một nghĩa nữa là gây nhầm. */
   --skill-listening: #2d7d9a;
   --skill-reading: #4b6bb0;
   --skill-writing: #8a5fa8;
   --skill-speaking: #1f7a4d;
 
   /* ---- chữ -------------------------------------------------------------- */
-  /* Inter phủ đủ dấu tiếng Việt lẫn umlaut/ß; Segoe UI là dự phòng có sẵn trên
-     Windows với cùng đặc điểm đó. */
   --font-sans: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
 
-  --fs-xs: 0.8125rem; /* 13px - chỉ cho nhãn phụ, không dùng cho nội dung */
-  --fs-sm: 0.875rem; /* 14px - nhãn */
-  --fs-md: 1rem; /* 16px - cỡ tối thiểu cho nội dung */
-  --fs-lg: 1.125rem; /* 18px */
-  --fs-xl: 1.375rem; /* 22px */
-  --fs-2xl: 1.75rem; /* 28px */
-  --fs-3xl: 2.25rem; /* 36px */
-  --fs-4xl: 3rem; /* 48px */
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --fs-3xl: 2.25rem;
+  --fs-4xl: 3rem;
   --fs-hero: clamp(2.375rem, 5.2vw, 3.875rem);
 
   --lh-tight: 1.15;
@@ -110,11 +145,11 @@
   --r-xl: 30px;
   --r-pill: 999px;
 
-  /* Bóng mang sắc xanh chứ không phải đen thuần: đen thuần trên nền --paper
-     trông như vết bẩn xám. */
-  --shadow-1: 0 1px 2px rgba(16, 48, 39, 0.06), 0 1px 3px rgba(16, 48, 39, 0.05);
-  --shadow-2: 0 4px 12px rgba(16, 48, 39, 0.07), 0 2px 4px rgba(16, 48, 39, 0.05);
-  --shadow-3: 0 18px 40px rgba(16, 48, 39, 0.12), 0 4px 12px rgba(16, 48, 39, 0.06);
+  /* Bóng mang sắc nâu đỏ chứ không phải đen thuần: đen trên nền giấy ấm trông
+     như vết bẩn xám. */
+  --shadow-1: 0 1px 2px rgba(58, 26, 20, 0.07), 0 1px 3px rgba(58, 26, 20, 0.05);
+  --shadow-2: 0 4px 12px rgba(58, 26, 20, 0.08), 0 2px 4px rgba(58, 26, 20, 0.05);
+  --shadow-3: 0 18px 40px rgba(58, 26, 20, 0.14), 0 4px 12px rgba(58, 26, 20, 0.07);
 
   /* ---- chuyển động ------------------------------------------------------ */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -128,25 +163,38 @@
   :root:not([data-theme]) {
     color-scheme: dark;
 
-    --paper: #101a17;
-    --paper-raised: #16231f;
-    --paper-sunken: #0b1310;
-    --forest: #5fbf9c;
-    --forest-600: #4fae8c;
-    --forest-800: #7fd3b4;
-    --forest-900: #a5e3cd;
-    --lime: #d7f096;
-    --lime-deep: #bfe077;
-    --on-lime: #12291f;
-    --ink: #e6efea;
-    --muted: #9db3aa;
-    --line: #25352f;
-    --line-strong: #35473f;
+    --paper: #17100f;
+    --paper-raised: #1f1614;
+    --paper-sunken: #120c0b;
 
-    /* Dải nền tối hơn trang, để nó vẫn đọc ra là một dải riêng. */
-    --band: #0a1512;
-    --on-band: #e6efea;
-    --on-band-muted: #93aca1;
+    /* Đỏ phải sáng lên mới đọc được trên nền tối; #CA2427 chỉ đạt 3.4:1. */
+    --brand: #f07b78;
+    --brand-600: #e8615e;
+    --brand-800: #f79b98;
+    --brand-900: #fbbdbb;
+
+    /* Vẫn là đỏ thật, không phải hồng. Trắng trên #C0292C đạt 6.0:1. */
+    --brand-fill: #c0292c;
+    --brand-fill-hover: #d43438;
+    --on-brand-fill: #ffffff;
+
+    --gold: #e6b76a;
+    --gold-light: #f0cd93;
+    --gold-deep: #c99a4e;
+    --on-gold: #241a17;
+
+    --star: #f9da07;
+    --on-star: #2a1d02;
+
+    --ink: #f2e9e4;
+    --muted: #b49f97;
+    --line: #33241f;
+    --line-strong: #4a352e;
+
+    /* Dải nền TỐI HƠN trang ở chủ đề tối, để nó vẫn đọc ra là một dải riêng. */
+    --band: #0f0a09;
+    --on-band: #f2e9e4;
+    --on-band-muted: #b49f97;
 
     --success: #62c78f;
     --success-bg: #12291f;
@@ -172,24 +220,35 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --paper: #101a17;
-  --paper-raised: #16231f;
-  --paper-sunken: #0b1310;
-  --forest: #5fbf9c;
-  --forest-600: #4fae8c;
-  --forest-800: #7fd3b4;
-  --forest-900: #a5e3cd;
-  --lime: #d7f096;
-  --lime-deep: #bfe077;
-  --on-lime: #12291f;
-  --ink: #e6efea;
-  --muted: #9db3aa;
-  --line: #25352f;
-  --line-strong: #35473f;
+  --paper: #17100f;
+  --paper-raised: #1f1614;
+  --paper-sunken: #120c0b;
 
-  --band: #0a1512;
-  --on-band: #e6efea;
-  --on-band-muted: #93aca1;
+  --brand: #f07b78;
+  --brand-600: #e8615e;
+  --brand-800: #f79b98;
+  --brand-900: #fbbdbb;
+
+  --brand-fill: #c0292c;
+  --brand-fill-hover: #d43438;
+  --on-brand-fill: #ffffff;
+
+  --gold: #e6b76a;
+  --gold-light: #f0cd93;
+  --gold-deep: #c99a4e;
+  --on-gold: #241a17;
+
+  --star: #f9da07;
+  --on-star: #2a1d02;
+
+  --ink: #f2e9e4;
+  --muted: #b49f97;
+  --line: #33241f;
+  --line-strong: #4a352e;
+
+  --band: #0f0a09;
+  --on-band: #f2e9e4;
+  --on-band-muted: #b49f97;
 
   --success: #62c78f;
   --success-bg: #12291f;
@@ -212,9 +271,8 @@
 }
 
 /*
- * Người dùng yêu cầu giảm chuyển động thì tắt sạch, kể cả hiệu ứng trạng thái
- * của avatar giáo viên. Đặt thời lượng về 0 ở tầng token là cách chắc chắn
- * nhất: không component nào phải nhớ tự kiểm tra.
+ * Người dùng yêu cầu giảm chuyển động thì tắt sạch. Đặt thời lượng về 0 ở tầng
+ * token là cách chắc chắn nhất: không component nào phải nhớ tự kiểm tra.
  */
 @media (prefers-reduced-motion: reduce) {
   :root {

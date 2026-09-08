@@ -43,7 +43,7 @@
   height: 130px;
   z-index: -1;
   border-radius: var(--r-xl);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--lime) 60%, transparent), transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 60%, transparent), transparent);
 }
 
 @media (min-width: 700px) {
@@ -89,8 +89,8 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--lime);
-  color: var(--on-lime);
+  background: var(--gold);
+  color: var(--on-gold);
   font-size: var(--fs-sm);
   font-weight: 700;
 }
@@ -140,7 +140,7 @@
   margin: 0 0 var(--s-6);
   padding: var(--s-5);
   background: var(--paper-sunken);
-  border-left: 4px solid var(--forest);
+  border-left: 4px solid var(--brand);
   border-radius: 0 var(--r-md) var(--r-md) 0;
   font-size: var(--fs-lg);
   line-height: 1.7;
@@ -150,8 +150,8 @@
   margin-bottom: var(--s-6);
   padding: var(--s-5);
   border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--lime) 28%, var(--paper-sunken));
-  border: 1px solid var(--lime-deep);
+  background: color-mix(in srgb, var(--gold) 28%, var(--paper-sunken));
+  border: 1px solid var(--gold-deep);
 }
 
 .test-audio__buttons {
@@ -164,7 +164,7 @@
 .test-audio__note {
   margin: 0;
   font-size: var(--fs-sm);
-  color: var(--on-lime);
+  color: var(--on-gold);
   max-width: none;
 }
 
@@ -202,8 +202,8 @@
 }
 
 .test-option:hover:not(:disabled) {
-  border-color: var(--forest);
-  background: color-mix(in srgb, var(--lime) 18%, var(--paper-raised));
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--gold) 18%, var(--paper-raised));
 }
 
 .test-option__key {
@@ -220,13 +220,13 @@
 }
 
 .test-option[data-chosen] {
-  border-color: var(--forest);
-  background: color-mix(in srgb, var(--lime) 32%, var(--paper-raised));
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--gold) 32%, var(--paper-raised));
 }
 
 .test-option[data-chosen] .test-option__key {
-  background: var(--forest);
-  border-color: var(--forest);
+  background: var(--brand);
+  border-color: var(--brand);
   color: var(--paper);
 }
 
@@ -314,8 +314,8 @@
   border-radius: var(--r-lg);
   background: linear-gradient(
     135deg,
-    var(--forest) 0%,
-    color-mix(in srgb, var(--forest) 80%, var(--lime)) 100%
+    var(--brand) 0%,
+    color-mix(in srgb, var(--brand) 80%, var(--gold)) 100%
   );
   color: var(--paper);
   margin-bottom: var(--s-8);
@@ -323,7 +323,7 @@
 
 .result-hero__label {
   font-size: var(--fs-sm);
-  color: var(--lime);
+  color: var(--gold);
   margin-bottom: var(--s-2);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -334,7 +334,7 @@
   line-height: 1;
   font-weight: 700;
   margin: 0;
-  color: var(--lime);
+  color: var(--gold);
 }
 
 .result-hero__body h2 {
@@ -466,7 +466,7 @@
 
 .test-gap input:hover:not(:disabled),
 .test-gap input:focus {
-  border-color: var(--forest);
+  border-color: var(--brand);
 }
 
 .test-gap input[data-state="right"] {

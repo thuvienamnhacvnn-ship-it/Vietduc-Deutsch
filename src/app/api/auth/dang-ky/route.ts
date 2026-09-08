@@ -21,10 +21,18 @@ const Body = z.object({
 
 export async function POST(request: Request) {
   const ip = clientIp(request);
-  // 10 chứ không phải 5: cả một văn phòng, một ký túc xá hay một nhà mạng dùng
-  // CGNAT đều ra ngoài bằng chung một địa chỉ IP. Đặt quá chặt thì người thứ
-  // sáu trong nhà không đăng ký được, mà kẻ tấn công thật thì đổi IP dễ hơn thế.
-  const limit = hit(`dang-ky:${ip}`, 10, 10 * 60 * 1000);
+  /*
+   * 30 lần trong 10 phút cho mỗi IP.
+   *
+   * Con số này đến từ chính cách sản phẩm được dùng: Việt Đức là hệ thống
+   * trường học, và một lớp ngồi cùng phòng máy hoặc cùng wifi sẽ đăng ký ba
+   * mươi tài khoản trong mười phút. Đặt trần 5 hay 10 là chặn đúng người dùng
+   * hợp lệ đông nhất, trong khi kẻ tấn công thật chỉ cần đổi IP.
+   *
+   * Rào chắn thật cho việc lạm dụng nằm ở chỗ khác: email phải xác minh, và
+   * quyền học chỉ mở sau khi backend xác nhận thanh toán.
+   */
+  const limit = hit(`dang-ky:${ip}`, 30, 10 * 60 * 1000);
   if (!limit.allowed) return tooMany(limit);
 
   const parsed = Body.safeParse(await request.json().catch(() => null));

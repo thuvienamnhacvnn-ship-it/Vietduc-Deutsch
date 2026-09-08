@@ -52,14 +52,14 @@ p {
 }
 
 a {
-  color: var(--forest);
-  text-decoration-color: color-mix(in srgb, var(--forest) 35%, transparent);
+  color: var(--brand);
+  text-decoration-color: color-mix(in srgb, var(--brand) 35%, transparent);
   text-underline-offset: 3px;
   transition: color var(--motion-fast) var(--ease);
 }
 
 a:hover {
-  color: var(--forest-600);
+  color: var(--brand-600);
   text-decoration-color: currentColor;
 }
 
@@ -81,7 +81,7 @@ video {
 }
 
 .on-band :focus-visible {
-  outline-color: var(--lime);
+  outline-color: var(--gold);
 }
 
 /* Bỏ qua điều hướng - hiện ra khi nhận focus bằng bàn phím. */
@@ -91,7 +91,7 @@ video {
   top: 0;
   z-index: 100;
   padding: var(--s-3) var(--s-5);
-  background: var(--forest);
+  background: var(--brand);
   color: #fff;
   border-radius: 0 0 var(--r-sm) 0;
 }
@@ -248,10 +248,10 @@ video {
   border: 1px solid var(--line);
 }
 
-.badge--lime {
-  background: var(--lime);
-  color: var(--on-lime);
-  border-color: var(--lime-deep);
+.badge--gold {
+  background: var(--gold);
+  color: var(--on-gold);
+  border-color: var(--gold-deep);
 }
 
 .badge--info {
@@ -324,36 +324,43 @@ video {
   transform: none;
 }
 
-/* Hành động chính: vàng chanh trên chữ xanh rất đậm, 10.4:1. */
+/*
+ * Hành động chính là ĐỎ với chữ trắng: 5.5:1, đạt AA. Đỏ là màu thương hiệu và
+ * chủ dự án yêu cầu ưu tiên đỏ, nên nút quan trọng nhất trên mỗi màn hình mang
+ * đúng màu đó.
+ */
 .btn--primary {
-  background: var(--lime);
-  color: var(--on-lime);
-  border-color: var(--lime-deep);
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
+  border-color: var(--brand-fill);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: var(--lime-deep);
+  background: var(--brand-fill-hover);
+  border-color: var(--brand-fill-hover);
 }
 
+/* Nút vàng kim: nhấn phụ, dùng khi trên màn hình đã có một nút đỏ. Chữ luôn
+   đậm - trắng trên vàng kim chỉ 2.9:1. */
 .btn--solid {
-  background: var(--forest);
-  color: var(--paper);
-  border-color: var(--forest);
+  background: var(--gold);
+  color: var(--on-gold);
+  border-color: var(--gold-deep);
 }
 
 .btn--solid:hover:not(:disabled) {
-  background: var(--forest-600);
+  background: var(--gold-light);
 }
 
 .btn--secondary {
   background: transparent;
-  color: var(--forest);
+  color: var(--brand);
   border-color: var(--line-strong);
 }
 
 .btn--secondary:hover:not(:disabled) {
-  border-color: var(--forest);
-  background: color-mix(in srgb, var(--forest) 7%, transparent);
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 7%, transparent);
 }
 
 .on-band .btn--secondary {
@@ -450,7 +457,7 @@ video {
 .field input:hover,
 .field select:hover,
 .field textarea:hover {
-  border-color: var(--forest);
+  border-color: var(--brand);
 }
 
 .field input:disabled,
@@ -492,7 +499,7 @@ video {
   min-height: 0;
   margin-top: 2px;
   flex: none;
-  accent-color: var(--forest);
+  accent-color: var(--brand);
 }
 
 /* ------------------------------------------------------------------ thông báo */
@@ -565,7 +572,7 @@ video {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--lime);
+  background: var(--gold);
   transition: width var(--motion-slow) var(--ease);
 }
 
@@ -677,7 +684,7 @@ table.data tr:last-child td {
 }
 
 .site-footer__cols a:hover {
-  color: var(--lime);
+  color: var(--gold);
   text-decoration: underline;
 }
 
@@ -700,7 +707,7 @@ table.data tr:last-child td {
 }
 
 .site-footer__pending {
-  color: var(--lime);
+  color: var(--gold);
   font-weight: 560;
 }
 
@@ -714,7 +721,7 @@ table.data tr:last-child td {
 /* `.band` là lớp thực tế dùng trên các dải nền đậm; các quy tắc `.on-band`
    phía trên giữ lại cho khối cần đảo màu mà không đổi nền. */
 .band :focus-visible {
-  outline-color: var(--lime);
+  outline-color: var(--gold);
 }
 
 .band .btn--secondary {
@@ -728,7 +735,7 @@ table.data tr:last-child td {
 }
 
 .band a {
-  color: var(--lime);
+  color: var(--gold);
 }
 
 .band .card {
@@ -747,8 +754,8 @@ table.data tr:last-child td {
 .hero {
   padding-block: var(--s-10) var(--s-12);
   background:
-    radial-gradient(1100px 460px at 88% -8%, color-mix(in srgb, var(--lime) 30%, transparent), transparent 70%),
-    radial-gradient(900px 420px at -6% 12%, color-mix(in srgb, var(--forest) 12%, transparent), transparent 65%);
+    radial-gradient(1100px 460px at 88% -8%, color-mix(in srgb, var(--gold) 30%, transparent), transparent 70%),
+    radial-gradient(900px 420px at -6% 12%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 65%);
 }
 
 .hero__inner {
@@ -829,7 +836,7 @@ table.data tr:last-child td {
 .journey__n {
   font-size: var(--fs-lg);
   font-weight: 700;
-  color: var(--forest);
+  color: var(--brand);
   background: var(--paper-sunken);
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
@@ -900,8 +907,8 @@ table.data tr:last-child td {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--lime);
-  border: 1px solid var(--lime-deep);
+  background: var(--gold);
+  border: 1px solid var(--gold-deep);
 }
 
 /* ------------------------------------------------------------- chu trình dạy */
@@ -928,7 +935,7 @@ table.data tr:last-child td {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--forest);
+  background: var(--brand);
   color: var(--paper);
   font-size: var(--fs-sm);
   font-weight: 700;
@@ -1028,7 +1035,7 @@ table.data tr:last-child td {
   top: 50%;
   transform: translateY(-50%);
   font-size: var(--fs-xl);
-  color: var(--forest);
+  color: var(--brand);
   font-weight: 400;
 }
 
@@ -1132,7 +1139,7 @@ table.data tr:last-child td {
 }
 
 .auth-shell__back:hover {
-  color: var(--forest);
+  color: var(--brand);
 }
 
 .auth-shell__card {
@@ -1186,7 +1193,7 @@ table.data tr:last-child td {
 }
 
 .app-nav__brand {
-  color: var(--forest);
+  color: var(--brand);
   text-decoration: none;
   flex: none;
 }
@@ -1221,11 +1228,11 @@ table.data tr:last-child td {
 
 .app-nav__link:hover {
   background: var(--paper-sunken);
-  color: var(--forest);
+  color: var(--brand);
 }
 
 .app-nav__link[aria-current="page"] {
-  background: var(--forest);
+  background: var(--brand);
   color: var(--paper);
 }
 
@@ -1395,11 +1402,11 @@ table.data tr:last-child td {
   display: flex;
   align-items: center;
   gap: var(--s-4);
-  min-height: 68px;
+  min-height: 76px;
 }
 
 .site-header__brand {
-  color: var(--forest);
+  color: var(--brand);
   text-decoration: none;
   flex: none;
 }
@@ -1421,13 +1428,13 @@ table.data tr:last-child td {
 }
 
 .site-header__link:hover {
-  color: var(--forest);
-  border-bottom-color: var(--lime-deep);
+  color: var(--brand);
+  border-bottom-color: var(--gold-deep);
 }
 
 .site-header__link[aria-current="page"] {
-  color: var(--forest);
-  border-bottom-color: var(--forest);
+  color: var(--brand);
+  border-bottom-color: var(--brand);
 }
 
 .site-header__actions {
@@ -1519,14 +1526,14 @@ table.data tr:last-child td {
    phần mô tả công việc bên dưới mà không cần thêm tiêu đề. */
 .persona {
   font-style: italic;
-  color: var(--forest);
+  color: var(--brand);
   font-size: var(--fs-sm);
   line-height: 1.55;
   margin-bottom: var(--s-3);
 }
 
 .band .persona {
-  color: var(--lime);
+  color: var(--gold);
 }
 
 /* Ghi chú trầm: dùng cho những điều bắt buộc phải nói nhưng không phải cảnh báo
@@ -1536,7 +1543,7 @@ table.data tr:last-child td {
   max-width: 72ch;
   margin-top: var(--s-4);
   padding-left: var(--s-4);
-  border-left: 3px solid var(--lime-deep);
+  border-left: 3px solid var(--gold-deep);
   color: var(--muted);
   font-size: var(--fs-sm);
   line-height: 1.6;
@@ -1544,4 +1551,31 @@ table.data tr:last-child td {
 
 .band .note-quiet {
   color: var(--on-band-muted);
+}
+
+/* Tấm nền sáng cho logo khi đặt trên nền đậm. Ngọn lửa trong logo có mảng đen
+   lấy từ cờ Đức; đặt thẳng lên nền tối thì mảng đó biến mất và ngọn lửa mất một
+   nửa hình. Tấm nền là cách xử lý thông thường, trung thực hơn là đổi màu logo. */
+.logo-plate {
+  display: inline-block;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: #ffffff;
+  line-height: 0;
+}
+
+/* Logo: chiều cao do biến --logo-h quyết định, nên màn hẹp thu nhỏ được. Logo
+   ngang của Việt Đức rộng gần gấp ba chiều cao, nên ở 390px nó đẩy cả thanh
+   header tràn ra ngoài nếu giữ nguyên cỡ desktop. */
+.logo-img {
+  height: var(--logo-h, 40px);
+  width: auto;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .site-header .logo-img,
+  .app-nav .logo-img {
+    height: 30px;
+  }
 }

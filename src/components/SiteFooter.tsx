@@ -11,9 +11,7 @@ export function SiteFooter() {
     <footer className="band">
       <div className="wrap site-footer">
         <div className="site-footer__brand">
-          <span style={{ color: "var(--on-band)" }}>
-            <Logo />
-          </span>
+          <Logo variant="plate" height={44} />
           <p className="lede" style={{ marginTop: "var(--s-4)", fontSize: "var(--fs-md)" }}>
             {brand.tagline.vi}.
           </p>

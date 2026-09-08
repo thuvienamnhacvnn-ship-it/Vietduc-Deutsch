@@ -42,8 +42,8 @@ export function AppNav({
   return (
     <header className="app-nav">
       <div className="app-nav__inner">
-        <Link href={homeHref} className="app-nav__brand">
-          <Logo />
+        <Link href={homeHref} className="app-nav__brand" aria-label="Về trang chủ">
+          <Logo height={40} />
         </Link>
 
         <button

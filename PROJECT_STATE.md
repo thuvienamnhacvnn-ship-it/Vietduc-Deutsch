@@ -1,4 +1,4 @@
-# Trạng thái dự án Lingora
+# Trạng thái dự án Việt Đức
 
 Cập nhật: 07.09.2026 · Giai đoạn 0 và 1 hoàn tất.
 
@@ -45,6 +45,8 @@ Bản đồ chi tiết theo ID nằm trong `REQUIREMENTS.md`.
 | Next.js 16 + Drizzle + Postgres, một web + một worker | đúng đặc tả, không dựng microservices sớm | `docs/adr/0001-stack.md` |
 | PGlite khi dev, `pg` khi có `DATABASE_URL` | máy dev không chạy được Postgres bản địa | `docs/adr/0002-pglite.md` |
 | CSS thuần với custom properties, không Tailwind | thư mục home là git root, Tailwind v4 quét cả home và treo dev server | `docs/adr/0003-css-tokens.md` |
+| Màu lấy bằng máy từ tệp logo, không chọn bằng mắt | `scripts/lay-mau-logo.ts` tự giải mã PNG và đo tương phản; bảng màu vì thế khớp đúng nhận diện của khách | `src/styles/tokens.css` |
+| Tách `--brand` (đỏ cho chữ) khỏi `--brand-fill` (đỏ cho mặt phẳng) | hai vai trò đi ngược chiều khi đổi chủ đề: chữ đỏ phải sáng lên trên nền tối, mặt phẳng đỏ mà sáng lên thì thành hồng | `src/styles/tokens.css` |
 | scrypt cho mật khẩu | argon2/bcrypt là native binary, bị Smart App Control chặn | `src/lib/auth/password.ts` |
 | CSS component để trong `globals.css`, không styled-jsx | styled-jsx không gắn class phạm vi lên `next/link`, mọi quy tắc nhắm vào `<Link>` sẽ im lặng không có tác dụng | `src/components/SiteHeader.tsx` |
 
@@ -60,9 +62,18 @@ Bản đồ chi tiết theo ID nằm trong `REQUIREMENTS.md`.
    tràn ngang ở 390px. Giờ chỉ áp cho nút trong thanh điều hướng.
 5. **Emoji trong heredoc của shell trên máy này làm vỡ lệnh** — viết tài liệu
    bằng ký tự thường.
-6. **Hai bộ test dùng chung hạn mức rate limit theo IP.** Chạy `tests/google.mjs`
-   rồi `tests/smoke.mjs` ngay sau đó có thể làm một kiểm tra đăng ký báo FAIL.
-   Đó là rate limit chạy đúng, không phải hỏng.
+6. **Hạn mức đăng ký từng quá chặt.** Trần 5 rồi 10 lần/10 phút mỗi IP chặn
+   đúng nhóm người dùng hợp lệ đông nhất: một lớp học đăng ký cùng lúc từ một
+   wifi. Nay là 30, và rào chắn thật nằm ở xác minh email cùng entitlement.
+7. **`x-forwarded-for` từng được tin vô điều kiện** — bất kỳ ai cũng vượt được
+   mọi rate limit bằng cách đổi một chuỗi trong request. Nay chỉ đọc header đó
+   khi `LINGORA_TRUST_PROXY=1`, tức khi thật sự đứng sau nginx của mình.
+8. **`iframe` trong flexbox bị co lại** làm phép đo tràn ngang sai hoàn toàn:
+   khung khai 390px nhưng `innerWidth` chỉ 300. Harness kiểm khung phải đặt
+   `flex: none`.
+9. **Python hiểu `` trong chuỗi thay thế là backreference** và nhét ký tự
+   điều khiển 0x01 vào tài liệu. Sửa đường dẫn Windows trong file thì dùng Node
+   hoặc chuỗi raw.
 
 ## Quy tắc nội dung: nói rõ ai đang dạy
 
@@ -82,6 +93,13 @@ Người học đọc "Lớp học bằng giọng nói chưa mở". Chủ dự �
 trộn: chữ như "chế độ mô phỏng có nhãn" hay đường dẫn tệp tài liệu từng lọt ra
 trang giới thiệu và trang học phí, làm trang trông như bảng báo lỗi. Bảng phân
 vai ở `docs/UI_SYSTEM.md`.
+
+## Nhận diện
+
+Nền tảng thuộc **Việt Đức Group**. Logo là tệp của khách trong `public/brand/`,
+không vẽ lại. Hệ màu đo trực tiếp từ logo: đỏ cờ Việt Nam làm màu chính theo yêu
+cầu chủ dự án, vàng kim của chữ VIET DUC làm màu phụ, đen cờ Đức làm chữ.
+Chi tiết ở `docs/UI_SYSTEM.md` và `docs/ASSETS.md`.
 
 ## Bước tiếp theo (giai đoạn 2)
 

@@ -1,12 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img"
-     aria-label="Lingora">
-  <title>Lingora</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"
+     aria-label="Việt Đức Group">
+  <title>Việt Đức Group</title>
   
-    <g transform="translate(0 0) scale(1)">
-      <path d="M8 26 C8 15 16.5 6.5 27.5 6.5 L52.5 6.5 C63.5 6.5 72 15 72 26 L72 44
-               C72 55 63.5 63.5 52.5 63.5 L34 63.5 L21 74 L21 63 C13.5 61 8 53.5 8 44 Z"
-            fill="#154B3D"/>
-      <path d="M29 22 L29 44 L52 44" fill="none" stroke="#DEF59A" stroke-width="7"
-            stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
+    <path d="M40 6 C50 20 56 30 56 40 C56 51 47 58 36 58 C25 58 16 51 16 40
+             C16 31 22 22 32 12 C31 22 34 28 38 30 C40 24 40 14 40 6 Z"
+          fill="#E0AC5A" stroke="#C28E43" stroke-width="1.2"/>
+    <path d="M32 10 C40 22 44 30 44 39 C44 49 37 56 30 56 C22 56 16 49 16 40
+             C16 30 24 20 32 10 Z"
+          fill="#CA2427"/>
+    <path d="M30 26 l2.6 5.6 6.1 .7 -4.5 4.2 1.2 6 -5.4 -3 -5.4 3 1.2 -6
+             -4.5 -4.2 6.1 -.7 Z"
+          fill="#F9DA07"/>
 </svg>

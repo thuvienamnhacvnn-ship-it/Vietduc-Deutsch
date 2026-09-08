@@ -34,8 +34,8 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
   return (
     <header className="site-header">
       <div className="wrap site-header__inner">
-        <Link href="/" className="site-header__brand" aria-label="Lingora, về trang chủ">
-          <Logo />
+        <Link href="/" className="site-header__brand" aria-label="Về trang chủ">
+          <Logo height={46} />
         </Link>
 
         <nav className="site-header__nav" aria-label="Điều hướng chính">

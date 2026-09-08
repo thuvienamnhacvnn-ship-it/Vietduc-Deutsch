@@ -48,10 +48,10 @@ export function ThemeToggle() {
   function apply(next: Theme) {
     try {
       if (next === "system") {
-        localStorage.removeItem("lingora-theme");
+        localStorage.removeItem("vd-theme");
         delete document.documentElement.dataset.theme;
       } else {
-        localStorage.setItem("lingora-theme", next);
+        localStorage.setItem("vd-theme", next);
         document.documentElement.dataset.theme = next;
       }
     } catch {

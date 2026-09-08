@@ -75,7 +75,7 @@ export default async function HomePage() {
           <div className="grid grid-4" style={{ marginTop: "var(--s-9)" }}>
             {CURRICULUM.map((lvl) => (
               <article key={lvl.level} className="card level-card">
-                <span className="badge badge--lime">{lvl.level}</span>
+                <span className="badge badge--gold">{lvl.level}</span>
                 <h3 style={{ marginTop: "var(--s-4)" }}>{lvl.headline}</h3>
                 <ul className="tick">
                   {lvl.canDo.slice(0, 3).map((c) => (

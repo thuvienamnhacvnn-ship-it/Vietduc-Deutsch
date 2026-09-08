@@ -44,11 +44,19 @@ export function hit(key: string, limit: number, windowMs: number): RateLimitResu
 }
 
 /**
- * IP của client. Chỉ tin `x-forwarded-for` khi ứng dụng thật sự đứng sau proxy
- * của mình - trên VPS, nginx đặt header này. Không có thì rơi về chuỗi cố định,
- * và rate limit khi đó tính chung cho cả máy, vẫn an toàn hơn là không giới hạn.
+ * IP của client.
+ *
+ * `x-forwarded-for` là một header do CLIENT gửi được. Tin nó vô điều kiện nghĩa
+ * là bất kỳ ai cũng vượt được mọi rate limit chỉ bằng cách đổi một chuỗi trong
+ * request - mỗi request một IP giả, mỗi IP một hạn mức mới.
+ *
+ * Vì vậy chỉ đọc header này khi `LINGORA_TRUST_PROXY` được bật, tức khi ứng
+ * dụng thật sự đứng sau proxy của chính mình (nginx trên VPS ghi đè header đó).
+ * Không bật thì mọi request rơi vào một nhóm chung: thô hơn, nhưng không giả
+ * mạo được.
  */
 export function clientIp(request: Request): string {
+  if (process.env.LINGORA_TRUST_PROXY !== "1") return "shared";
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0]!.trim();
   return request.headers.get("x-real-ip")?.trim() || "unknown";

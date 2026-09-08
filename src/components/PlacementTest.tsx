@@ -213,7 +213,7 @@ export function PlacementTest() {
   if (phase === "intro") {
     return (
       <div className="test-card test-intro">
-        <span className="badge badge--lime">Khoảng 10–15 phút</span>
+        <span className="badge badge--gold">Khoảng 10–15 phút</span>
         <h1>Xem bạn đang ở đâu</h1>
         <p className="lede" style={{ fontSize: "var(--fs-md)" }}>
           Bốn phần, mỗi màn một câu. Sai cũng không sao — mục đích là tìm đúng điểm bắt đầu cho
@@ -281,7 +281,7 @@ export function PlacementTest() {
       <div className="test-progress">
         <div className="test-progress__meta">
           <span className="badge">{SKILL_LABEL[item.skill] ?? item.skill}</span>
-          <span className="badge badge--lime">{item.level}</span>
+          <span className="badge badge--gold">{item.level}</span>
           <span className="test-progress__count">
             Câu {item.index} / khoảng {item.total}
           </span>

@@ -1,20 +1,31 @@
-# Hệ thống thiết kế Lingora
+# Hệ thống thiết kế Việt Đức
 
 Thẩm mỹ đích: học viện ngôn ngữ hiện đại - tri thức gặp công nghệ. Thoáng, có
 chiều sâu, chữ rõ, hình có mục đích. Không phải dashboard SaaS đại trà, cũng
 không phải app học tiếng cho trẻ con.
 
-## Bảng màu (theo hướng nghệ thuật trong bản giao việc)
+## Bảng màu — lấy từ logo, không phải chọn tự do
 
-| Token | Giá trị | Vai trò |
-|---|---|---|
-| `--paper` | `#F8FAF9` | Nền trang |
-| `--forest` | `#154B3D` | Xanh ngọc đậm - màu cấu trúc, band, nút chính |
-| `--lime` | `#DEF59A` | Vàng chanh - **chỉ** cho hành động chính và thanh tiến độ |
-| `--ink` | `#203B34` | Chữ chính |
+Màu đo trực tiếp từ tệp logo bằng `npx tsx scripts/lay-mau-logo.ts`.
+**Đỏ là màu chính** theo yêu cầu của chủ dự án.
 
-Vàng chanh dùng có tiết chế. Nó không bao giờ là nền của một khối lớn và không
-bao giờ mang chữ trắng: `--on-lime` là `#153A2E`, đạt tương phản 9.6:1.
+| Token | Giá trị | Lấy từ | Vai trò |
+|---|---|---|---|
+| `--brand` | `#CA2427` | đỏ cờ Việt Nam trong logo | đỏ dùng cho CHỮ và viền |
+| `--brand-fill` | `#CA2427` | như trên | đỏ dùng cho MẶT PHẲNG: nút chính, bong bóng, khối nhấn |
+| `--band` | `#8E1A1D` | đỏ sẫm | dải nền lớn, chữ trắng đạt 9.1:1 |
+| `--gold` | `#C28E43` | chữ VIET DUC | màu phụ: huy hiệu, viền, thanh tiến độ |
+| `--star` | `#F9DA07` | ngôi sao trên cờ | điểm nhấn nhỏ |
+| `--ink` | `#241A17` | — | chữ chính, ấm để hợp với đỏ và vàng |
+| `--paper` | `#FAF7F4` | — | nền giấy hơi ấm; trắng lạnh làm đỏ trông như báo lỗi |
+
+Hai quy tắc không được phá:
+
+1. **Vàng kim không bao giờ mang chữ trắng.** Trắng trên `#C28E43` chỉ 2.9:1.
+   Chữ trên nền vàng luôn là `--on-gold`.
+2. **`--brand` và `--brand-fill` đi ngược chiều khi đổi chủ đề.** Đỏ dùng cho
+   chữ phải SÁNG lên trên nền tối mới đọc được; đỏ dùng cho mặt phẳng mà sáng
+   lên thì thành hồng và mất chất thương hiệu. Vì vậy chúng là hai token riêng.
 
 Các token dẫn xuất (`--forest-700`, `--paper-raised`, `--line`, `--muted`...) khai
 báo đầy đủ trong `src/styles/tokens.css`, kèm bảng tương phản đã đo trong chính
