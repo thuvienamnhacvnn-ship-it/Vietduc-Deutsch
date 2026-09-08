@@ -1527,3 +1527,20 @@ table.data tr:last-child td {
 .band .persona {
   color: var(--lime);
 }
+
+/* Ghi chú trầm: dùng cho những điều bắt buộc phải nói nhưng không phải cảnh báo
+   - ví dụ lời khai báo "đây là giáo viên trí tuệ nhân tạo". Một hộp alert cho
+   việc này làm trang trông như đang báo lỗi, và hai hộp cạnh nhau thì càng nặng. */
+.note-quiet {
+  max-width: 72ch;
+  margin-top: var(--s-4);
+  padding-left: var(--s-4);
+  border-left: 3px solid var(--lime-deep);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.band .note-quiet {
+  color: var(--on-band-muted);
+}

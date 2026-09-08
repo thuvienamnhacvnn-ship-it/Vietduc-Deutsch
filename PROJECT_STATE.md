@@ -75,6 +75,14 @@ hiện ở đúng ba nơi: trang đội ngũ, trang lớp học, và FAQ cùng �
 đây nhãn "AI" bị dán lên mọi thẻ và mọi khối, làm giao diện lạnh như bảng thông
 báo mà không làm sự thật rõ hơn.
 
+## Quy tắc: ngôn ngữ sản phẩm vs ngôn ngữ kỹ thuật
+
+Người học đọc "Lớp học bằng giọng nói chưa mở". Chủ dự án đọc `stt: mock` ở
+`/quan-tri`. Lập trình viên đọc `docs/INTEGRATIONS.md`. Ba thứ này không được
+trộn: chữ như "chế độ mô phỏng có nhãn" hay đường dẫn tệp tài liệu từng lọt ra
+trang giới thiệu và trang học phí, làm trang trông như bảng báo lỗi. Bảng phân
+vai ở `docs/UI_SYSTEM.md`.
+
 ## Bước tiếp theo (giai đoạn 2)
 
 1. Cố vấn Mia: luồng hỏi mục tiêu, lưu vào `learner_profiles`, sinh lộ trình đề

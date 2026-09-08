@@ -35,21 +35,26 @@ export default async function PricingPage() {
         <div className="wrap">
           <h2>Trạng thái thanh toán</h2>
           <div className="alert alert--info" style={{ maxWidth: "76ch" }}>
-            <p>
-              Cổng thanh toán đang ở chế độ <strong>{payments === "live" ? "thật" : "chưa kết nối"}</strong>.
-              {payments === "live"
-                ? " Giao dịch được xử lý qua nhà cung cấp đã cấu hình."
-                : " Chưa có giao dịch nào được thực hiện và không nút nào trên trang này thu tiền được."}
+            <p style={{ marginBottom: 0 }}>
+              {payments === "live" ? (
+                <>
+                  <strong>Thanh toán đang mở.</strong> Giao dịch được xử lý qua nhà cung cấp đã cấu
+                  hình.
+                </>
+              ) : (
+                <>
+                  <strong>Chưa mở thanh toán.</strong> Bạn chưa mua được gói nào, và chúng tôi chưa
+                  thu tiền của ai.
+                </>
+              )}
             </p>
           </div>
 
-          <h3>Những gì phải xong trước khi mở bán</h3>
-          <ul className="tick" style={{ maxWidth: "72ch" }}>
-            <li>Thông tin pháp nhân, tài khoản nhận tiền và thông tin thuế của doanh nghiệp.</li>
-            <li>Điều khoản sử dụng, chính sách hủy và hoàn tiền được người chịu trách nhiệm duyệt.</li>
-            <li>Kết nối PayPal và một nhà cung cấp thẻ, kiểm thử ở môi trường sandbox trước.</li>
-            <li>Nội dung và bộ đánh giá của cấp độ được bán đã qua duyệt.</li>
-          </ul>
+          <p style={{ maxWidth: "72ch", color: "var(--muted)" }}>
+            Khi mở bán, giá, chu kỳ, điều kiện gia hạn và chính sách hoàn tiền sẽ được ghi đầy đủ
+            tại trang này và trong <a href="/dieu-khoan">Điều khoản sử dụng</a> trước khi có hiệu
+            lực.
+          </p>
         </div>
       </section>
     </>

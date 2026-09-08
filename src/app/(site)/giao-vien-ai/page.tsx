@@ -20,10 +20,10 @@ export default function AgentsPage() {
             nhất.
           </p>
 
-          <div className="alert alert--info" style={{ maxWidth: "72ch" }} role="note">
-            <p style={{ marginBottom: 0 }}>{AI_DISCLOSURE} Chúng tôi đặt tên và tính cách cho họ
-            để buổi học có người đồng hành, không phải để bạn hiểu nhầm.</p>
-          </div>
+          <p className="note-quiet">
+            {AI_DISCLOSURE} Chúng tôi đặt tên và tính cách cho họ để buổi học có người đồng hành,
+            không phải để bạn hiểu nhầm.
+          </p>
         </div>
       </section>
 

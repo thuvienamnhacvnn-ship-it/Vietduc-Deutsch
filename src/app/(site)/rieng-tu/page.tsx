@@ -51,8 +51,9 @@ export default function PrivacyPage() {
 
         <h2>Dịch vụ tham gia xử lý</h2>
         <p>
-          Bảng dưới đây đọc trực tiếp từ cấu hình đang chạy. &quot;Chưa kết nối&quot; nghĩa là chức
-          năng đó đang chạy ở chế độ mô phỏng nội bộ và không có dữ liệu nào rời khỏi hệ thống.
+          Bảng dưới đây đọc trực tiếp từ cấu hình đang chạy, nên nó luôn khớp với thực tế.
+          &quot;Chưa dùng&quot; nghĩa là chức năng đó chưa hoạt động và chưa có dữ liệu nào của bạn
+          rời khỏi hệ thống.
         </p>
         <div className="table-scroll">
           <table className="data">
@@ -67,8 +68,8 @@ export default function PrivacyPage() {
                 <tr key={key}>
                   <td style={{ whiteSpace: "normal" }}>{SERVICE_LABEL[key] ?? key}</td>
                   <td>
-                    <span className={mode === "live" ? "badge badge--success" : "mock-tag"}>
-                      {mode === "live" ? "đã kết nối" : "chưa kết nối · mô phỏng"}
+                    <span className={mode === "live" ? "badge badge--success" : "badge"}>
+                      {mode === "live" ? "đang dùng" : "chưa dùng"}
                     </span>
                   </td>
                 </tr>

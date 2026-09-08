@@ -39,9 +39,9 @@ export function PlanCards({ plans }: { plans: PublicPlan[] }) {
     <>
       {anyDraft && (
         <div className="alert alert--warning" style={{ marginTop: "var(--s-6)" }}>
-          <p>
-            <strong>Giá tham khảo.</strong> Những con số dưới đây dùng để dựng và kiểm thử giao
-            diện. Chúng chưa được chủ dự án duyệt làm giá kinh doanh, nên chưa thanh toán được.
+          <p style={{ marginBottom: 0 }}>
+            <strong>Giá tham khảo.</strong> Những con số dưới đây chưa phải giá chính thức và có
+            thể thay đổi. Chưa mở đăng ký.
           </p>
         </div>
       )}
@@ -72,8 +72,7 @@ export function PlanCards({ plans }: { plans: PublicPlan[] }) {
             </button>
             {!plan.approvedForSale && (
               <p id={`plan-note-${plan.id}`} className="plan-card__note">
-                Cổng thanh toán chưa được kích hoạt. Xem docs/INTEGRATIONS.md để biết các bước còn
-                thiếu.
+                Chưa mở đăng ký gói này.
               </p>
             )}
           </article>

@@ -42,8 +42,10 @@ export function GoogleButton({ next = "/hoc" }: { next?: string }) {
       )}
 
       {!available && (
+        // Người học không cần biết tên tệp tài liệu của dự án; họ chỉ cần biết
+        // dùng cách nào thay thế. Hướng dẫn kỹ thuật nằm ở docs/INTEGRATIONS.md.
         <p className="oauth-block__hint">
-          Cần cấu hình OAuth client của Google trước khi bật. Xem docs/INTEGRATIONS.md.
+          Cách đăng nhập này chưa mở. Bạn dùng email và mật khẩu bên dưới nhé.
         </p>
       )}
 

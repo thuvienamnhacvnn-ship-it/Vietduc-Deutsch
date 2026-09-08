@@ -120,6 +120,21 @@ export default async function AdminHome() {
         </section>
 
         <section className="card">
+          <h2 style={{ fontSize: "var(--fs-lg)" }}>Trước khi mở bán</h2>
+          <p style={{ color: "var(--muted)", fontSize: "var(--fs-sm)" }}>
+            Danh sách này dành cho chủ dự án. Nó cố ý không nằm trên trang học phí công khai -
+            người học không cần đọc kế hoạch nội bộ.
+          </p>
+          <ul className="tick" style={{ marginBottom: 0 }}>
+            <li>Thông tin pháp nhân, tài khoản nhận tiền và thông tin thuế của doanh nghiệp.</li>
+            <li>Điều khoản, chính sách hủy và hoàn tiền được người chịu trách nhiệm duyệt.</li>
+            <li>Kết nối PayPal và một nhà cung cấp thẻ, kiểm thử sandbox trước khi bật live.</li>
+            <li>Nội dung và bộ đánh giá của cấp độ được bán đã qua duyệt.</li>
+            <li>Chuyển cờ <code>approved_for_sale</code> của bản giá tương ứng sang true.</li>
+          </ul>
+        </section>
+
+        <section className="card">
           <h2 style={{ fontSize: "var(--fs-lg)" }}>Nhật ký gần đây</h2>
           {recent.length === 0 ? (
             <div className="empty">

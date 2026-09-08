@@ -74,6 +74,28 @@ biểu tượng vuông (chữ L lồng trong hình bong bóng thoại). Sinh b�
 `mark.svg`, `favicon.svg`, `icon-512.png` (nếu có sharp), `og.svg`.
 Toàn bộ là SVG viết tay trong `scripts/logo.ts`, không phụ thuộc dịch vụ ngoài.
 
+## Ngôn ngữ trên màn hình: ai đọc cái gì
+
+Ba nhóm người đọc ba thứ khác nhau, và không được trộn lẫn:
+
+| Người đọc | Chỗ | Cách viết |
+|---|---|---|
+| Người học và khách | trang công khai, khu học viên | Ngôn ngữ sản phẩm: "Lớp học bằng giọng nói chưa mở", "Chưa mở thanh toán". Nói cái gì dùng được và cái gì chưa. |
+| Chủ dự án và nhân viên | `/quan-tri` | Ngôn ngữ kỹ thuật: `live` / `mock`, tên bảng, tên cờ cấu hình. Checklist mở bán nằm ở đây. |
+| Lập trình viên | `docs/`, comment trong code | Chi tiết đầy đủ: tên biến môi trường, đường dẫn tệp, các bước kích hoạt. |
+
+Chữ như "chế độ mô phỏng có nhãn", "adapter chưa kết nối", hay đường dẫn tới
+`docs/INTEGRATIONS.md` **không được xuất hiện trên màn hình của người học**. Nó
+đúng về mặt kỹ thuật nhưng vô nghĩa với họ, và làm trang giới thiệu trông như
+một bảng báo lỗi.
+
+Điều này KHÔNG có nghĩa là giấu sự thật. Người học vẫn được biết chính xác cái
+gì chưa chạy - chỉ là bằng câu họ hiểu được.
+
+Thành phần `.note-quiet` dùng cho những điều bắt buộc phải nói nhưng không phải
+cảnh báo, ví dụ lời khai báo giáo viên là AI. Một hộp `alert` cho việc đó làm
+trang trông như đang báo lỗi, và hai hộp cạnh nhau thì càng nặng.
+
 ## Nguyên tắc nội dung giao diện
 
 - Không nhận xét học viên, con số người học, chứng chỉ hay logo đối tác bịa đặt.

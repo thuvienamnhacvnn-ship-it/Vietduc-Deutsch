@@ -123,8 +123,15 @@ export default async function LearnHome() {
             </p>
           </div>
           {!voiceReady && (
-            <p className="mock-tag" style={{ marginTop: "var(--s-4)" }}>
-              Giọng nói: chưa kết nối dịch vụ, đang ở chế độ mô phỏng
+            <p
+              style={{
+                marginTop: "var(--s-4)",
+                marginBottom: 0,
+                fontSize: "var(--fs-sm)",
+                color: "var(--muted)",
+              }}
+            >
+              Lớp học bằng giọng nói đang được hoàn thiện và chưa mở.
             </p>
           )}
         </section>

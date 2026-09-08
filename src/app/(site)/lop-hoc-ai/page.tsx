@@ -53,12 +53,12 @@ export default function AiClassPage() {
           </p>
 
           {!voiceReady && (
-            <div className="alert alert--warning" style={{ maxWidth: "72ch" }}>
-              <p>
-                <strong>Trạng thái hiện tại:</strong> phần giọng nói của lớp học đang chạy ở chế độ
-                mô phỏng có nhãn. Dịch vụ nhận dạng giọng nói và tổng hợp giọng nói tiếng Đức chưa
-                được kết nối, nên chưa có buổi học bằng giọng nói thật. Chúng tôi ghi điều này ở
-                đây thay vì để bạn phát hiện lúc vào lớp.
+            <div className="alert alert--info" style={{ maxWidth: "72ch" }}>
+              <p style={{ marginBottom: 0 }}>
+                <strong>Lớp học bằng giọng nói chưa mở.</strong> Trang này mô tả cách buổi học được
+                thiết kế. Phần nói và nghe đang được hoàn thiện, nên hiện chưa có buổi học nào diễn
+                ra bằng giọng nói. Chúng tôi nói trước ở đây, thay vì để bạn phát hiện lúc đã đăng
+                ký xong.
               </p>
             </div>
           )}
@@ -67,13 +67,10 @@ export default function AiClassPage() {
 
       <section className="section" style={{ background: "var(--paper-sunken)", paddingTop: "var(--s-9)" }}>
         <div className="wrap">
-          <div className="alert alert--info" style={{ maxWidth: "72ch" }} role="note">
-            <p style={{ marginBottom: 0 }}>
-              {AI_DISCLOSURE} Dòng nhắc này cũng xuất hiện ngay khi bạn bước vào lớp.
-            </p>
-          </div>
-
           <h2>Tám bước của một buổi học</h2>
+          <p className="note-quiet">
+            {AI_DISCLOSURE} Dòng nhắc này cũng xuất hiện ngay khi bạn bước vào lớp.
+          </p>
           <ol className="cycle">
             {TEACHING_CYCLE.map((s, i) => (
               <li key={s.step} className="cycle__item">
