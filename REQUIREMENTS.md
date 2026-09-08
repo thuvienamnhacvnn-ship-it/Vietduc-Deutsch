@@ -44,14 +44,14 @@ Trạng thái: `DONE` (đã chạy thật) · `MOCK` (chạy bằng mock/sandbox
 | C-01 | Mia — cố vấn tuyển sinh: hỏi mục tiêu, kinh nghiệm, thời gian, hạn, ngôn ngữ hỗ trợ | 2 | TODO |
 | C-02 | Onboarding từng bước, lưu và tiếp tục, quay lại được | 2 | TODO |
 | C-03 | Kiểm tra nhanh (gợi ý) tách khỏi kiểm tra xếp lớp đầy đủ | 2 | TODO |
-| C-04 | Đánh giá Nghe: audio có quyền dùng, số lần phát cấu hình được | 2 | TODO |
-| C-05 | Đánh giá Đọc: đoạn văn theo cấp độ, đáp án có giải thích | 2 | TODO |
-| C-06 | Đánh giá Viết: đề mở + rubric 4 tiêu chí | 2 | TODO |
-| C-07 | Đánh giá Nói: nhiệm vụ nói, chấm dựa trên audio khi đủ năng lực | 2 | TODO |
-| C-08 | Thiếu audio/độ tin cậy thấp ⇒ đánh dấu chưa đủ dữ liệu, không tự cho điểm | 2 | TODO |
-| C-09 | Ngân hàng câu hỏi có level/skill/objective/độ khó/rubric/version/trạng thái duyệt | 2 | TODO |
-| C-10 | Lưu từng câu, tiếp tục được khi mất mạng | 2 | TODO |
-| C-11 | Kết quả theo từng kỹ năng + độ tin cậy + bằng chứng + lộ trình đề xuất | 2 | TODO |
+| C-04 | Đánh giá Nghe: câu tiếng Đức đọc lên, nghe lại không giới hạn | 2 | DONE |
+| C-05 | Đánh giá Đọc: đoạn văn theo cấp độ, đáp án có giải thích | 2 | DONE |
+| C-06 | Đánh giá Viết: đề mở + rubric; hiện chấm được phần kiểm tự động | 2 | WIP |
+| C-07 | Đánh giá Nói: có đề nói; chấm cần dịch vụ giọng nói | 2 | BLOCKED |
+| C-08 | Thiếu audio/độ tin cậy thấp ⇒ đánh dấu chưa đủ dữ liệu, không tự cho điểm | 2 | DONE |
+| C-09 | Ngân hàng câu hỏi có level/skill/độ khó/rubric/version/trạng thái duyệt — 33 câu | 2 | DONE |
+| C-10 | Lưu từng câu, tiếp tục được khi mất mạng | 2 | DONE |
+| C-11 | Kết quả theo từng kỹ năng + độ tin cậy + bằng chứng + mức bắt đầu đề xuất | 2 | DONE |
 | C-12 | Quản trị viên điều chỉnh mức kèm lý do; người học xin đánh giá lại | 2 | TODO |
 
 ## D — Giáo trình và phương pháp

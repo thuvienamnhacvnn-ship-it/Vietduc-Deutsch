@@ -1,0 +1,438 @@
+/*
+ * Bài kiểm tra trình độ và trang kết quả.
+ *
+ * Tách khỏi globals.css vì đây là một màn hình có luật riêng: người học đang
+ * tập trung làm bài, nên nền phải lùi lại và chỉ còn câu hỏi ở phía trước.
+ *
+ * Tông màu: xanh ngọc đậm làm cấu trúc, xanh non làm điểm nhấn - dùng cho thanh
+ * tiến độ, lựa chọn đang chọn, và lớp nền mềm phía sau thẻ bài làm.
+ */
+
+.test-shell {
+  max-width: 760px;
+  margin-inline: auto;
+  padding-block: var(--s-4) var(--s-10);
+}
+
+.test-center {
+  text-align: center;
+  color: var(--muted);
+  padding-block: var(--s-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  max-width: none;
+}
+
+/* Thẻ bài làm nổi trên một vệt xanh non nhạt, để mắt biết đây là khu vực làm
+   bài chứ không phải một trang nội dung thường. */
+.test-card {
+  position: relative;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: var(--s-7) var(--s-6) var(--s-6);
+  box-shadow: var(--shadow-2);
+}
+
+.test-card::before {
+  content: "";
+  position: absolute;
+  inset: -16px -12px auto -12px;
+  height: 130px;
+  z-index: -1;
+  border-radius: var(--r-xl);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lime) 60%, transparent), transparent);
+}
+
+@media (min-width: 700px) {
+  .test-card {
+    padding: var(--s-9) var(--s-9) var(--s-7);
+  }
+}
+
+/* ------------------------------------------------------ màn giới thiệu */
+
+.test-intro h1 {
+  margin-top: var(--s-4);
+  font-size: var(--fs-2xl);
+}
+
+.test-steps {
+  list-style: none;
+  counter-reset: step;
+  margin: var(--s-6) 0 var(--s-7);
+  padding: 0;
+  display: grid;
+  gap: var(--s-2);
+}
+
+.test-steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: var(--s-4);
+  align-items: baseline;
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.test-steps li:last-child {
+  border-bottom: none;
+}
+
+.test-steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: var(--on-lime);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+/* Ba phần tử con trong một grid hai cột: số thứ tự, tiêu đề, mô tả. Nếu không
+   ghim cột cho hai phần tử sau, mô tả rơi xuống cột số thứ tự rộng 30px và vỡ
+   thành mỗi dòng một chữ. */
+.test-steps strong {
+  grid-column: 2;
+  margin-bottom: 2px;
+}
+
+.test-steps span {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+
+.test-steps li::before {
+  grid-row: span 2;
+}
+
+/* -------------------------------------------------------- thanh tiến độ */
+
+.test-progress {
+  margin-bottom: var(--s-6);
+}
+
+.test-progress__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-3);
+}
+
+.test-progress__count {
+  margin-left: auto;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------ nội dung câu hỏi */
+
+.test-passage {
+  margin: 0 0 var(--s-6);
+  padding: var(--s-5);
+  background: var(--paper-sunken);
+  border-left: 4px solid var(--forest);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  font-size: var(--fs-lg);
+  line-height: 1.7;
+}
+
+.test-audio {
+  margin-bottom: var(--s-6);
+  padding: var(--s-5);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--lime) 28%, var(--paper-sunken));
+  border: 1px solid var(--lime-deep);
+}
+
+.test-audio__buttons {
+  display: flex;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-3);
+}
+
+.test-audio__note {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--on-lime);
+  max-width: none;
+}
+
+.test-prompt {
+  font-size: var(--fs-xl);
+  line-height: 1.4;
+  margin-bottom: var(--s-6);
+}
+
+/* ------------------------------------------------------------ lựa chọn */
+
+.test-options {
+  display: grid;
+  gap: var(--s-3);
+  margin-bottom: var(--s-6);
+}
+
+.test-option {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  align-items: center;
+  gap: var(--s-4);
+  text-align: left;
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-md);
+  border: 2px solid var(--line);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--ease),
+    background-color var(--motion-fast) var(--ease);
+}
+
+.test-option:hover:not(:disabled) {
+  border-color: var(--forest);
+  background: color-mix(in srgb, var(--lime) 18%, var(--paper-raised));
+}
+
+.test-option__key {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.test-option[data-chosen] {
+  border-color: var(--forest);
+  background: color-mix(in srgb, var(--lime) 32%, var(--paper-raised));
+}
+
+.test-option[data-chosen] .test-option__key {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: var(--paper);
+}
+
+/* Sau khi trả lời, đáp án đúng luôn được tô - kể cả khi người học chọn sai.
+   Họ cần thấy cái đúng nằm ở đâu, không chỉ biết mình sai. */
+.test-option[data-state="right"] {
+  border-color: var(--success);
+  background: var(--success-bg);
+}
+
+.test-option[data-state="wrong"] {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.test-option:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------- phản hồi */
+
+.test-feedback {
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-md);
+  margin-bottom: var(--s-5);
+  border: 1px solid transparent;
+}
+
+.test-feedback p {
+  margin: var(--s-2) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  max-width: none;
+}
+
+.test-feedback.is-right {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 30%, transparent);
+}
+
+.test-feedback.is-wrong {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 30%, transparent);
+}
+
+.test-speak p {
+  max-width: none;
+}
+
+.test-note {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  background: var(--paper-sunken);
+  border-radius: var(--r-sm);
+  padding: var(--s-3) var(--s-4);
+  margin-bottom: var(--s-5);
+  max-width: none;
+}
+
+.test-actions {
+  display: grid;
+  gap: var(--s-3);
+  justify-items: center;
+}
+
+.test-saved {
+  margin: var(--s-5) 0 0;
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  max-width: none;
+}
+
+/* =================================================================== KẾT QUẢ */
+
+.result-hero {
+  display: grid;
+  gap: var(--s-5);
+  grid-template-columns: 1fr;
+  align-items: center;
+  padding: var(--s-7);
+  border-radius: var(--r-lg);
+  background: linear-gradient(
+    135deg,
+    var(--forest) 0%,
+    color-mix(in srgb, var(--forest) 80%, var(--lime)) 100%
+  );
+  color: var(--paper);
+  margin-bottom: var(--s-8);
+}
+
+.result-hero__label {
+  font-size: var(--fs-sm);
+  color: var(--lime);
+  margin-bottom: var(--s-2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.result-hero__level {
+  font-size: 4rem;
+  line-height: 1;
+  font-weight: 700;
+  margin: 0;
+  color: var(--lime);
+}
+
+.result-hero__body h2 {
+  color: var(--paper);
+  font-size: var(--fs-lg);
+  margin-bottom: var(--s-3);
+}
+
+.result-hero__body p {
+  color: color-mix(in srgb, var(--paper) 82%, transparent);
+  font-size: var(--fs-sm);
+  margin: 0;
+  max-width: none;
+}
+
+@media (min-width: 760px) {
+  .result-hero {
+    grid-template-columns: 150px 1fr;
+    gap: var(--s-8);
+  }
+}
+
+.result-grid {
+  display: grid;
+  gap: var(--s-5);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .result-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.result-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+}
+
+.result-card__head h3 {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.result-card__head .badge {
+  margin-left: auto;
+}
+
+.result-card__note,
+.result-card__conf,
+.result-card__why {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  max-width: none;
+}
+
+.result-card__why {
+  border-top: 1px dashed var(--line-strong);
+  padding-top: var(--s-3);
+  margin-bottom: 0;
+}
+
+.result-blocks {
+  list-style: none;
+  margin: var(--s-3) 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  font-size: var(--fs-sm);
+}
+
+.result-blocks li {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  background: var(--paper-sunken);
+}
+
+.result-blocks li span:first-child {
+  font-weight: 650;
+}
+
+.result-checks {
+  list-style: none;
+  margin: var(--s-3) 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+}
+
+.result-checks li[data-ok="true"] {
+  color: var(--success);
+}
+
+.result-checks li[data-ok="false"] {
+  color: var(--muted);
+}

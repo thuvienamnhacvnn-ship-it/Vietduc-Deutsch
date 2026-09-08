@@ -22,10 +22,14 @@ import {
   planVersions,
   plans,
   learnerProfiles,
+  questionBank,
+  questionVersions,
+  rubricVersions,
   users,
 } from "../src/lib/db/schema";
 import { hashPassword } from "../src/lib/auth/password";
 import { CURRICULUM } from "../src/content/curriculum";
+import { ALL_ITEMS } from "../src/content/placement";
 
 function demoPassword(): string {
   // Đủ dài để không phải mật khẩu yếu nếu ai đó lỡ để tài khoản demo trên máy
@@ -106,6 +110,68 @@ async function main() {
     void created;
   }
 
+  /* --------------------------------------------------- ngân hàng câu hỏi */
+
+  // Rubric cho phần Viết. Bất biến sau khi đã dùng để chấm - sửa tiêu chí thì
+  // tạo phiên bản mới, không sửa tại chỗ.
+  const existingRubric = await db
+    .select({ id: rubricVersions.id })
+    .from(rubricVersions)
+    .where(eq(rubricVersions.code, "writing-placement"))
+    .limit(1);
+
+  let writingRubricId = existingRubric[0]?.id;
+  if (!writingRubricId) {
+    const created = await db
+      .insert(rubricVersions)
+      .values({
+        code: "writing-placement",
+        version: 1,
+        skill: "writing",
+        criteria: [
+          { key: "task", label: "Hoàn thành yêu cầu của đề", machineCheckable: true },
+          { key: "length", label: "Đủ độ dài tối thiểu", machineCheckable: true },
+          { key: "coherence", label: "Mạch lạc", machineCheckable: false },
+          { key: "vocabulary", label: "Từ vựng", machineCheckable: false },
+          { key: "grammar", label: "Ngữ pháp", machineCheckable: false },
+        ],
+      })
+      .returning({ id: rubricVersions.id });
+    writingRubricId = created[0]!.id;
+  }
+
+  let newQuestions = 0;
+  for (const item of ALL_ITEMS) {
+    const existing = await db
+      .select({ id: questionBank.id })
+      .from(questionBank)
+      .where(eq(questionBank.code, item.code))
+      .limit(1);
+    if (existing[0]) continue;
+
+    // Độ khó thô theo cấp độ; dùng để xếp thứ tự, không phải để chấm.
+    const difficulty = { A1: 0.2, A2: 0.4, B1: 0.6, B2: 0.85 }[item.level];
+
+    const q = await db
+      .insert(questionBank)
+      .values({ code: item.code, level: item.level, skill: item.skill, difficulty })
+      .returning({ id: questionBank.id });
+
+    // `payload` giữ nguyên nội dung câu hỏi; `answerKey` tách riêng để phần
+    // gửi ra trình duyệt không bao giờ kèm đáp án.
+    const isMcq = item.kind === "mcq";
+    await db.insert(questionVersions).values({
+      questionId: q[0]!.id,
+      version: 1,
+      payload: item,
+      answerKey: isMcq ? { answer: item.answer, why: item.why } : null,
+      rubricVersionId: item.kind === "write" ? writingRubricId : null,
+      // Bộ câu hỏi này do chủ dự án duyệt cùng lúc với việc nạp seed.
+      reviewState: "published",
+    });
+    newQuestions += 1;
+  }
+
   /* -------------------------------------------------------------- gói học */
 
   const demoPlans = [
@@ -175,7 +241,7 @@ async function main() {
     });
   }
 
-  console.log("\nĐã nạp dữ liệu demo.");
+  console.log(`\nĐã nạp dữ liệu demo. Câu hỏi xếp lớp mới nạp: ${newQuestions}.`);
   if (credentials.length > 0) {
     console.log("\nTài khoản demo (mật khẩu chỉ hiện một lần, không lưu ở đâu cả):");
     console.log(credentials.join("\n"));

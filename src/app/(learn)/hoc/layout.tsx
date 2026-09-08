@@ -3,7 +3,8 @@ import { requireUser } from "@/lib/auth/guard";
 
 const ITEMS: NavItem[] = [
   { href: "/hoc", label: "Bảng học" },
-  { href: "/hoc/xep-lop", label: "Xếp lớp", soon: true },
+  { href: "/hoc/xep-lop", label: "Kiểm tra trình độ" },
+  { href: "/hoc/ket-qua", label: "Kết quả" },
   { href: "/hoc/lo-trinh", label: "Lộ trình", soon: true },
   { href: "/hoc/on-tap", label: "Ôn tập", soon: true },
   { href: "/hoc/ho-so", label: "Hồ sơ" },

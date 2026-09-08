@@ -9,7 +9,7 @@
     "start": "next start -p 3055",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node tests/smoke.mjs && node tests/google.mjs",
+    "test": "node tests/smoke.mjs && node tests/google.mjs && node tests/xep-lop.mjs",
     "db:push": "tsx scripts/db-push.ts",
     "seed": "tsx scripts/seed.ts",
     "logo": "tsx scripts/logo.ts",

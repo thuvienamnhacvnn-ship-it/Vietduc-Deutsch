@@ -21,7 +21,10 @@ const Body = z.object({
 
 export async function POST(request: Request) {
   const ip = clientIp(request);
-  const limit = hit(`dang-ky:${ip}`, 5, 10 * 60 * 1000);
+  // 10 chứ không phải 5: cả một văn phòng, một ký túc xá hay một nhà mạng dùng
+  // CGNAT đều ra ngoài bằng chung một địa chỉ IP. Đặt quá chặt thì người thứ
+  // sáu trong nhà không đăng ký được, mà kẻ tấn công thật thì đổi IP dễ hơn thế.
+  const limit = hit(`dang-ky:${ip}`, 10, 10 * 60 * 1000);
   if (!limit.allowed) return tooMany(limit);
 
   const parsed = Body.safeParse(await request.json().catch(() => null));
