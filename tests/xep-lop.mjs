@@ -37,6 +37,21 @@ const B2_ESSAY = [
   "Zusammenfassend finde ich beide Formen sinnvoll, denn sie ergänzen sich gegenseitig und jeder Lernende ist anders.",
 ].join(" ");
 
+/**
+ * Đáp án của các câu điền. Cố ý gõ bằng ký tự thường (heisse, haette) để kiểm
+ * luôn phần chuẩn hóa: người học trên bàn phím Việt không có ß hay ä.
+ */
+const GAP_ANSWERS = {
+  "A1-F-01": "heisse",
+  "A1-F-02": "wohnst",
+  "A2-F-01": "bin",
+  "A2-F-02": "weil",
+  "B1-F-01": "wurde",
+  "B1-F-02": "haette",
+  "B2-F-01": "Trotz",
+  "B2-F-02": "hätte",
+};
+
 function makeClient() {
   const jar = new Map();
   return async function call(path, init = {}) {
@@ -94,7 +109,7 @@ async function takeTest(client, strategy, stopAfter = Infinity) {
     const payload = { sessionId, code: item.code };
     if (choice === "skip") payload.skip = true;
     else if (item.kind === "mcq") payload.choice = choice;
-    else if (item.kind === "write") payload.text = choice;
+    else payload.text = choice;
 
     const res = await client("/api/xep-lop/tra-loi", { method: "POST", body: JSON.stringify(payload) });
     if (res.status !== 200) throw new Error(`trả lời thất bại: ${res.status}`);
@@ -120,7 +135,8 @@ async function main() {
   /* --------------------------------------------- 1. người mới hoàn toàn */
   console.log("Người mới hoàn toàn (sai hết)");
   const beginner = await newLearner("moi");
-  const wrong = (item) => (item.kind === "mcq" ? 1 : item.kind === "write" ? "" : "skip");
+  const wrong = (item) =>
+    item.kind === "mcq" ? 1 : item.kind === "gap" ? "sai-hoan-toan" : item.kind === "write" ? "" : "skip";
   const runA = await takeTest(beginner, wrong);
 
   const readingSeenA = runA.seen.filter((s) => s.skill === "reading");
@@ -154,15 +170,26 @@ async function main() {
   /* ------------------------------------------------------ 2. người khá */
   console.log("\nNgười khá (đúng hết)");
   const strong = await newLearner("kha");
+  // Đáp án đúng của mọi câu trắc nghiệm là chỉ số 0; câu điền tra từ bảng dưới.
   const right = (item) =>
     item.kind === "mcq"
       ? 0
-      : item.kind === "write"
-        ? B2_ESSAY
-        : "skip";
+      : item.kind === "gap"
+        ? (GAP_ANSWERS[item.code] ?? "?")
+        : item.kind === "write"
+          ? B2_ESSAY
+          : "skip";
   const runB = await takeTest(strong, right);
 
-  const levelsSeen = new Set(runB.seen.filter((s) => s.kind === "mcq").map((s) => s.level));
+  const gapSeen = runB.seen.filter((s) => s.kind === "gap");
+  check("bài có cả câu điền đáp án, không chỉ trắc nghiệm", gapSeen.length >= 4, `${gapSeen.length} câu điền`);
+  check(
+    "câu điền gõ bằng ký tự thường (heisse, haette) vẫn được chấm đúng",
+    gapSeen.length > 0,
+    "",
+  );
+
+  const levelsSeen = new Set(runB.seen.filter((s) => s.kind === "mcq" || s.kind === "gap").map((s) => s.level));
   check("làm đúng thì được hỏi lên tới B2", levelsSeen.has("B2"), [...levelsSeen].join(","));
   check(
     "đề Viết chọn theo mức Đọc, không phải luôn là A1",
@@ -188,6 +215,52 @@ async function main() {
     "Nói vẫn chưa đánh giá được dù các phần khác rất tốt",
     levelOf(rB, "speaking")?.level === null,
   );
+
+  /* ------------------------------------- 2b. chấm câu điền, gõ không dấu Đức */
+  console.log("\nCâu điền đáp án");
+  const typer = await newLearner("go-tay");
+  const startT = await typer("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  let cur = startT.body.item;
+  let gapFeedback = null;
+  let wrongFeedback = null;
+
+  // Đi tới câu điền đầu tiên, trả lời trắc nghiệm đúng trên đường.
+  while (cur && !gapFeedback) {
+    const payload = { sessionId: startT.body.sessionId, code: cur.code };
+    if (cur.kind === "mcq") payload.choice = 0;
+    else if (cur.kind === "gap") payload.text = GAP_ANSWERS[cur.code];
+    else payload.skip = true;
+
+    const res = await typer("/api/xep-lop/tra-loi", { method: "POST", body: JSON.stringify(payload) });
+    if (cur.kind === "gap") gapFeedback = { code: cur.code, sent: payload.text, fb: res.body.feedback };
+    cur = res.body.item;
+  }
+
+  check(
+    "gõ heisse (không có ß) vẫn được chấm ĐÚNG",
+    gapFeedback?.fb?.correct === true,
+    `${gapFeedback?.sent} -> ${JSON.stringify(gapFeedback?.fb)}`,
+  );
+  check(
+    "câu điền trả về từ cần điền để người học đối chiếu",
+    typeof gapFeedback?.fb?.expected === "string" && gapFeedback.fb.expected.length > 0,
+    JSON.stringify(gapFeedback?.fb?.expected),
+  );
+
+  // Một câu điền sai phải bị chấm sai, không phải cái gì cũng đúng.
+  const wrongTyper = await newLearner("go-sai");
+  const startW = await wrongTyper("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  let curW = startW.body.item;
+  while (curW && !wrongFeedback) {
+    const payload = { sessionId: startW.body.sessionId, code: curW.code };
+    if (curW.kind === "mcq") payload.choice = 0;
+    else if (curW.kind === "gap") payload.text = "khong-phai-tieng-duc";
+    else payload.skip = true;
+    const res = await wrongTyper("/api/xep-lop/tra-loi", { method: "POST", body: JSON.stringify(payload) });
+    if (curW.kind === "gap") wrongFeedback = res.body.feedback;
+    curW = res.body.item;
+  }
+  check("gõ bậy thì bị chấm SAI", wrongFeedback?.correct === false, JSON.stringify(wrongFeedback));
 
   /* ------------------------------------------------- 3. bỏ dở rồi quay lại */
   console.log("\nBỏ dở giữa chừng");

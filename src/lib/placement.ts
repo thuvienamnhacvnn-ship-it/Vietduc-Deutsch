@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
   assessmentSessions,
@@ -13,10 +13,12 @@ import {
   type Skill,
 } from "@/lib/db/schema";
 import {
+  AUTO_ITEMS,
   LEVEL_ORDER,
-  MCQ_ITEMS,
   SPEAK_ITEMS,
   WRITE_ITEMS,
+  gapIsCorrect,
+  type GapItem,
   type McqItem,
   type PlacementItem,
   type WriteItem,
@@ -48,7 +50,7 @@ const PASS_TO_CLAIM_LEVEL = 0.6;
 
 export type PublicItem = {
   code: string;
-  kind: "mcq" | "write" | "speak";
+  kind: "mcq" | "gap" | "write" | "speak";
   level: Level;
   skill: Skill;
   prompt: string;
@@ -85,8 +87,13 @@ export const EMPTY_STATE: SessionState = { answered: [], correct: {}, skipped: [
 
 /* ------------------------------------------------------- chọn câu kế tiếp */
 
-function mcqBlock(skill: Skill, level: Level): McqItem[] {
-  return MCQ_ITEMS.filter((i) => i.skill === skill && i.level === level);
+/**
+ * Các câu chấm tự động của một kỹ năng ở một cấp: trắc nghiệm trước, điền sau.
+ * Thứ tự cố ý - người học quen tay với dạng chọn rồi mới phải tự gõ.
+ */
+function autoBlock(skill: Skill, level: Level): (McqItem | GapItem)[] {
+  const block = AUTO_ITEMS.filter((i) => i.skill === skill && i.level === level);
+  return [...block.filter((i) => i.kind === "mcq"), ...block.filter((i) => i.kind === "gap")];
 }
 
 /**
@@ -95,7 +102,7 @@ function mcqBlock(skill: Skill, level: Level): McqItem[] {
  */
 function blockScore(state: SessionState, skill: Skill, level: Level) {
   const skipped = state.skipped ?? [];
-  const block = mcqBlock(skill, level);
+  const block = autoBlock(skill, level);
   const done = block.filter((i) => state.answered.includes(i.code) && !skipped.includes(i.code));
   const right = done.filter((i) => state.correct[i.code]).length;
   return { done: done.length, total: block.length, right, ratio: done.length ? right / done.length : 0 };
@@ -111,7 +118,7 @@ export function nextItem(state: SessionState, writeLevel?: Level): PlacementItem
     if (state.stopped.includes(skill)) continue;
 
     for (const level of LEVEL_ORDER) {
-      const block = mcqBlock(skill, level);
+      const block = autoBlock(skill, level);
       if (block.length === 0) continue;
 
       const remaining = block.filter((i) => !state.answered.includes(i.code));
@@ -151,10 +158,10 @@ export function estimateTotal(state: SessionState): number {
   let total = 0;
   for (const skill of ["reading", "listening"] as const) {
     for (const level of LEVEL_ORDER) {
-      total += mcqBlock(skill, level).length;
+      total += autoBlock(skill, level).length;
       if (
-        state.answered.some((c) => mcqBlock(skill, level).some((i) => i.code === c)) &&
-        blockScore(state, skill, level).done === mcqBlock(skill, level).length &&
+        state.answered.some((c) => autoBlock(skill, level).some((i) => i.code === c)) &&
+        blockScore(state, skill, level).done === autoBlock(skill, level).length &&
         blockScore(state, skill, level).ratio < PASS_TO_CONTINUE
       ) {
         break;
@@ -186,6 +193,16 @@ export function publicItem(item: PlacementItem, index: number, total: number): P
       speakText: item.audioText,
     };
   }
+  if (item.kind === "gap") {
+    // `accept` ở lại server. Gửi ra là đưa luôn đáp án cho người làm bài.
+    return {
+      ...base,
+      kind: "gap",
+      passage: item.passage,
+      hint: item.hint,
+      speakText: item.audioText,
+    };
+  }
   if (item.kind === "write") {
     return { ...base, kind: "write", hint: item.hint, minWords: item.minWords };
   }
@@ -193,6 +210,15 @@ export function publicItem(item: PlacementItem, index: number, total: number): P
 }
 
 /* --------------------------------------------------------------- chấm bài */
+
+/** Chấm một câu tự động. Trắc nghiệm so chỉ số, câu điền so chuỗi đã chuẩn hóa. */
+export function autoIsCorrect(
+  item: McqItem | GapItem,
+  answer: { choice?: number | null; text?: string | null },
+): boolean {
+  if (item.kind === "mcq") return answer.choice === item.answer;
+  return typeof answer.text === "string" && gapIsCorrect(item, answer.text);
+}
 
 /**
  * Chấm phần Viết bằng những tiêu chí máy kiểm được: đủ độ dài chưa, và có mặt
@@ -384,6 +410,32 @@ export async function finishSession(
     .update(assessmentSessions)
     .set({ status: "completed", completedAt: new Date() })
     .where(and(eq(assessmentSessions.id, sessionId), eq(assessmentSessions.userId, userId)));
+}
+
+/**
+ * Phiên này đã thu được đoạn ghi âm bài Nói chưa.
+ *
+ * Có audio KHÔNG có nghĩa là chấm được: vẫn thiếu bộ phân tích giọng nói. Nhưng
+ * nó đổi lời giải thích cho người học từ "chưa thu được âm thanh" thành "đã có
+ * bản ghi, đang chờ chấm" - hai câu này nói hai chuyện khác nhau.
+ */
+export async function hasSpeakingAudio(sessionId: number, userId: number): Promise<boolean> {
+  const db = await getDb();
+  const rows = await db
+    .select({ id: responses.id })
+    .from(responses)
+    .innerJoin(questionVersions, eq(questionVersions.id, responses.questionVersionId))
+    .innerJoin(questionBank, eq(questionBank.id, questionVersions.questionId))
+    .where(
+      and(
+        eq(responses.sessionId, sessionId),
+        eq(responses.userId, userId),
+        eq(questionBank.skill, "speaking"),
+        isNotNull(responses.audioAssetId),
+      ),
+    )
+    .limit(1);
+  return rows.length > 0;
 }
 
 /** Bài làm phần Viết của phiên, để chấm khi kết thúc. */

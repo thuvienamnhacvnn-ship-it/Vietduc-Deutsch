@@ -3,7 +3,13 @@ import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { assessmentSessions } from "@/lib/db/schema";
 import { apiUser } from "@/lib/auth/guard";
-import { finishSession, scoreSession, writingResponseFor, type SessionState } from "@/lib/placement";
+import {
+  finishSession,
+  hasSpeakingAudio,
+  scoreSession,
+  writingResponseFor,
+  type SessionState,
+} from "@/lib/placement";
 import { clientIp, hit, tooMany } from "@/lib/rate-limit";
 import { audit } from "@/lib/audit";
 
@@ -60,9 +66,10 @@ export async function POST(request: Request) {
   const state = session.resumeState as SessionState;
   const writing = await writingResponseFor(session.id, auth.user.id);
 
-  // Chưa có dịch vụ phân tích giọng nói, nên chưa có phiên nào thu được audio
-  // dùng để chấm. Truyền false một cách tường minh thay vì để mặc định ngầm.
-  const results = scoreSession(state, writing, false);
+  // Người học có thể đã ghi âm bài Nói. Điều đó chưa đủ để chấm - vẫn thiếu bộ
+  // phân tích giọng nói - nhưng nó quyết định câu giải thích trả về cho họ.
+  const spokeAudio = await hasSpeakingAudio(session.id, auth.user.id);
+  const results = scoreSession(state, writing, spokeAudio);
 
   await finishSession(auth.user.id, session.id, results);
   await audit({

@@ -47,9 +47,9 @@ Trạng thái: `DONE` (đã chạy thật) · `MOCK` (chạy bằng mock/sandbox
 | C-04 | Đánh giá Nghe: câu tiếng Đức đọc lên, nghe lại không giới hạn | 2 | DONE |
 | C-05 | Đánh giá Đọc: đoạn văn theo cấp độ, đáp án có giải thích | 2 | DONE |
 | C-06 | Đánh giá Viết: đề mở + rubric; hiện chấm được phần kiểm tự động | 2 | WIP |
-| C-07 | Đánh giá Nói: có đề nói; chấm cần dịch vụ giọng nói | 2 | BLOCKED |
+| C-07 | Đánh giá Nói: thu âm thật qua micro và lưu làm bằng chứng; chấm cần dịch vụ giọng nói | 2 | WIP |
 | C-08 | Thiếu audio/độ tin cậy thấp ⇒ đánh dấu chưa đủ dữ liệu, không tự cho điểm | 2 | DONE |
-| C-09 | Ngân hàng câu hỏi có level/skill/độ khó/rubric/version/trạng thái duyệt — 33 câu | 2 | DONE |
+| C-09 | Ngân hàng câu hỏi có level/skill/độ khó/rubric/version/trạng thái duyệt — 41 câu, gồm trắc nghiệm và điền | 2 | DONE |
 | C-10 | Lưu từng câu, tiếp tục được khi mất mạng | 2 | DONE |
 | C-11 | Kết quả theo từng kỹ năng + độ tin cậy + bằng chứng + mức bắt đầu đề xuất | 2 | DONE |
 | C-12 | Quản trị viên điều chỉnh mức kèm lý do; người học xin đánh giá lại | 2 | TODO |
@@ -116,9 +116,9 @@ Trạng thái: `DONE` (đã chạy thật) · `MOCK` (chạy bằng mock/sandbox
 | H-02 | Triển khai VPS bằng Docker Compose, tách web/worker/db | 5 | TODO |
 | H-03 | ADR ghi quyết định và trade-off | 0 | DONE |
 | H-04 | Hợp đồng API: method, input schema, output, quyền, lỗi, rate limit | 0 | DONE |
-| H-05 | Upload có giới hạn kích thước + kiểm MIME + URL ký có hạn | 3 | TODO |
+| H-05 | Upload có giới hạn kích thước + kiểm MIME + hạn giữ tệp; URL ký chưa làm | 3 | WIP |
 | H-06 | Không ghi dữ liệu nhạy cảm vào log; secret không vào bundle/Git | 1 | DONE |
 | H-07 | Backup + diễn tập khôi phục | 5 | TODO |
-| H-08 | Cấu hình thời gian giữ audio/transcript; mặc định không giữ audio thô lâu | 3 | TODO |
+| H-08 | Cấu hình thời gian giữ audio; mỗi tệp ghi âm có `expires_at`. Job dọn chưa làm | 3 | WIP |
 | H-09 | Dashboard vận hành: lớp, lỗi, latency, usage, chi phí theo học viên/gói | 5 | TODO |
 | H-10 | Job nền có retry giới hạn, không gửi nhắc học trùng | 4 | TODO |

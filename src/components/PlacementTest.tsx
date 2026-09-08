@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiPost } from "@/lib/api-client";
+import { SpeakingRecorder } from "@/components/SpeakingRecorder";
 
 type Item = {
   code: string;
-  kind: "mcq" | "write" | "speak";
+  kind: "mcq" | "gap" | "write" | "speak";
   level: string;
   skill: string;
   prompt: string;
@@ -19,7 +20,14 @@ type Item = {
   total: number;
 };
 
-type Feedback = { correct: boolean; answer: number; why: string } | null;
+type Feedback = {
+  correct: boolean;
+  /** Chỉ số đáp án đúng, chỉ có ở câu trắc nghiệm. */
+  answer: number | null;
+  /** Từ cần điền, chỉ có ở câu điền. */
+  expected: string | null;
+  why: string;
+} | null;
 
 const SKILL_LABEL: Record<string, string> = {
   reading: "Đọc và cấu trúc",
@@ -52,6 +60,8 @@ export function PlacementTest() {
   /** Câu kế tiếp, giữ lại trong lúc người học đang đọc lời giải thích. */
   const [pendingNext, setPendingNext] = useState<Item | null>(null);
   const [pendingDone, setPendingDone] = useState(false);
+  /** Đã gửi xong đoạn ghi âm cho đề Nói đang mở. */
+  const [recorded, setRecorded] = useState(false);
   const startedRef = useRef(false);
 
   /* --------------------------------------------------------- giọng đọc */
@@ -131,7 +141,9 @@ export function PlacementTest() {
         sessionId,
         code: item.code,
         ...(item.kind === "mcq" ? { choice: choice ?? -1 } : {}),
-        ...(item.kind === "write" ? { text } : {}),
+        // Câu điền và bài viết dùng chung ô `text`. Thiếu "gap" ở đây từng làm
+        // mọi câu điền bị chấm sai vì server không nhận được gì.
+        ...(item.kind === "gap" || item.kind === "write" ? { text } : {}),
         ...(skip ? { skip: true } : {}),
       },
     );
@@ -158,6 +170,7 @@ export function PlacementTest() {
     setFeedback(null);
     setChoice(null);
     setText("");
+    setRecorded(false);
     setBusy(false);
     if (done || !next) {
       void finish();
@@ -257,9 +270,11 @@ export function PlacementTest() {
   const canSubmit =
     item.kind === "mcq"
       ? choice !== null
-      : item.kind === "write"
-        ? text.trim().split(/\s+/).filter(Boolean).length >= 5
-        : true;
+      : item.kind === "gap"
+        ? text.trim().length > 0
+        : item.kind === "write"
+          ? text.trim().split(/\s+/).filter(Boolean).length >= 5
+          : true;
 
   return (
     <div className="test-card">
@@ -351,6 +366,33 @@ export function PlacementTest() {
         </div>
       )}
 
+      {item.kind === "gap" && (
+        <div className="test-gap">
+          <label htmlFor="test-gap-input">Điền vào chỗ trống</label>
+          <input
+            id="test-gap-input"
+            lang="de"
+            autoComplete="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            value={text}
+            disabled={Boolean(feedback) || busy}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              // Enter là phím tự nhiên nhất ở một ô nhập một từ. Không gắn thì
+              // người học phải rời tay khỏi bàn phím để bấm chuột mỗi câu.
+              if (e.key === "Enter" && text.trim() && !feedback && !busy) submit(false);
+            }}
+            placeholder="Gõ từ cần điền…"
+            data-state={feedback ? (feedback.correct ? "right" : "wrong") : undefined}
+          />
+          <span className="hint">
+            Gợi ý: {item.hint}. Không có ký tự ß hay ä trên bàn phím cũng không sao — gõ ss, ae là
+            được.
+          </span>
+        </div>
+      )}
+
       {item.kind === "write" && (
         <div className="field">
           <label htmlFor="test-write">Bài viết của bạn (bằng tiếng Đức)</label>
@@ -369,13 +411,20 @@ export function PlacementTest() {
         </div>
       )}
 
-      {item.kind === "speak" && (
+      {item.kind === "speak" && sessionId && (
         <div className="test-speak">
           <p>{item.hint}</p>
-          <p className="test-note">
-            Phần chấm kỹ năng Nói cần dịch vụ phân tích giọng nói, và dịch vụ đó chưa được kết nối.
-            Bạn cứ nói thử thành tiếng để tự cảm nhận, rồi bấm Bỏ qua — kỹ năng Nói sẽ được ghi là
-            chưa đánh giá được, chứ chúng tôi không đoán một mức điểm cho bạn.
+
+          <SpeakingRecorder
+            sessionId={sessionId}
+            code={item.code}
+            onSaved={() => setRecorded(true)}
+          />
+
+          <p className="test-note" style={{ marginTop: "var(--s-5)" }}>
+            Đoạn ghi âm được gửi thẳng lên máy chủ Lingora và không đi đâu khác. Hiện chưa có bộ
+            phân tích giọng nói để chấm, nên kỹ năng Nói vẫn được ghi là <strong>chưa đánh giá
+            được</strong> — chúng tôi giữ bản ghi làm bằng chứng thay vì đoán một mức điểm cho bạn.
           </p>
         </div>
       )}
@@ -383,6 +432,11 @@ export function PlacementTest() {
       {feedback && (
         <div className={`test-feedback ${feedback.correct ? "is-right" : "is-wrong"}`} role="status">
           <strong>{feedback.correct ? "Đúng rồi." : "Chưa đúng."}</strong>
+          {feedback.expected && !feedback.correct && (
+            <p>
+              Đáp án: <strong lang="de">{feedback.expected}</strong>
+            </p>
+          )}
           <p>{feedback.why}</p>
         </div>
       )}
@@ -411,9 +465,12 @@ export function PlacementTest() {
               disabled={!canSubmit || busy}
             >
               {busy && <span className="spinner" aria-hidden="true" />}
-              {item.kind === "speak" ? "Tôi đã nói xong" : "Trả lời"}
+              {item.kind === "speak" ? (recorded ? "Xong, đi tiếp" : "Tôi đã nói xong") : "Trả lời"}
             </button>
-            {(item.kind === "speak" || (item.speakText && !germanVoice) || item.kind === "write") && (
+            {(item.kind === "speak" ||
+              (item.speakText && !germanVoice) ||
+              item.kind === "gap" ||
+              item.kind === "write") && (
               <button
                 type="button"
                 className="btn btn--ghost btn--sm"

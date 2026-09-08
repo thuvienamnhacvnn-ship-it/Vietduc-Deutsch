@@ -33,6 +33,30 @@ export type McqItem = {
   why: string;
 };
 
+/**
+ * Câu điền đáp án: người học GÕ từ vào chỗ trống thay vì chọn trong bốn phương
+ * án. Khó hơn trắc nghiệm thật sự - không đoán mò được, và nó đo được việc nhớ
+ * hình thái từ chứ không chỉ nhận ra mặt chữ.
+ */
+export type GapItem = {
+  code: string;
+  kind: "gap";
+  level: Level;
+  skill: Skill;
+  /** Câu có dấu ___ ở chỗ cần điền. */
+  prompt: string;
+  passage?: string;
+  audioText?: string;
+  /** Gợi ý dạng nguyên thể hoặc nghĩa, để đây không thành câu đố mẹo. */
+  hint: string;
+  /**
+   * Mọi cách viết được chấp nhận. Luôn ghi cả biến thể không dấu Đức
+   * (heisse cho heiße) - người học gõ trên bàn phím Việt không có ß.
+   */
+  accept: string[];
+  why: string;
+};
+
 export type WriteItem = {
   code: string;
   kind: "write";
@@ -58,7 +82,7 @@ export type SpeakItem = {
   hint: string;
 };
 
-export type PlacementItem = McqItem | WriteItem | SpeakItem;
+export type PlacementItem = McqItem | GapItem | WriteItem | SpeakItem;
 
 /* ------------------------------------------------------------------ A1 */
 
@@ -421,6 +445,95 @@ const B2: McqItem[] = [
   },
 ];
 
+/* -------------------------------------------------------- điền đáp án */
+
+/**
+ * Câu điền, xếp theo cấp. Đặt sau phần trắc nghiệm cùng cấp trong mỗi kỹ năng,
+ * nên người học đã quen tay trước khi phải tự gõ.
+ */
+export const GAP_ITEMS: GapItem[] = [
+  {
+    code: "A1-F-01",
+    kind: "gap",
+    level: "A1",
+    skill: "reading",
+    prompt: "Ich ___ Mai und komme aus Vietnam.",
+    hint: "động từ heißen, chia cho ngôi ich",
+    accept: ["heiße", "heisse"],
+    why: "Ngôi „ich“ thì „heißen“ thành „heiße“. Gõ „heisse“ cũng được chấp nhận vì bàn phím tiếng Việt không có ß.",
+  },
+  {
+    code: "A1-F-02",
+    kind: "gap",
+    level: "A1",
+    skill: "reading",
+    prompt: "Wo ___ du? — In Berlin.",
+    hint: "động từ wohnen, chia cho ngôi du",
+    accept: ["wohnst"],
+    why: "Ngôi „du“ lấy đuôi -st: „du wohnst“.",
+  },
+  {
+    code: "A2-F-01",
+    kind: "gap",
+    level: "A2",
+    skill: "reading",
+    prompt: "Gestern ___ ich ins Kino gegangen.",
+    hint: "trợ động từ cho thì Perfekt của „gehen“",
+    accept: ["bin"],
+    why: "„gehen“ là động từ chỉ sự di chuyển nên dùng „sein“: „ich bin gegangen“, không phải „habe“.",
+  },
+  {
+    code: "A2-F-02",
+    kind: "gap",
+    level: "A2",
+    skill: "reading",
+    prompt: "Ich komme später, ___ ich noch arbeiten muss.",
+    hint: "liên từ đẩy động từ xuống cuối câu",
+    accept: ["weil", "da"],
+    why: "„weil“ (hoặc „da“) đẩy động từ „muss“ xuống cuối mệnh đề, đúng như trong câu.",
+  },
+  {
+    code: "B1-F-01",
+    kind: "gap",
+    level: "B1",
+    skill: "reading",
+    prompt: "Der Brief ___ gestern von der Sekretärin geschrieben.",
+    hint: "bị động ở quá khứ",
+    accept: ["wurde"],
+    why: "Bị động quá khứ: „werden“ ở Präteritum („wurde“) + Partizip II. „war geschrieben“ là trạng thái, không phải hành động.",
+  },
+  {
+    code: "B1-F-02",
+    kind: "gap",
+    level: "B1",
+    skill: "reading",
+    prompt: "Wenn ich mehr Zeit ___, würde ich einen Kurs besuchen.",
+    hint: "Konjunktiv II của „haben“",
+    accept: ["hätte", "haette"],
+    why: "Câu điều kiện không có thật dùng Konjunktiv II: „wenn ich … hätte, würde ich …“.",
+  },
+  {
+    code: "B2-F-01",
+    kind: "gap",
+    level: "B2",
+    skill: "reading",
+    prompt: "___ des schlechten Wetters fand das Fest statt.",
+    hint: "giới từ mang nghĩa „mặc dù“, đi với cách 2",
+    accept: ["trotz"],
+    why: "„trotz“ đi với Genitiv: „trotz des schlechten Wetters“ — mặc dù thời tiết xấu.",
+  },
+  {
+    code: "B2-F-02",
+    kind: "gap",
+    level: "B2",
+    skill: "reading",
+    prompt: "Er tut so, als ___ er alles verstanden.",
+    hint: "Konjunktiv II của „haben“, sau „als ob / als“",
+    accept: ["hätte", "haette"],
+    why: "Sau „als“ mang nghĩa giả vờ, tiếng Đức dùng Konjunktiv: „als hätte er alles verstanden“.",
+  },
+];
+
 /* --------------------------------------------------------------- Viết */
 
 export const WRITE_ITEMS: WriteItem[] = [
@@ -503,7 +616,39 @@ export const SPEAK_ITEMS: SpeakItem[] = [
 /** Toàn bộ câu trắc nghiệm, đã xếp theo cấp độ tăng dần. */
 export const MCQ_ITEMS: McqItem[] = [...A1, ...A2, ...B1, ...B2];
 
-export const ALL_ITEMS: PlacementItem[] = [...MCQ_ITEMS, ...WRITE_ITEMS, ...SPEAK_ITEMS];
+/** Câu chấm tự động được: trắc nghiệm và điền. Dùng chung một quy tắc chấm. */
+export const AUTO_ITEMS: (McqItem | GapItem)[] = [...MCQ_ITEMS, ...GAP_ITEMS];
+
+export const ALL_ITEMS: PlacementItem[] = [
+  ...MCQ_ITEMS,
+  ...GAP_ITEMS,
+  ...WRITE_ITEMS,
+  ...SPEAK_ITEMS,
+];
+
+/**
+ * So khớp câu trả lời gõ tay.
+ *
+ * Chuẩn hóa trước khi so: bỏ hoa thường, bỏ dấu câu, và quy các ký tự riêng của
+ * tiếng Đức về dạng gõ được trên bàn phím thường (ß→ss, ä→ae). Người học đang
+ * học ngữ pháp, không phải đang thi gõ ký tự đặc biệt.
+ */
+export function normalizeAnswer(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[.,!?;:"'()]/g, "")
+    .replace(/ß/g, "ss")
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/\s+/g, " ");
+}
+
+export function gapIsCorrect(item: GapItem, value: string): boolean {
+  const given = normalizeAnswer(value);
+  return item.accept.some((a) => normalizeAnswer(a) === given);
+}
 
 /** Tra nhanh theo mã. */
 export function itemByCode(code: string): PlacementItem | undefined {

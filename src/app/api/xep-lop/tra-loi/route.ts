@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { assessmentSessions, responses } from "@/lib/db/schema";
 import { apiUser } from "@/lib/auth/guard";
 import {
+  autoIsCorrect,
   estimateTotal,
   nextItem,
   publicItem,
@@ -100,13 +101,18 @@ export async function POST(request: Request) {
     const raw =
       item.kind === "mcq"
         ? { code, choice: skip ? null : (choice ?? null), skipped: Boolean(skip) }
-        : item.kind === "write"
-          ? { code, text: text ?? "", skipped: Boolean(skip) }
-          : { code, spoken: false };
+        : item.kind === "gap"
+          ? { code, text: skip ? "" : (text ?? ""), skipped: Boolean(skip) }
+          : item.kind === "write"
+            ? { code, text: text ?? "", skipped: Boolean(skip) }
+            : { code, spoken: false };
 
     // Bỏ qua khác với trả lời sai. Câu bỏ qua không có điểm, và hàm chấm loại
     // nó khỏi phép tính thay vì coi là một câu làm hỏng.
-    const isCorrect = item.kind === "mcq" && !skip ? choice === item.answer : null;
+    const isCorrect =
+      (item.kind === "mcq" || item.kind === "gap") && !skip
+        ? autoIsCorrect(item, { choice, text })
+        : null;
 
     await db.insert(responses).values({
       sessionId,
@@ -132,8 +138,15 @@ export async function POST(request: Request) {
     saved: true,
     // Chỉ trả về đáp án đúng và lời giải thích ở đây, sau khi đã ghi bài làm.
     feedback:
-      item.kind === "mcq" && !skip
-        ? { correct: state.correct[code] === true, answer: item.answer, why: item.why }
+      (item.kind === "mcq" || item.kind === "gap") && !skip
+        ? {
+            correct: state.correct[code] === true,
+            // Trắc nghiệm trả về chỉ số để tô đáp án đúng; câu điền trả về chính
+            // từ cần điền, vì không có phương án nào để tô.
+            answer: item.kind === "mcq" ? item.answer : null,
+            expected: item.kind === "gap" ? item.accept[0] : null,
+            why: item.why,
+          }
         : null,
     item: next ? publicItem(next, state.answered.length + 1, estimateTotal(state)) : null,
     done: next === null,

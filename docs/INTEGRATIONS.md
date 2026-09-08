@@ -100,8 +100,13 @@ production, dù chỉ là nội bộ.
 
 - Adapter: `src/lib/adapters/storage.ts`
 - Biến: `LINGORA_STORAGE_DRIVER` (`local` hoặc `s3`), `LINGORA_S3_*`
-- Mặc định khi phát triển: đĩa cục bộ trong `data/uploads/`, phục vụ qua URL ký có
-  hạn. Trên VPS dùng S3-compatible.
+- Mặc định khi phát triển: đĩa cục bộ trong `data/uploads/`. Trên VPS dùng
+  S3-compatible; hàm `storeAudio` ném lỗi rõ ràng nếu đặt driver `s3` mà chưa có
+  bản cài đặt, thay vì âm thầm ghi xuống đĩa của một instance web bất kỳ.
+- Đã dùng thật: ghi âm bài Nói trong bài kiểm tra xếp lớp. Giới hạn 8 MB, chỉ
+  nhận các định dạng trình duyệt thật sự tạo ra, tên tệp do server sinh, mỗi tệp
+  có `expires_at` theo `LINGORA_AUDIO_RETENTION_DAYS`.
+- Còn thiếu: URL ký có hạn để phát lại, và job nền xoá tệp quá hạn.
 - Thời gian giữ audio thô cấu hình bằng `LINGORA_AUDIO_RETENTION_DAYS`, mặc định
   ngắn.
 
