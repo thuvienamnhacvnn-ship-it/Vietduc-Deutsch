@@ -646,41 +646,222 @@ table.data tr:last-child td {
 
 /* ------------------------------------------------------------------- footer */
 
+/*
+ * Ba dải đều nhau: văn phòng, sơ đồ trang, dòng pháp lý. Lấy nguyên bố cục của
+ * chân trang vietducgroup. Mỗi dải có lưới riêng, nên các cột thẳng hàng mà
+ * không khối nào phải kê thêm.
+ */
 .site-footer {
-  display: grid;
-  gap: var(--s-9);
-  padding-block: var(--s-12) var(--s-8);
-  grid-template-columns: 1fr;
+  margin-top: var(--s-9);
 }
 
-.site-footer__brand {
+/* --------------------------------------------------------------- văn phòng */
+
+.site-footer__office {
+  display: grid;
+  gap: var(--s-6);
+  padding-block: var(--s-10) var(--s-8);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .site-footer__office {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-9);
+    align-items: stretch;
+  }
+}
+
+.site-footer__office > * {
+  min-width: 0;
+}
+
+.site-footer__office-text {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--s-4);
+}
+
+.site-footer__motto {
+  margin: 0;
+  /*
+   * KHÔNG dùng font chữ có chân ở đây. Bản gốc đặt khẩu hiệu bằng Georgia, và
+   * trên Windows Georgia không có sẵn glyph tiếng Việt đủ bộ: "Kiến tạo tri
+   * thức - Dẫn lối tương lai" hiện ra thành "Kiê´n tạo tri thức - Dẫn lô´i
+   * tương lai", dấu sắc rơi ra thành ký tự riêng. Chính câu khẩu hiệu của khách
+   * là chỗ không được phép sai chữ.
+   */
+  font-size: var(--fs-lg);
+  line-height: 1.4;
+  color: var(--gold);
+  max-width: 26ch;
+}
+
+.site-footer__legal-name {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--on-band-muted);
   max-width: 42ch;
 }
 
-.site-footer__cols {
+/* Địa chỉ, điện thoại, email, website ở dạng danh sách định nghĩa: nhãn nhỏ và
+   lặng, giá trị mới là thứ để đọc. */
+.site-footer__contact {
   display: grid;
-  gap: var(--s-7);
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--s-3);
+  margin: 0;
+  width: 100%;
 }
 
-.site-footer__cols div {
+@media (min-width: 520px) {
+  .site-footer__contact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-4) var(--s-5);
+  }
+}
+
+.site-footer__contact > div {
+  min-width: 0;
+}
+
+.site-footer__contact dt {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.site-footer__contact dd {
+  margin: 3px 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--on-band);
+  overflow-wrap: anywhere;
+}
+
+/* Nhãn của danh sách đã là màu vàng, nên giá trị phải khác màu nhãn - để cả
+   khối một màu là mất thứ bậc. Viết kèm .band để thắng quy tắc .band a nằm sau
+   trong tệp này, chứ không phải để tăng độ ưu tiên cho vui. */
+.band .site-footer__contact a,
+.band .site-footer__cols a {
+  color: var(--on-band);
+  text-decoration: none;
+}
+
+.band .site-footer__contact a:hover,
+.band .site-footer__cols a:hover {
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+.site-footer__social {
+  margin-top: var(--s-2);
+}
+
+.site-footer__social-links {
   display: flex;
-  flex-direction: column;
-  gap: var(--s-3);
+  flex-wrap: wrap;
+  gap: var(--s-4);
+}
+
+/* ------------------------------------------------------------- bản đồ trụ sở */
+
+.footer-map {
+  position: relative;
+  /* Ghi rõ chứ không để thừa hưởng: đây là ô lưới, mà một <iframe> co lại vừa
+     nội dung thì rơi về cỡ mặc định 300x150 của trình duyệt. */
+  width: 100%;
+  min-height: clamp(220px, 26vw, 300px);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--on-band) 16%, transparent);
+  background: color-mix(in srgb, var(--on-band) 8%, transparent);
+}
+
+.footer-map__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(220px, 26vw, 300px);
+  border: 0;
+  /* Bản đồ mặc định là một tờ trắng chói; trên dải nền đậm phải kéo xuống cùng
+     độ sáng với mọi thứ quanh nó. */
+  filter: grayscale(0.35) brightness(0.86) contrast(1.06);
+}
+
+.footer-map__directions {
+  position: absolute;
+  left: var(--s-4);
+  /* Trên chứ không phải dưới: chân khung là dòng ghi nguồn của OpenStreetMap,
+     nút đặt ở đó sẽ đè lên. */
+  top: var(--s-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  background: var(--gold);
+  color: var(--on-gold);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-2);
+  transition:
+    background-color var(--motion-fast) var(--ease),
+    translate var(--motion-fast) var(--ease);
+}
+
+.band .footer-map__directions {
+  color: var(--on-gold);
+}
+
+.footer-map__directions:hover,
+.footer-map__directions:focus-visible {
+  background: var(--gold-light);
+  translate: 0 -2px;
+}
+
+/* ------------------------------------------------------------- sơ đồ trang */
+
+.site-footer__cols {
+  display: grid;
+  gap: var(--s-6) var(--s-5);
+  padding-block: var(--s-8);
+  border-top: 1px solid color-mix(in srgb, var(--on-band) 12%, transparent);
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+}
+
+.site-footer__cols > * {
+  min-width: 0;
 }
 
 .site-footer__h {
-  font-size: var(--fs-sm);
-  letter-spacing: 0.08em;
+  margin: 0 0 var(--s-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--on-band-muted);
+  color: var(--gold);
+}
+
+.site-footer__cols ul {
+  display: grid;
+  gap: var(--s-2);
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .site-footer__cols a {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
   color: var(--on-band);
   text-decoration: none;
-  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+  transition: color var(--motion-fast) var(--ease);
 }
 
 .site-footer__cols a:hover {
@@ -688,33 +869,150 @@ table.data tr:last-child td {
   text-decoration: underline;
 }
 
-.site-footer__social {
-  display: flex;
-  gap: var(--s-4);
+/* Văn phòng: tên thành phố trên, địa chỉ dưới - không phải liên kết, nên không
+   được trông giống liên kết. */
+.site-footer__offices li {
+  display: grid;
+  gap: 2px;
+  margin-bottom: var(--s-3);
+}
+
+.site-footer__offices strong {
+  font-size: var(--fs-sm);
+  color: var(--on-band);
+}
+
+.site-footer__offices span {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--on-band-muted);
+}
+
+/* --------------------------------------------------------------- pháp lý */
+
+.site-footer__bottom {
+  border-top: 1px solid color-mix(in srgb, var(--on-band) 12%, transparent);
   padding-bottom: var(--s-6);
 }
 
-.site-footer__legal {
-  border-top: 1px solid color-mix(in srgb, var(--on-band) 18%, transparent);
-  padding-block: var(--s-6) var(--s-9);
-  color: var(--on-band-muted);
-  font-size: var(--fs-sm);
+.site-footer__bottom-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding-block: var(--s-5);
 }
 
-.site-footer__legal p {
-  max-width: 78ch;
-  margin-bottom: var(--s-2);
+.site-footer__copy {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--on-band-muted);
+  max-width: 62ch;
+}
+
+.site-footer__legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__legal-links a {
+  font-size: var(--fs-sm);
+  color: var(--on-band-muted);
+  text-decoration: none;
+}
+
+.site-footer__legal-links a:hover {
+  color: var(--gold);
+  text-decoration: underline;
 }
 
 .site-footer__pending {
+  margin: 0;
+  font-size: var(--fs-sm);
   color: var(--gold);
   font-weight: 560;
 }
 
-@media (min-width: 900px) {
-  .site-footer {
-    grid-template-columns: 1.1fr 1.6fr;
-    gap: var(--s-12);
+/* ------------------------------------------------------------ trên điện thoại */
+
+/*
+ * Ở màn hẹp ba dải thành một cột dài lệch trái: sơ đồ trang rơi xuống một hàng
+ * dọc, hơn chục liên kết chạy suốt màn hình và các tiêu đề lạc giữa chúng.
+ *
+ * Sơ đồ trang chuyển thành hai cột đều nhau, còn thứ gì là lời phát biểu chứ
+ * không phải danh sách - khối văn phòng và dòng pháp lý - thì căn giữa, để mỗi
+ * dải nằm cân giữa hai lề thay vì kéo lệch sang phải.
+ */
+@media (max-width: 719px) {
+  .site-footer__office {
+    justify-items: center;
+    text-align: center;
+    padding-block: var(--s-8) var(--s-7);
+  }
+
+  .site-footer__office-text {
+    justify-items: center;
+  }
+
+  .site-footer__legal-name {
+    max-width: 34ch;
+  }
+
+  .site-footer__contact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-4);
+    text-align: center;
+  }
+
+  /*
+   * Email và website chiếm cả bề ngang.
+   *
+   * Nửa màn hình 390px còn khoảng 170px, mà "info@vietducgroup.com.vn" cần hơn
+   * thế. `overflow-wrap: anywhere` ở trên bèn cắt ngay giữa tên miền, ra thành
+   * "info@vietducgroup.co" xuống dòng "m.vn" - đọc như địa chỉ sai. Cho hai
+   * dòng này nguyên bề ngang thì chúng vừa đủ một dòng, không phải cắt.
+   */
+  .site-footer__contact > div:nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+
+  .site-footer__social {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .site-footer__cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5) var(--s-4);
+    padding-block: var(--s-7);
+  }
+
+  /* Hai địa chỉ đầy đủ quá cao cho nửa cột: chúng để cột bên cạnh trống gần hết
+     một màn hình. Khối này lấy nguyên bề ngang. */
+  .site-footer__offices {
+    grid-column: 1 / -1;
+    padding-top: var(--s-4);
+    border-top: 1px solid color-mix(in srgb, var(--on-band) 12%, transparent);
+  }
+
+  .site-footer__bottom-inner {
+    justify-content: center;
+    text-align: center;
+    gap: var(--s-2);
+  }
+
+  .site-footer__legal-links {
+    justify-content: center;
+    gap: var(--s-2) var(--s-4);
+  }
+
+  .site-footer__pending {
+    text-align: center;
   }
 }
 

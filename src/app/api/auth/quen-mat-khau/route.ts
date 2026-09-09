@@ -15,14 +15,30 @@ const Body = z.object({ email: z.string().trim().toLowerCase().email() });
  * lời khác nhau sẽ thành công cụ dò xem ai có tài khoản.
  */
 export async function POST(request: Request) {
+  /*
+   * Hai mức chặn, vì hai kiểu lạm dụng khác nhau.
+   *
+   * Theo IP thì rộng tay: cả một lớp học ngồi chung một đường mạng văn phòng,
+   * ba lượt cho cả toà nhà là chặn nhầm người thật.
+   *
+   * Theo địa chỉ email mới là mức chặt, và đó mới là mức bảo vệ đúng người:
+   * thứ cần ngăn là dội thư đặt lại mật khẩu vào hộp thư của một người, mà việc
+   * đó đếm theo email chứ không đếm theo IP - đổi IP là lách được.
+   *
+   * Cả hai mức đều trả lời giống hệt nhau dù email có tài khoản hay không, nên
+   * không mức nào biến thành công cụ dò xem ai có tài khoản.
+   */
   const ip = clientIp(request);
-  const limit = hit(`quen-mk:${ip}`, 3, 10 * 60 * 1000);
-  if (!limit.allowed) return tooMany(limit);
+  const byIp = hit(`quen-mk-ip:${ip}`, 12, 10 * 60 * 1000);
+  if (!byIp.allowed) return tooMany(byIp);
 
   const parsed = Body.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ ok: true });
 
   const email = parsed.data.email;
+  const byMail = hit(`quen-mk-mail:${email}`, 3, 10 * 60 * 1000);
+  if (!byMail.allowed) return tooMany(byMail);
+
   const db = await getDb();
   const rows = await db
     .select({ id: users.id, name: users.name, status: users.status })

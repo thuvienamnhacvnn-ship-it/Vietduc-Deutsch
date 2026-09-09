@@ -136,6 +136,31 @@ Thành phần `.note-quiet` dùng cho những điều bắt buộc phải nói n
 cảnh báo, ví dụ lời khai báo giáo viên là AI. Một hộp `alert` cho việc đó làm
 trang trông như đang báo lỗi, và hai hộp cạnh nhau thì càng nặng.
 
+
+## Chân trang
+
+Ba dải, lấy nguyên bố cục của chân trang vietducgroup:
+
+1. **Văn phòng** - logo trên tấm nền trắng, khẩu hiệu, tên pháp nhân, danh sách
+   định nghĩa (trụ sở, điện thoại, email, website), và bản đồ OpenStreetMap có
+   nút "Chỉ đường".
+2. **Sơ đồ trang** - bốn cột ngang sức: Học, Tài khoản, Pháp lý, Văn phòng.
+3. **Dòng pháp lý** - bản quyền, lời khai báo nội dung có AI hỗ trợ, và các mục
+   pháp lý còn thiếu.
+
+Ba điều dễ làm sai khi sửa khối này:
+
+- **Khẩu hiệu không được đặt bằng font chữ có chân.** Bản gốc dùng Georgia;
+  trên Windows Georgia thiếu glyph tiếng Việt, "Kiến tạo tri thức" hiện ra
+  thành "Kiê´n tạo tri thức". Chính câu khẩu hiệu của khách là chỗ không được
+  phép sai chữ.
+- **Giá trị trong danh sách liên hệ phải khác màu nhãn.** Nhãn đã là vàng; quy
+  tắc `.band a` nằm sau trong globals.css cũng tô liên kết thành vàng, nên các
+  quy tắc của chân trang phải viết kèm `.band` mới thắng được.
+- **Cột "Văn phòng" bỏ trụ sở ra**, vì địa chỉ trụ sở đã nằm ngay trên cạnh bản
+  đồ. In lại lần thứ hai làm chân trang trên điện thoại dài thêm cả một màn
+  hình mà không thêm thông tin nào.
+
 ## Nguyên tắc nội dung giao diện
 
 - Không nhận xét học viên, con số người học, chứng chỉ hay logo đối tác bịa đặt.

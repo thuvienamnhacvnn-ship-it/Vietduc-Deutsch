@@ -101,6 +101,23 @@ không vẽ lại. Hệ màu đo trực tiếp từ logo: đỏ cờ Việt Nam 
 cầu chủ dự án, vàng kim của chữ VIET DUC làm màu phụ, đen cờ Đức làm chữ.
 Chi tiết ở `docs/UI_SYSTEM.md` và `docs/ASSETS.md`.
 
+## Thông tin tổ chức
+
+Tên pháp nhân, trụ sở, hai văn phòng, điện thoại, email và website lấy nguyên từ
+dự án vietducgroup (`src/lib/site-config.ts` bên đó) và nằm gọn trong
+`src/lib/brand.ts`. Chân trang cũng bê nguyên bố cục ba dải của chân trang bên
+đó: văn phòng kèm bản đồ, sơ đồ trang bốn cột, dòng pháp lý.
+
+Quy tắc giữ nguyên từ bản gốc: giá trị rỗng nghĩa là "chưa cấu hình", và giao
+diện khi ấy không hiện gì cả, chứ không hiện chỗ trống hay một đường dẫn đoán
+bừa. Vì vậy khối mạng xã hội hiện chưa render, còn mã số doanh nghiệp, mã số
+thuế và người chịu trách nhiệm nội dung thì chân trang và trang điều khoản tự
+ghi ra là còn thiếu.
+
+Bản đồ dùng OpenStreetMap chứ không dùng bản nhúng thương mại: nó không đặt
+cookie, nên được phép có mặt trước khi người dùng trả lời thông báo cookie -
+đúng như trang quyền riêng tư đã hứa.
+
 ## Bước tiếp theo (giai đoạn 2)
 
 1. Cố vấn Mia: luồng hỏi mục tiêu, lưu vào `learner_profiles`, sinh lộ trình đề
@@ -120,7 +137,8 @@ Chi tiết ở `docs/UI_SYSTEM.md` và `docs/ASSETS.md`.
 | OAuth client của Google (`GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`) | đăng nhập Google thật; hiện chạy mô phỏng ở máy dev, tắt hẳn ở production |
 | Nhà cung cấp STT và TTS tiếng Đức + khóa | lớp học giọng nói (giai đoạn 3) |
 | Nhà cung cấp email giao dịch + khóa | email xác minh thật (hiện ghi ra `data/outbox/`) |
-| Pháp nhân, tài khoản nhận tiền, thông tin thuế | mở bán (giai đoạn 5) |
+| Mã số doanh nghiệp, mã số thuế, người chịu trách nhiệm nội dung (tên và trụ sở đã có) | công khai trang, mở bán |
+| Tài khoản nhận tiền | mở bán (giai đoạn 5) |
 | Tài khoản PayPal + nhà cung cấp thẻ | thanh toán (giai đoạn 5) |
 | Duyệt điều khoản, chính sách hủy và hoàn tiền | công khai trang, mở bán |
 | Chốt giá kinh doanh thật | hiện giá trong seed là giá tham khảo, `approved_for_sale = false` |

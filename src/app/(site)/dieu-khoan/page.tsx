@@ -61,16 +61,29 @@ export default function TermsPage() {
         </p>
 
         <h2>6. Thông tin pháp nhân</h2>
-        {brand.legalEntity ? (
+        <p>
+          {brand.legalEntity.company} · {brand.legalEntity.address}
+          {brand.legalEntity.register ? ` · ${brand.legalEntity.register}` : ""}
+          {brand.legalEntity.vatId ? ` · ${brand.legalEntity.vatId}` : ""}
+          {brand.legalEntity.responsible
+            ? ` · Chịu trách nhiệm nội dung: ${brand.legalEntity.responsible}`
+            : ""}
+        </p>
+        {/* Ghi rõ còn thiếu gì thay vì bỏ trống: bên Đức những mục này bắt buộc
+            phải có trước khi trang được công khai. */}
+        {(!brand.legalEntity.register ||
+          !brand.legalEntity.vatId ||
+          !brand.legalEntity.responsible) && (
           <p>
-            {brand.legalEntity.company} · {brand.legalEntity.address} ·{" "}
-            {brand.legalEntity.register} · {brand.legalEntity.vatId} · Chịu trách nhiệm nội dung:{" "}
-            {brand.legalEntity.responsible}
-          </p>
-        ) : (
-          <p>
-            Thông tin pháp nhân chưa được cung cấp. Phần này bắt buộc phải có trước khi trang được
-            công khai tại Đức.
+            Chưa có{" "}
+            {[
+              !brand.legalEntity.register && "mã số doanh nghiệp",
+              !brand.legalEntity.vatId && "mã số thuế",
+              !brand.legalEntity.responsible && "người chịu trách nhiệm nội dung",
+            ]
+              .filter(Boolean)
+              .join(", ")}
+            . Những mục này bắt buộc phải có trước khi trang được công khai tại Đức.
           </p>
         )}
 
