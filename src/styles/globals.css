@@ -1409,12 +1409,110 @@ table.data tr:last-child td {
   min-height: 100dvh;
 }
 
+/*
+ * Cột trái của khu auth.
+ *
+ * `justify-content: space-between` với hai khối nội dung tạo ra đúng cái lỗ
+ * trống giữa màn hình mà bản trước mắc phải. Giờ là một lưới bốn hàng, trong đó
+ * hàng chứa hình được phép co lại - hình nhường chỗ trước, chữ không bao giờ bị
+ * ép.
+ */
 .auth-shell__aside {
   display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--s-9);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: var(--s-7);
   padding: var(--s-9) var(--s-8);
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--gold) 26%, transparent), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, color-mix(in srgb, var(--brand-fill) 40%, transparent), transparent 65%),
+    var(--band);
+  overflow: hidden;
+}
+
+.auth-shell__brand {
+  display: grid;
+  gap: var(--s-4);
+  justify-items: start;
+}
+
+.auth-shell__headline {
+  font-size: var(--fs-2xl);
+  line-height: 1.2;
+  max-width: 16ch;
+  margin: 0;
+}
+
+.auth-shell__lede {
+  max-width: 42ch;
+  margin: 0;
+}
+
+/* Hình hội thoại: căn giữa và có trần chiều cao. Không có trần thì ở màn hình
+   cao 1400px nó phình to như một tấm áp phích và đẩy ba dòng điểm mạnh xuống
+   dưới tầm nhìn. */
+.auth-shell__art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.auth-shell__art > * {
+  width: 100%;
+  max-width: 360px;
+}
+
+/*
+ * Bỏ chú thích dưới hình khi hình nằm trong cột trái.
+ *
+ * Đặt max-height lên cả khối hình là sai: khối đó gồm cả một dòng chú thích, và
+ * chú thích bị đẩy tràn ra ngoài rồi ĐÈ LÊN dòng "Bốn kỹ năng đo riêng". Ở cột
+ * trái, câu ngay trên hình đã nói đúng điều chú thích định nói, nên bỏ hẳn nó
+ * gọn hơn là ép chiều cao.
+ */
+.auth-shell__art .hero-art__note {
+  display: none;
+}
+
+.auth-shell__points {
+  display: grid;
+  gap: var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auth-shell__points li {
+  display: grid;
+  gap: 2px;
+  padding-left: var(--s-4);
+  border-left: 2px solid var(--gold);
+}
+
+.auth-shell__points strong {
+  font-size: var(--fs-sm);
+  color: var(--on-band);
+}
+
+.auth-shell__points span {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--on-band-muted);
+}
+
+.auth-shell__note {
+  font-size: var(--fs-sm);
+  color: var(--on-band-muted);
+  margin: 0;
+}
+
+/* Màn hình thấp: bỏ hình đi trước, chữ ở lại. Ngưỡng 900px chứ không phải 780:
+   laptop 1280x800 là cỡ máy phổ biến nhất của học viên, và ở đó hình làm cột
+   trái cao 1096px trong khung 800px - tức là kéo dài cả trang. */
+@media (max-height: 900px) {
+  .auth-shell__art {
+    display: none;
+  }
 }
 
 .auth-shell__main {
@@ -1478,7 +1576,12 @@ table.data tr:last-child td {
     margin-right: auto;
   }
   .auth-shell__aside {
-    display: flex;
+    display: grid;
+    /* Dính và cao đúng một màn hình: cột TRÁI không bao giờ được kéo dài trang.
+       Thứ được phép cuộn ở đây là biểu mẫu bên phải. */
+    position: sticky;
+    top: 0;
+    height: 100dvh;
   }
   .auth-shell__main {
     justify-content: center;
