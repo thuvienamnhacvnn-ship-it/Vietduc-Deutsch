@@ -14,7 +14,8 @@
     "seed": "tsx scripts/seed.ts",
     "logo": "tsx scripts/logo.ts",
     "assets": "tsx scripts/assets.ts",
-    "icon:app": "tsx scripts/icon-app.ts"
+    "icon:app": "tsx scripts/icon-app.ts",
+    "dat-quyen": "tsx scripts/dat-quyen.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",

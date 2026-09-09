@@ -2,6 +2,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  /*
+   * Mở bằng http://127.0.0.1:3055 phải chạy được y như http://localhost:3055.
+   *
+   * Next 16 chặn tài nguyên dev (HMR, chunk) khi origin khác với origin dev
+   * server tự khai. Hậu quả rất khó đoán ra: trang vẫn hiện đầy đủ vì đó là
+   * bản dựng ở server, nhưng React KHÔNG hydrate - bấm nút không ăn, ô tick
+   * tick vào rồi tự nhả, và không có lỗi nào trong console. Chỉ có một dòng
+   * cảnh báo trong log của dev server.
+   *
+   * Chỉ ảnh hưởng lúc chạy dev; bản production không đọc mục này.
+   */
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
   // Không sinh AGENTS.md/CLAUDE.md vào repo: đây là mã nguồn bàn giao cho chủ dự án.
   agentRules: false,
   poweredByHeader: false,

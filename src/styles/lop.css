@@ -250,9 +250,22 @@
 }
 
 @media (max-width: 719px) {
+  /*
+   * Thanh nói phải NẰM TRÊN thanh tab dưới, không đè lên nó.
+   *
+   * Thanh tab cao 64px cộng phần safe-area; `bottom: 0` làm ô gõ chui xuống
+   * dưới bốn cái icon và người học chỉ còn cách nói chứ không gõ được nữa.
+   */
   .lop__bar {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
     margin-inline: calc(var(--s-6) * -1);
     padding-inline: var(--s-6);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .lop {
+    min-height: 0;
   }
 
   .lop-turn {
