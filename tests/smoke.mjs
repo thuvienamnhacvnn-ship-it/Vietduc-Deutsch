@@ -214,8 +214,18 @@ async function main() {
     `nhận ${learnAnon.status}`,
   );
 
+  // Người chưa làm bài kiểm tra nào KHÔNG bị đưa vào bảng học rỗng: việc duy
+  // nhất họ cần làm lúc đó là bài kiểm tra trình độ.
   const learnAlice = await alice("/hoc");
-  check("người đã đăng nhập mở được /hoc", learnAlice.status === 200, `nhận ${learnAlice.status}`);
+  check(
+    "người mới vào /hoc được đưa thẳng tới bài kiểm tra",
+    (learnAlice.status === 307 || learnAlice.status === 302) &&
+      String(learnAlice.headers.get("location")).includes("/hoc/xep-lop"),
+    `${learnAlice.status} -> ${learnAlice.headers.get("location")}`,
+  );
+
+  const testPage = await alice("/hoc/xep-lop");
+  check("trang kiểm tra trình độ mở được", testPage.status === 200, `nhận ${testPage.status}`);
 
   const adminAlice = await alice("/quan-tri");
   check(

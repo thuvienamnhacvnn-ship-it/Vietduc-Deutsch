@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/guard";
 import { activeEntitlements, dueReviewCount, profileFor, skillStateFor } from "@/lib/queries";
 import { SKILL_LABEL_VI } from "@/lib/db/schema";
@@ -8,6 +9,14 @@ import { adapterStatus } from "@/lib/config";
 
 export const metadata: Metadata = { title: "Bảng học" };
 
+/**
+ * Bảng học.
+ *
+ * Chỉ có nghĩa khi đã có kết quả để bày ra. Người vừa đăng ký xong mà nhìn thấy
+ * bốn ô rỗng và một khối "chưa có bài học nào" thì không biết phải làm gì -
+ * việc duy nhất họ cần làm lúc đó là bài kiểm tra trình độ, nên đưa thẳng họ
+ * tới đó thay vì bắt đi qua một màn hình trống.
+ */
 export default async function LearnHome() {
   const user = await requireUser("/hoc");
   const [skills, due, ents, profile] = await Promise.all([
@@ -18,6 +27,7 @@ export default async function LearnHome() {
   ]);
 
   const assessed = skills.filter((s) => !s.unknown).length;
+  if (assessed === 0) redirect("/hoc/xep-lop");
   const status = adapterStatus();
   const voiceReady = status.stt === "live" && status.tts === "live";
 

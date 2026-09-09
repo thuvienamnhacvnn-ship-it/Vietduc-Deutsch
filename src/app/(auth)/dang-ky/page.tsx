@@ -15,7 +15,9 @@ export default async function RegisterPage({
   if (await getSessionUser()) redirect("/hoc");
   const { tiep } = await searchParams;
   // Chỉ nhận đường dẫn nội bộ: `tiep=https://...` sẽ thành một open redirect.
-  const next = tiep?.startsWith("/") ? tiep : "/hoc";
+  // Đăng ký xong đi thẳng vào bài kiểm tra trình độ. Bảng học lúc này chưa có
+  // gì để bày, và việc duy nhất người mới cần làm là bài kiểm tra.
+  const next = tiep?.startsWith("/") ? tiep : "/hoc/xep-lop";
 
   return (
     <>

@@ -53,7 +53,7 @@ const SKILL_LABEL: Record<string, string> = {
  * Một câu một màn: người học ở mức A1 nhìn thấy hai mươi câu tiếng Đức cùng lúc
  * thì bỏ ngay.
  */
-export function PlacementTest() {
+export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
   const router = useRouter();
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [item, setItem] = useState<Item | null>(null);
@@ -62,7 +62,11 @@ export function PlacementTest() {
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [phase, setPhase] = useState<"loading" | "intro" | "question" | "finishing">("loading");
+  // Chưa có bài đang dở thì quy chế hiện ngay ở lần vẽ đầu, không qua vòng xoay:
+  // đây là màn hình đầu tiên người vừa đăng ký nhìn thấy.
+  const [phase, setPhase] = useState<"loading" | "intro" | "question" | "finishing">(
+    hasOpenSession ? "loading" : "intro",
+  );
   const [resumed, setResumed] = useState(false);
   const [pledged, setPledged] = useState(false);
   const [germanVoice, setGermanVoice] = useState<SpeechSynthesisVoice | null>(null);
@@ -157,8 +161,15 @@ export function PlacementTest() {
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
-    void load(false);
-  }, [load]);
+    // Không có bài dở thì không cần hỏi server: cứ hiện quy chế và chờ người
+    // học ký cam kết.
+    //
+    // `load` là hàm async - nó chỉ khởi động một request rồi trả về ngay, và
+    // setState nằm sau `await` chứ không chạy đồng bộ trong thân effect. Đây
+    // đúng là việc effect sinh ra để làm: đồng bộ với một hệ thống bên ngoài.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (hasOpenSession) void load(false);
+  }, [load, hasOpenSession]);
 
   // Lượt nghe đầu tiên phát tự động, đúng như trong phòng thi: đề được đọc lên
   // một lần, người làm bài không phải đi tìm nút.

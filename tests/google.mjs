@@ -114,9 +114,12 @@ async function main() {
   console.log("\nĐăng ký bằng Google");
   const email = `google.${stamp}@lingora.test`;
   const first = await signInWithGoogle(email, "Nguyễn Thị Google");
+  // Người MỚI đăng ký bằng Google phải rơi thẳng vào bài kiểm tra trình độ,
+  // không đi qua bảng học rỗng.
   check(
-    "callback chuyển về khu học",
-    first.callback.status === 302 && new URL(first.callback.location, BASE).pathname === "/hoc",
+    "đăng ký bằng Google đưa thẳng tới bài kiểm tra trình độ",
+    first.callback.status === 302 &&
+      new URL(first.callback.location, BASE).pathname === "/hoc/xep-lop",
     `${first.callback.status} → ${first.callback.location}`,
   );
 
@@ -125,8 +128,8 @@ async function main() {
   const userId = profile.body?.profile?.userId;
   check("hồ sơ học viên được tạo kèm", Boolean(userId));
 
-  const learn = await first.client("/hoc");
-  check("mở được trang học", learn.status === 200, `nhận ${learn.status}`);
+  const learn = await first.client("/hoc/xep-lop");
+  check("mở được trang kiểm tra trình độ", learn.status === 200, `nhận ${learn.status}`);
 
   /* ------------------------------------------- đăng nhập lại: cùng tài khoản */
   console.log("\nĐăng nhập lại");

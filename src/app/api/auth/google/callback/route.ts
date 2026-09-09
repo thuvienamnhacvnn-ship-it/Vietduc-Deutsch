@@ -193,5 +193,7 @@ export async function GET(request: Request) {
     ip,
   });
 
-  return Response.redirect(new URL(saved.next, request.url).toString(), 302);
+  // Người MỚI đi thẳng vào bài kiểm tra trình độ, không qua bảng học rỗng.
+  const firstStop = saved.next === "/hoc" ? "/hoc/xep-lop" : saved.next;
+  return Response.redirect(new URL(firstStop, request.url).toString(), 302);
 }
