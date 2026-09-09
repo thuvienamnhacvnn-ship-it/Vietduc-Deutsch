@@ -48,6 +48,7 @@ export async function lessonList(includeDrafts = false): Promise<LessonRow[]> {
       slug: lessons.slug,
       title: lessons.title,
       state: lessonVersions.reviewState,
+      version: lessonVersions.version,
       body: lessonVersions.body,
       position: lessons.position,
       moduleId: modules.id,
@@ -57,7 +58,30 @@ export async function lessonList(includeDrafts = false): Promise<LessonRow[]> {
     .innerJoin(modules, eq(modules.id, lessons.moduleId))
     .orderBy(asc(lessons.position), asc(lessons.id));
 
-  return rows
+  /*
+   * Mỗi bài chỉ lấy MỘT phiên bản, và ưu tiên bản đã duyệt.
+   *
+   * Một bài có nhiều phiên bản là chuyện bình thường sau vài lần sửa nội dung.
+   * Học viên phải thấy bản đã duyệt mới nhất; người biên tập thì thấy bản mới
+   * nhất kể cả chưa duyệt, để còn đọc mà duyệt.
+   */
+  const best = new Map<number, (typeof rows)[number]>();
+  for (const row of rows) {
+    const current = best.get(row.lessonId);
+    if (!current) {
+      best.set(row.lessonId, row);
+      continue;
+    }
+    const rowPublished = row.state === "published";
+    const curPublished = current.state === "published";
+    if (rowPublished !== curPublished) {
+      if (rowPublished) best.set(row.lessonId, row);
+      continue;
+    }
+    if (row.version > current.version) best.set(row.lessonId, row);
+  }
+
+  return [...best.values()]
     .filter((r) => includeDrafts || r.state === "published")
     .map((r) => {
       const body = r.body as Lesson;
@@ -70,7 +94,8 @@ export async function lessonList(includeDrafts = false): Promise<LessonRow[]> {
         published: r.state === "published",
         body,
       };
-    });
+    })
+    .sort((a, b) => a.code.localeCompare(b.code));
 }
 
 export async function lessonByCodeDb(code: string, includeDrafts = false): Promise<LessonRow | null> {

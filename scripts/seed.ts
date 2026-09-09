@@ -14,7 +14,7 @@
  * Mật khẩu demo in ra màn hình, không nằm trong bất kỳ tệp nào được commit.
  */
 import { randomBytes } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { getDb } from "../src/lib/db";
 import {
   courses,
@@ -156,22 +156,43 @@ async function main() {
       .from(lessons)
       .where(eq(lessons.slug, lesson.code.toLowerCase()))
       .limit(1);
-    if (existing[0]) continue;
 
-    const created = await db
-      .insert(lessons)
-      .values({
-        moduleId: mod[0]!.id,
-        slug: lesson.code.toLowerCase(),
-        title: lesson.title,
-        position: seededLessons,
-        estimatedMinutes: 20,
-      })
-      .returning({ id: lessons.id });
+    let lessonId = existing[0]?.id;
+    if (!lessonId) {
+      const created = await db
+        .insert(lessons)
+        .values({
+          moduleId: mod[0]!.id,
+          slug: lesson.code.toLowerCase(),
+          title: lesson.title,
+          position: seededLessons,
+          estimatedMinutes: 20,
+        })
+        .returning({ id: lessons.id });
+      lessonId = created[0]!.id;
+    }
+
+    /*
+     * Nội dung đổi thì tạo PHIÊN BẢN MỚI, không sửa đè lên phiên bản cũ.
+     *
+     * Bài làm và buổi học của học viên trỏ tới đúng phiên bản họ đã học; sửa đè
+     * là làm sai lệch lịch sử học của người khác. Phiên bản mới luôn ở trạng
+     * thái chờ duyệt, kể cả khi phiên bản trước đã được duyệt - nội dung đổi thì
+     * phải có người đọc lại.
+     */
+    const versions = await db
+      .select({ version: lessonVersions.version, body: lessonVersions.body })
+      .from(lessonVersions)
+      .where(eq(lessonVersions.lessonId, lessonId))
+      .orderBy(desc(lessonVersions.version));
+
+    const newest = versions[0];
+    const unchanged = newest && JSON.stringify(newest.body) === JSON.stringify(lesson);
+    if (unchanged) continue;
 
     await db.insert(lessonVersions).values({
-      lessonId: created[0]!.id,
-      version: 1,
+      lessonId,
+      version: (newest?.version ?? 0) + 1,
       body: lesson,
       reviewState: "in_review",
     });
@@ -310,7 +331,9 @@ async function main() {
   }
 
   console.log(`\nĐã nạp dữ liệu demo. Câu hỏi xếp lớp mới nạp: ${newQuestions}.`);
-  console.log(`Buổi học nói mới nạp: ${seededLessons} (đang CHỜ DUYỆT trong /quan-tri/bai-hoc).`);
+  console.log(
+    `Buổi học nói mới hoặc có bản mới: ${seededLessons} (đang CHỜ DUYỆT trong /quan-tri/bai-hoc).`,
+  );
   if (credentials.length > 0) {
     console.log("\nTài khoản demo (mật khẩu chỉ hiện một lần, không lưu ở đâu cả):");
     console.log(credentials.join("\n"));

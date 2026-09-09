@@ -55,7 +55,7 @@ chỉ tốn CPU đúng một lần cho toàn bộ học viên.
 Ứng dụng chạy ở máy khác thì mở đường hầm SSH thay vì mở cổng ra Internet:
 
 ```
-ssh -N -L 3600:127.0.0.1:3600 ovh-fra
+ssh -N -L 3600:127.0.0.1:3600 -L 8080:127.0.0.1:8080 ovh-fra
 ```
 
 Rồi đặt trong `.env.local`:
@@ -112,29 +112,83 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF
 cmake --build build --config Release -j "$(nproc)" --target llama-server
 
 cd /opt/vd-voice/models
+# Bản đang dùng: 3B, vì tốc độ mới là thứ quyết định lớp học dùng được hay không.
+wget -O qwen2.5-3b-instruct-q4_k_m.gguf \
+  https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf
+# Bản 7B để dành cho việc chạy nền (chấm bài viết), nơi không ai phải chờ:
 wget -O qwen2.5-7b-instruct-q4_k_m.gguf \
-  https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q4_k_m.gguf
+  https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf
 
 /opt/vd-voice/llama.cpp/build/bin/llama-server \
-  -m /opt/vd-voice/models/qwen2.5-7b-instruct-q4_k_m.gguf \
-  --host 127.0.0.1 --port 8080 -c 4096 -t "$(nproc)"
+  -m /opt/vd-voice/models/qwen2.5-3b-instruct-q4_k_m.gguf \
+  --host 127.0.0.1 --port 8080 -c 4096 -t 6 --jinja
 ```
 
-Chọn Qwen2.5-7B vì nó là model mã nguồn mở (giấy phép Apache 2.0) làm được cả
-tiếng Đức lẫn tiếng Việt ở cùng một chỗ - lời giảng phải là tiếng Việt trong khi
-câu nói mẫu phải là tiếng Đức, và một model chỉ mạnh tiếng Anh sẽ hỏng đúng ở
-chỗ đó.
+BẪY đã mất thời gian: kho GGUF chính chủ của Qwen chia bản Q4_K_M thành hai mảnh
+(`-00001-of-00002`), nên đường dẫn tới một tệp đơn ở đó trả 404. Kho
+`bartowski` để một tệp liền, dùng thẳng được.
+
+Chọn Qwen2.5 vì nó là model mã nguồn mở (giấy phép Apache 2.0) làm được cả tiếng
+Đức lẫn tiếng Việt ở cùng một chỗ - lời giảng phải là tiếng Việt trong khi câu
+nói mẫu phải là tiếng Đức, và một model chỉ mạnh tiếng Anh sẽ hỏng đúng ở chỗ đó.
 
 Nối vào ứng dụng:
 
 ```
 LINGORA_LLM_URL=http://127.0.0.1:8080/v1
-LINGORA_LLM_MODEL=qwen2.5-7b-instruct
+LINGORA_LLM_MODEL=qwen2.5-3b-instruct
 ```
 
-Trên CPU, một câu trả lời ngắn của giáo viên mất khoảng 5-15 giây. Đó là lý do
-câu Anna mở lời trong mỗi bài là câu cố định, không do model sinh: người vừa vào
-lớp không phải nhìn màn hình trống.
+### Đo thật, và vì sao lớp học không để model sinh câu nói
+
+Chạy thử trên chính máy chủ (8 nhân CPU, không GPU), cùng một lời nhắc:
+
+| Model | Tốc độ | Chất lượng quan sát được |
+|---|---|---|
+| Qwen2.5-7B Q4 | 2,4-4,3 token/giây → **25-45 giây một câu đáp** | sửa nhầm lỗi gõ ß, giải thích bằng tiếng Đức thay vì tiếng Việt |
+| Qwen2.5-3B Q4 | ~9 token/giây → **16 giây một câu đáp** | có lượt trả lời phần tiếng Việt bằng **tiếng Trung** |
+
+Kết luận rút ra từ hai bảng số đó, không phải từ sở thích: **model cỡ nhỏ chạy
+CPU không đủ để làm người đối thoại trực tiếp trong lớp tiếng Đức.** Người học A1
+không chờ nửa phút cho câu "Woher kommst du?", và một câu tiếng Trung giữa lớp
+tiếng Đức thì hỏng hoàn toàn.
+
+Nên lớp học được dựng lại theo hướng khác:
+
+- **Câu Anna nói lấy từ kịch bản của bài** (`script` trong
+  `src/content/bai-hoc.ts`). Ra ngay lập tức, luôn đúng cấp độ, không bao giờ
+  bịa.
+- **Model chỉ làm đúng một việc**: nhìn câu người học vừa nói và chỉ ra một lỗi.
+  Việc này ngắn, và đo được **3,8-4,5 giây một lượt** với model 3B.
+- **Model hỏng, chậm hay chưa bật thì buổi học vẫn chạy**, chỉ là không có ô sửa
+  lỗi.
+
+Chất lượng phần chữa lỗi sau khi thêm ví dụ mẫu và ba chốt chặn ở server
+(`src/lib/lop-hoc.ts`):
+
+| Câu người học nói | Kết quả |
+|---|---|
+| Ich komme von Vietnam. | `komme von` → `komme aus`, giải thích tiếng Việt ✓ |
+| Gestern ich habe nach Berlin gefahren. | `habe nach` → `bin nach` ✓ |
+| Ich möchte zwei Kilo Tomaten. | không chữa ✓ (tiếng Đức đời thường, không phải lỗi) |
+| Ich treffe meine Freundin um acht Uhr. | không chữa ✓ |
+| Ich heisse Mai. | không chữa ✓ (ß gõ thành ss là bàn phím, không phải lỗi) |
+| Ich habe gestern in Berlin gefahren. | không chữa ✗ (bỏ sót) |
+
+Bỏ sót thì chấp nhận được; chữa sai thì không. Người học tin lời cô giáo, nên
+một lời chữa sai làm hỏng đúng cái mà buổi học vừa dạy đúng. Ba chốt chặn ở
+server đều sinh ra từ lỗi gặp thật khi chạy thử: câu sửa phải là tiếng Đức
+(model đã có lần "sửa" `ich heisse` thành `tôi tên là`), phần bị coi là sai
+phải thật sự nằm trong câu người học nói, và khác biệt chỉ ở ß/ä/ö/ü thì bỏ.
+
+**Đường nâng cấp khi có GPU:** dùng model lớn hơn cho phần chữa lỗi và cho phép
+model sinh cả câu đáp. Không cần đổi kiến trúc - chỉ đổi biến môi trường.
+
+### Dịch vụ vd-llm
+
+systemd unit `vd-llm.service`, nghe `127.0.0.1:8080`, dùng chung máy với
+`vd-voice`. Đổi model là sửa đường dẫn trong unit rồi
+`systemctl restart vd-llm`; model nạp xong trong vài giây (3B) tới một phút (7B).
 
 ## Điều KHÔNG tự host được
 

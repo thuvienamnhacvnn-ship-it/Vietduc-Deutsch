@@ -429,13 +429,21 @@ async function main() {
         method: "POST",
         body: JSON.stringify({ sessionId: sid, code: listenItem.code }),
       });
-      plays.push({ status: res.status, left: res.body?.listensLeft, hasText: Boolean(res.body?.text) });
+      plays.push({
+        status: res.status,
+        left: res.body?.listensLeft,
+        // Có engine giọng nói thì server trả ÂM THANH và cố ý không trả chữ;
+        // chưa có engine thì trả chữ để trình duyệt tự đọc. Kiểm thử phải chấp
+        // nhận cả hai, nhưng KHÔNG được chấp nhận việc không có gì cả.
+        hasText: Boolean(res.body?.text),
+        hasAudio: Boolean(res.body?.audio),
+      });
     }
 
     check(
-      `${limit} lượt đầu đều được cấp chữ để đọc`,
-      plays.slice(0, limit).every((p) => p.status === 200 && p.hasText),
-      JSON.stringify(plays),
+      `${limit} lượt đầu đều nghe được (âm thanh thật hoặc chữ để trình duyệt đọc)`,
+      plays.slice(0, limit).every((p) => p.status === 200 && (p.hasAudio || p.hasText)),
+      JSON.stringify(plays.map((p) => ({ ...p, hasAudio: p.hasAudio }))),
     );
     check(
       "lượt vượt quá bị server từ chối, không phải chỉ ẩn nút",
@@ -443,8 +451,8 @@ async function main() {
       `nhận ${plays[limit].status}`,
     );
     check(
-      "lượt bị từ chối KHÔNG kèm chữ tiếng Đức",
-      plays[limit].hasText === false,
+      "lượt bị từ chối KHÔNG kèm chữ lẫn âm thanh",
+      plays[limit].hasText === false && plays[limit].hasAudio === false,
       JSON.stringify(plays[limit]),
     );
     check(

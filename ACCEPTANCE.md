@@ -102,20 +102,42 @@ tạo phiên. Chỉ khác một chỗ là màn hình chọn tài khoản.
 | UI-10 | Không có nhận xét học viên, chứng chỉ, con số hay logo đối tác bịa | Rà toàn bộ `src/content/` và các trang | PASS |
 | UI-11 | Icon mạng xã hội chỉ hiện khi có URL thật | `brand.social` rỗng, footer không render khối đó | PASS |
 
-## AI, VOICE, PAY, CONTENT — chưa tới giai đoạn
+## AI, VOICE, PAY, CONTENT — giai đoạn 3-4-5
 
-| ID | Kiểm tra | Trạng thái | Mở khóa bằng cách nào |
+| ID | Kiểm tra | Trạng thái | Ghi chú |
 |---|---|---|---|
-| AI-01..06 | Vai trò agent, orchestrator, RAG, chống prompt injection, giới hạn chi phí | NOT STARTED | Giai đoạn 3 |
-| VOICE-01..10 | Mic, STT, TTS, ngắt lời, latency, reconnect | BLOCKED | Cần tài khoản STT và TTS; xem `docs/INTEGRATIONS.md` |
-| PAY-01..09 | Checkout, webhook, entitlement, hoàn tiền | BLOCKED | Cần pháp nhân, tài khoản PayPal và nhà cung cấp thẻ |
-| CONTENT-01..03 | 12 bài pilot, bản đồ độ phủ, quy trình duyệt | NOT STARTED | Giai đoạn 3; theo dõi ở `CONTENT_COVERAGE.md` |
-| OPS-01..04 | Backup, dashboard chi phí, job retry | NOT STARTED | Giai đoạn 5 |
+| AI-01 | Vai trò giáo viên có ràng buộc mức, sửa một lỗi mỗi lượt, giải thích tiếng Việt | PASS | `src/lib/lop-hoc.ts` |
+| AI-02 | Thiếu bộ giảng dạy thì KHÔNG bịa lời giảng, trả 503 có giải thích | PASS | test `lop-hoc.mjs` |
+| AI-03 | Bộ giảng dạy tự host, đổi model không phải sửa code | PASS | chuẩn OpenAI, `LINGORA_LLM_URL` |
+| AI-04..06 | Orchestrator nhiều agent, RAG, trần chi phí | NOT STARTED | một agent giáo viên là đủ cho lớp nói; RAG chờ có kho nội dung lớn hơn |
+| VOICE-01 | Ghi âm từ trình duyệt, bấm giữ để nói | PASS | `ClassRoom.tsx` |
+| VOICE-02 | Nghe ra chữ (STT) chạy trên engine của trường | PASS | whisper.cpp, đo 5,2s cho 11s tiếng nói |
+| VOICE-03 | Đọc tiếng Đức (TTS) chạy trên engine của trường | PASS | piper, nhanh gấp 12 lần thời gian thực |
+| VOICE-04 | Người học sửa được phần máy nghe nhầm trước khi gửi | PASS | bước bắt buộc trong luồng |
+| VOICE-05 | Phần Nghe của bài thi phát âm thanh thật, không gửi kèm chữ | PASS | `/api/xep-lop/nghe` |
+| VOICE-06 | Engine hỏng không làm hỏng bài thi | PASS | rơi về giọng trình duyệt, có nhãn |
+| VOICE-07..10 | Ngắt lời giữa câu, đo độ trễ liên tục, tự nối lại khi rớt | NOT STARTED | cần lớp học chạy thật với người dùng trước |
+| PAY-01 | Đặt đơn, sinh mã chuyển khoản | PASS | `/api/goi-hoc/dat` |
+| PAY-02 | Giá chưa duyệt thì server từ chối bán | PASS | test `lop-hoc.mjs` |
+| PAY-03 | Xác nhận thu tiền ghi khoản thu, đóng đơn, cấp quyền trong một luồng | PASS | `confirmBankPayment` |
+| PAY-04 | Chỉ quản trị xác nhận được, có ghi chú đối chiếu bắt buộc | PASS | test phân quyền |
+| PAY-05 | Quyền học chỉ đến từ bảng `entitlements` | PASS | `activeEntitlement` |
+| PAY-06..09 | PayPal, thẻ, webhook, hoàn tiền tự động | BLOCKED | cần tài khoản thương gia; chuyển khoản không cần |
+| CONTENT-01 | 12 bài pilot | PASS | `src/content/bai-hoc.ts`, nạp vào CSDL |
+| CONTENT-02 | Quy trình duyệt nội dung trước khi tới học viên | PASS | `/quan-tri/bai-hoc`, ghi ai duyệt |
+| CONTENT-03 | Bản đồ độ phủ | NOT STARTED | theo dõi ở `CONTENT_COVERAGE.md` |
+| SRS-01 | Lỗi được sửa thành thẻ ôn, ôn theo khoảng cách tăng dần | PASS | `/hoc/on-tap` |
+| OPS-01 | Trang sức khỏe hỏi thẳng engine, không suy từ biến môi trường | PASS | `/api/suc-khoe` |
+| OPS-02..04 | Backup, bảng chi phí, job retry | NOT STARTED | — |
 
 ## Ghi chú trung thực
 
-- **Không có dịch vụ ngoài nào đang kết nối.** LLM, STT, TTS, avatar, email,
-  thanh toán, lưu trữ và đăng nhập Google đều chạy adapter mock. `/api/suc-khoe` và trang
+- **Ba dịch vụ nặng nhất không còn là dịch vụ ngoài.** Đọc, nghe và bộ giảng dạy
+  chạy trên máy chủ của trường bằng phần mềm mã nguồn mở
+  (`docs/ENGINE-TU-HOST.md`). Bản cài nào chưa trỏ tới engine thì chúng vẫn ở
+  mock và tự khai là mock.
+- **Còn lại vẫn là mock:** avatar, email, thanh toán thẻ, lưu trữ đám mây và
+  đăng nhập Google. `/api/suc-khoe` và trang
   `/quan-tri` in ra đúng trạng thái này; giao diện dán nhãn ở mọi chỗ liên quan.
 - **Chưa có bài học nào được xuất bản**, nên chưa thể nghiệm thu bất kỳ mục nào
   thuộc nhóm LEARN.

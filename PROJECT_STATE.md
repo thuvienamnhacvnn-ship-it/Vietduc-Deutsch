@@ -154,9 +154,14 @@ mua dịch vụ theo lượt. Chi tiết và số đo thật ở `docs/ENGINE-TU
   ký.
 - Giá chưa được chủ trường duyệt thì SERVER từ chối đặt mua, không chỉ ẩn nút.
 
-**Chưa xong, nói rõ:** máy chủ giảng dạy (llama.cpp) chưa được cài trên VPS -
-lệnh cài nằm sẵn trong `docs/ENGINE-TU-HOST.md`. Trước khi cài xong thì lớp
-học nói mở được, xem được bài, nhưng chưa có câu trả lời của giáo viên.
+**Đã chạy thật:** cả ba engine (đọc, nghe, giảng dạy) đang chạy trên máy chủ
+`ovh-fra` và nối vào ứng dụng qua đường hầm SSH. Một lượt trong lớp mất
+khoảng 4 giây, câu Anna đáp hiện ngay lập tức vì nó lấy từ kịch bản bài học.
+
+**Điều phải nói rõ:** model cỡ nhỏ chạy CPU KHÔNG đủ để làm người đối thoại tự
+do - đo được 25-45 giây một câu với 7B, và 3B thì có lượt trả lời tiếng Việt
+bằng tiếng Trung. Vì vậy câu Anna nói là kịch bản viết tay, model chỉ lo phần
+chữa lỗi. Bảng số đo và các chốt chặn ở `docs/ENGINE-TU-HOST.md`.
 
 ## Bước tiếp theo (giai đoạn 2)
 

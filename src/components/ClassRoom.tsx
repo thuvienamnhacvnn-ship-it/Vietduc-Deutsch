@@ -194,7 +194,13 @@ export function ClassRoom({ code }: { code: string }) {
     setState("thinking");
 
     const res = await apiPost<{
-      turn: { replyDe: string; glossVi: string; correction: Correction | null; hintVi: string };
+      turn: {
+        replyDe: string;
+        glossVi: string;
+        correction: Correction | null;
+        hintVi: string;
+        done: boolean;
+      };
       audio: string | null;
     }>("/api/lop-hoc/luot", {
       classSessionId: data.classSessionId,
@@ -263,13 +269,11 @@ export function ClassRoom({ code }: { code: string }) {
         </p>
       )}
 
-      {llmOff && (
-        <div className="alert" role="status">
-          <p>
-            Lớp học nói chưa mở trên bản cài này: máy chủ giảng dạy chưa được bật. Bạn vẫn xem được
-            bài và câu mở lời, nhưng chưa có câu trả lời của giáo viên.
-          </p>
-        </div>
+{llmOff && (
+        <p className="note-quiet">
+          Buổi học chạy bình thường, nhưng phần chữa lỗi đang tắt trên bản cài này: bạn sẽ không
+          thấy ô sửa lỗi sau mỗi câu.
+        </p>
       )}
 
       <div className="lop__stream">

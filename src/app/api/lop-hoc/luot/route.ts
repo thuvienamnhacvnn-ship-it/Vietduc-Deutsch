@@ -24,9 +24,10 @@ const Body = z.object({
 /**
  * Một lượt trong buổi học: người học nói, Anna đáp.
  *
- * Ba việc chạy nối tiếp và cả ba đều trên máy chủ của trường: mô hình ngôn ngữ
- * soạn câu đáp, engine giọng nói đọc nó thành tiếng, và lỗi được sửa thì thành
- * một thẻ ôn tập.
+ * Câu Anna đáp lấy từ KỊCH BẢN của bài, nên nó ra ngay và luôn đúng cấp độ -
+ * xem ghi chú đầu `src/lib/lop-hoc.ts` để biết vì sao không để mô hình sinh
+ * câu này. Mô hình chỉ soi câu người học vừa nói và chỉ ra một lỗi; engine
+ * giọng nói đọc câu đáp thành tiếng; lỗi được sửa thì thành một thẻ ôn tập.
  *
  * Lượt được ghi vào cơ sở dữ liệu TRƯỚC khi gọi mô hình. Mô hình chạy trên CPU
  * có thể mất mươi giây; người học đóng tab giữa chừng thì câu họ vừa nói vẫn
@@ -82,45 +83,20 @@ export async function POST(request: Request) {
     transcript: said,
   });
 
-  const history = await recentTurns(classSessionId, 6);
+  // Người học đã nói bao nhiêu lượt trước lượt này: đó là vị trí trong kịch bản.
+  // Đếm từ cơ sở dữ liệu chứ không tin số client gửi lên - client mở hai tab là
+  // số đếm lệch ngay.
+  const history = await recentTurns(classSessionId, 100);
+  const turnIndex = Math.max(0, history.filter((h) => h.role === "user").length - 1);
   const startedModel = Date.now();
 
-  let result;
-  try {
-    result = await classTurn({
-      lesson: lesson.body,
-      level: lesson.level,
-      learnerName: auth.user.name,
-      // Bỏ lượt vừa ghi ra khỏi lịch sử: nó được gửi riêng ở `said`, để trong
-      // cả hai chỗ thì mô hình thấy người học nói hai lần cùng một câu.
-      history: history.slice(0, -1),
-      said,
-    });
-  } catch (error) {
-    return Response.json(
-      {
-        error: {
-          code: "engine_error",
-          message: "Bộ giảng dạy đang không trả lời. Câu bạn vừa nói đã được lưu.",
-          detail: error instanceof Error ? error.message : undefined,
-        },
-      },
-      { status: 503 },
-    );
-  }
-
-  if (result.mode === "mock") {
-    return Response.json(
-      {
-        error: {
-          code: "chua_mo",
-          message:
-            "Lớp học nói chưa mở trên bản cài này. Câu bạn vừa nói đã được lưu, nhưng chưa có câu trả lời của giáo viên.",
-        },
-      },
-      { status: 503 },
-    );
-  }
+  const result = await classTurn({
+    lesson: lesson.body,
+    level: lesson.level,
+    learnerName: auth.user.name,
+    turnIndex,
+    said,
+  });
 
   const modelMs = Date.now() - startedModel;
   const turn = result.turn;
@@ -158,5 +134,12 @@ export async function POST(request: Request) {
     audio = null;
   }
 
-  return Response.json({ turn, audio, latency: { model: modelMs, tts: ttsMs } });
+  return Response.json({
+    turn,
+    audio,
+    // Nói rõ phần sửa lỗi có chạy hay không, để giao diện không im lặng khi bộ
+    // giảng dạy đang tắt: người học cần biết vì sao không thấy ai chữa bài.
+    correctionEngine: result.engine,
+    latency: { model: modelMs, tts: ttsMs },
+  });
 }
