@@ -1132,6 +1132,14 @@ table.data tr:last-child td {
   margin-bottom: var(--s-8);
 }
 
+/* Logo trên thanh của khu auth: chỉ ở màn hẹp, vì màn rộng đã có logo trong
+   dải đỏ bên trái. Hai logo cùng lúc là thừa. */
+.auth-shell__logo {
+  display: flex;
+  align-items: center;
+  margin-right: auto;
+}
+
 .auth-shell__back {
   font-size: var(--fs-sm);
   color: var(--muted);
@@ -1163,6 +1171,13 @@ table.data tr:last-child td {
   .auth-shell {
     grid-template-columns: 0.9fr 1.1fr;
   }
+  /* Màn rộng đã có logo trong dải đỏ bên trái; hai logo cùng lúc là thừa. */
+  .auth-shell__logo {
+    display: none;
+  }
+  .auth-shell__back {
+    margin-right: auto;
+  }
   .auth-shell__aside {
     display: flex;
   }
@@ -1174,107 +1189,275 @@ table.data tr:last-child td {
 
 /* ========================================================= KHU HỌC / QUẢN TRỊ */
 
+/*
+ * Thanh điều hướng của khu học viên và cổng quản trị dùng CÙNG ngôn ngữ hình
+ * với header công khai: ba vùng, menu dạng pill, tách khỏi trang bằng bóng khi
+ * đã cuộn. Hai khu vẫn là hai thanh riêng vì nội dung khác nhau, nhưng người
+ * dùng không nên cảm thấy mình vừa nhảy sang một sản phẩm khác.
+ */
 .app-nav {
-  background: var(--paper-raised);
-  border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 30;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--motion) var(--ease),
+    border-color var(--motion) var(--ease),
+    box-shadow var(--motion) var(--ease);
+}
+
+.app-nav[data-scrolled] {
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  border-bottom-color: var(--line);
+  box-shadow: var(--shadow-1);
+}
+
+.app-nav[data-open] {
+  background: var(--paper);
+  border-bottom-color: var(--line);
 }
 
 .app-nav__inner {
   max-width: 1320px;
   margin-inline: auto;
-  padding: var(--s-3) var(--s-6);
-  display: flex;
+  padding-inline: var(--s-6);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--s-4);
-  flex-wrap: wrap;
+  min-height: 64px;
 }
 
 .app-nav__brand {
-  color: var(--brand);
   text-decoration: none;
   flex: none;
+  display: flex;
+  align-items: center;
 }
+
+/* ---- menu giữa ---- */
 
 .app-nav__list {
   display: none;
-  gap: var(--s-2);
-  flex: 1;
-  min-width: 100%;
-  order: 3;
-  flex-direction: column;
-  padding-top: var(--s-3);
-  border-top: 1px solid var(--line);
-  margin-top: var(--s-2);
-}
-
-.app-nav__list[data-open="true"] {
-  display: flex;
+  justify-self: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--paper-sunken) 70%, transparent);
+  border: 1px solid var(--line);
 }
 
 .app-nav__link {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: var(--s-3) var(--s-4);
+  padding: var(--s-2) var(--s-4);
   border-radius: var(--r-pill);
   color: var(--ink);
   text-decoration: none;
   font-size: var(--fs-sm);
   font-weight: 560;
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-fast) var(--ease),
+    color var(--motion-fast) var(--ease);
 }
 
 .app-nav__link:hover {
-  background: var(--paper-sunken);
+  background: var(--paper-raised);
   color: var(--brand);
 }
 
 .app-nav__link[aria-current="page"] {
-  background: var(--brand);
-  color: var(--paper);
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
 }
 
-.app-nav__link--soon {
-  color: var(--muted);
-  cursor: not-allowed;
-}
+/* ---- cụm tài khoản ---- */
 
 .app-nav__user {
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: var(--s-2);
-  margin-left: auto;
+  min-width: 0;
 }
 
 .app-nav__who {
   display: none;
   flex-direction: column;
-  line-height: 1.2;
+  line-height: 1.25;
   font-size: var(--fs-xs);
   text-align: right;
+  max-width: 22ch;
+}
+
+.app-nav__who strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-nav__who span {
   color: var(--muted);
 }
 
-@media (min-width: 960px) {
-  .app-nav__burger {
+.app-nav .app-nav__theme,
+.app-nav .app-nav__logout {
+  display: none;
+}
+
+.app-nav__burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--ease),
+    background-color var(--motion-fast) var(--ease);
+}
+
+.app-nav__burger:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ---- panel mobile ---- */
+
+.app-nav__panel {
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: var(--shadow-2);
+}
+
+.app-nav__panel-inner {
+  max-width: 1320px;
+  margin-inline: auto;
+  padding: var(--s-4) var(--s-6) var(--s-6);
+}
+
+.app-nav__panel-who {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  margin: 0 0 var(--s-3);
+  padding: 0 var(--s-3) var(--s-3);
+  border-bottom: 1px solid var(--line);
+  max-width: none;
+}
+
+.app-nav__panel-who span {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.app-nav__panel-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--fs-lg);
+  font-weight: 560;
+  padding: var(--s-4) var(--s-3);
+  border-radius: var(--r-md);
+}
+
+.app-nav__panel-link span {
+  color: var(--muted);
+  font-size: var(--fs-xl);
+  line-height: 1;
+}
+
+.app-nav__panel-link:hover {
+  background: var(--paper-sunken);
+  color: var(--brand);
+}
+
+.app-nav__panel-link[aria-current="page"] {
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
+}
+
+.app-nav__panel-link[aria-current="page"] span {
+  color: var(--on-brand-fill);
+}
+
+/* Mục của giai đoạn sau. Liệt kê chứ không làm thành liên kết: một liên kết
+   không đi tới đâu tệ hơn là không có liên kết. */
+.app-nav__soon {
+  margin-top: var(--s-4);
+  padding: var(--s-4) var(--s-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+.app-nav__soon h2 {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--s-3);
+}
+
+.app-nav__soon ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.app-nav__soon li {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-pill);
+  border: 1px dashed var(--line-strong);
+}
+
+.app-nav__panel-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-5);
+  padding: var(--s-4) var(--s-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+.app-nav__panel-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-left: auto;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+@media (min-width: 1040px) {
+  .app-nav .app-nav__list {
+    display: flex;
+  }
+  .app-nav .app-nav__who {
+    display: flex;
+  }
+  .app-nav .app-nav__theme {
+    display: inline-flex;
+  }
+  .app-nav .app-nav__logout {
+    display: inline-flex;
+  }
+  .app-nav .app-nav__burger,
+  .app-nav .app-nav__panel {
     display: none;
-  }
-  .app-nav__list {
-    display: flex;
-    flex-direction: row;
-    min-width: 0;
-    order: 0;
-    border-top: none;
-    padding-top: 0;
-    margin-top: 0;
-  }
-  .app-nav__who {
-    display: flex;
   }
 }
 
@@ -1355,36 +1538,6 @@ table.data tr:last-child td {
   color: var(--muted);
   margin-top: var(--s-2);
   margin-bottom: 0;
-}
-
-/* Thẻ dạng cột: badge không được kéo giãn hết chiều ngang. `align-items:stretch`
-   là mặc định của flex column, và nó biến một nhãn nhỏ thành một dải dài. */
-.level-card > .badge,
-.plan-card > .badge,
-.agent-card > .badge {
-  align-self: flex-start;
-}
-
-/* Giờ học: mặc định màu chữ phụ của nền sáng, đảo lại khi nằm trong dải đậm. */
-.level-card__hours {
-  color: var(--muted);
-}
-
-.band .level-card__hours {
-  color: var(--on-band-muted);
-}
-
-/* Nhãn nút trong thanh điều hướng không xuống dòng: ở 390px "Bắt đầu" từng vỡ
-   thành hai dòng và làm thanh header cao gấp đôi. Nút trong nội dung thì KHÔNG
-   khoá như vậy - nhãn dài ở 390px sẽ đẩy trang tràn ngang. */
-.site-header .btn,
-.app-nav .btn {
-  white-space: nowrap;
-}
-
-.btn {
-  max-width: 100%;
-  text-align: center;
 }
 
 /* ============================================================ HEADER CÔNG KHAI */

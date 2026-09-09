@@ -71,6 +71,35 @@ hint, lỗi, `aria-describedby`), `Card`, `Badge`, `SkillMeter`, `Stepper`,
 `Alert`, `EmptyState`, `Reveal` (hiệu ứng vào màn, tự tắt khi reduced-motion),
 `ThemeToggle`, `SiteHeader`, `SiteFooter`, `LearnNav`, `AdminNav`.
 
+## Ba thanh điều hướng
+
+Sản phẩm có ba khu, mỗi khu một thanh, nhưng dùng CÙNG ngôn ngữ hình để người
+dùng không cảm thấy vừa nhảy sang một sản phẩm khác.
+
+| Thanh | Khu | Thành phần |
+|---|---|---|
+| `SiteHeader` | trang công khai | logo, menu pill, đổi giao diện, Đăng nhập, nút hành động chính |
+| `AppNav` | khu học viên và cổng quản trị | logo, menu pill, tên và vai trò, Đăng xuất |
+| thanh trong `.auth-shell` | đăng ký, đăng nhập, đặt lại mật khẩu | logo (chỉ màn hẹp), Về trang chủ, đổi giao diện |
+
+Quy ước chung của hai thanh đầu:
+
+- **Lưới ba vùng `auto 1fr auto`**: logo trái, menu giữa, hành động phải. Dùng
+  flex thì menu dính vào logo rồi bỏ trống cả khoảng giữa.
+- **Menu là một dải pill** trên nền lõm; trang đang mở tô nguyên viên bằng
+  `--brand-fill`, chữ trắng đạt 5.5:1.
+- **Chưa cuộn thì trong suốt**, cuộn rồi mới thêm bóng và đường kẻ. Một cái viền
+  cố định ngay dưới hero làm trang trông như bị cắt ngang.
+- **Mobile chỉ giữ ba thứ trên thanh**: logo, hành động chính, nút mở menu. Mỗi
+  món thêm vào thanh là một món đẩy nó tràn ở 390px.
+- **Nút menu vẽ bằng SVG**, ba vạch chuyển thành X. Hai ký tự hamburger và dấu
+  nhân lệch cỡ và lệch đường chân giữa các font hệ thống, nên nút bị nhảy khi
+  đóng mở.
+- **Mục của giai đoạn sau không nằm trên thanh ngang.** Bảy mục kèm bảy huy hiệu
+  "sắp có" làm thanh cao gấp đôi và không mục nào đọc ra. Chúng xuống panel,
+  dưới tiêu đề "Sắp có", ở dạng chip nét đứt — liệt kê chứ không phải liên kết,
+  vì một liên kết không đi tới đâu tệ hơn là không có liên kết.
+
 ## Điểm gãy
 
 `390px` (mốc kiểm bắt buộc), `768px`, `1024px`, `1440px`. Lưới nội dung rộng tối

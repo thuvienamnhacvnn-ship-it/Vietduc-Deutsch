@@ -28,6 +28,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       <main id="noi-dung" className="auth-shell__main">
         <div className="auth-shell__bar">
+          {/*
+            Logo trên thanh chỉ hiện ở màn hẹp. Ở màn rộng nó đã nằm trong dải
+            đỏ bên trái; nhưng dải đó bị ẩn dưới 900px, và trước đây trang đăng
+            nhập trên điện thoại không còn nhận diện nào - người dùng nhìn một
+            biểu mẫu không rõ của ai.
+          */}
+          <Link href="/" className="auth-shell__logo" aria-label="Về trang chủ">
+            <Logo height={34} />
+          </Link>
+
           <Link href="/" className="auth-shell__back">
             ← Về trang chủ
           </Link>
