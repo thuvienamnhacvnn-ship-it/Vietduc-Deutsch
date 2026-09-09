@@ -221,6 +221,24 @@ export async function classTurn(args: {
     if (!noiDaNoi.includes(goiVeBanPhim(correction.wrong))) correction = null;
   }
 
+  /*
+   * Chốt thứ tư: câu sửa chỉ NỐI THÊM chữ vào đuôi câu sai thì không phải sửa.
+   *
+   * Gặp thật khi chạy trên máy chủ: "Ich arbeite in ein Restaurant" bị chữa
+   * thành "in ein" thành "in ein Restaurant". Mô hình chép lại y nguyên rồi
+   * thêm danh từ vào sau, trong khi lỗi thật nằm ở "ein" đáng lẽ phải là
+   * "einem". Người học nhìn hai vế gần như giống hệt nhau và không hiểu mình
+   * sai chỗ nào.
+   *
+   * Chỉ chặn kiểu NỐI ĐUÔI. Lỗi thiếu từ ở giữa - "habe Hund" thành "habe einen
+   * Hund" - vẫn được giữ, vì đó là sửa thật.
+   */
+  if (correction) {
+    const sai = goiVeBanPhim(correction.wrong);
+    const dung = goiVeBanPhim(correction.right);
+    if (dung.startsWith(sai)) correction = null;
+  }
+
   return {
     engine,
     turn: {
