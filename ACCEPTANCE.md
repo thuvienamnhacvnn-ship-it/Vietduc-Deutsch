@@ -70,7 +70,7 @@ tạo phiên. Chỉ khác một chỗ là màn hình chọn tài khoản.
 | GG-12 | Giao diện có nút Google và nhãn "bản mô phỏng" | google.mjs mục "Giao diện" | PASS |
 | GG-13 | PKCE (S256) gửi đúng lên Google | Code có, nhưng chỉ kiểm được khi có khóa thật — bản mô phỏng không kiểm `code_verifier` | BLOCKED |
 | GG-14 | Kiểm `iss`, `aud`, `exp`, `nonce`, `email_verified` của id_token | Code có trong `verifyIdToken`. Chỉ chạy ở chế độ live | BLOCKED |
-| GG-15 | Nút Google bị vô hiệu ở production khi thiếu khóa | Logic trong `mockEnabled()`. Chưa kiểm trên môi trường production thật | NOT STARTED |
+| GG-15 | Nút Google bị vô hiệu ở production khi thiếu khóa | ĐÃ KIỂM trên bản đang chạy: trang đăng nhập hiện "Google chưa kết nối" kèm lý do, và `POST /api/auth/google/mo-phong` trả 404 | PASS |
 
 ## DATA — dữ liệu và hồ sơ
 

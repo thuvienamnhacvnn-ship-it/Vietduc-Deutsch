@@ -7,6 +7,8 @@ Thương hiệu đổi tập trung ở `src/lib/brand.ts`. Hệ màu lấy trự
 (`npx tsx scripts/lay-mau-logo.ts`) — xem `src/styles/tokens.css` và
 `docs/ASSETS.md`.
 
+**Bản đang chạy:** https://deutsch.57-129-45-199.sslip.io — xem `docs/TRIEN-KHAI.md`.
+
 ## Trạng thái
 
 **Chạy thật:** tài khoản và phân quyền, bài kiểm tra xếp lớp phân nhánh nhiều
@@ -105,6 +107,7 @@ code nào.
 | `docs/DATA_MODEL.md` | vì sao các bảng có hình dạng như vậy |
 | `docs/ROUTES.md` | hợp đồng route và API |
 | `docs/UI_SYSTEM.md` | hệ thiết kế |
+| `docs/TRIEN-KHAI.md` | bản đang chạy ở đâu, cập nhật thế nào, dựng lại từ đầu ra sao |
 | `docs/ENGINE-TU-HOST.md` | engine giọng nói và bộ giảng dạy tự host: cài đặt, số đo, giới hạn |
 | `docs/INTEGRATIONS.md` | dịch vụ ngoài còn lại và checklist kích hoạt |
 | `docs/ASSETS.md` | danh mục tài nguyên hình ảnh |
