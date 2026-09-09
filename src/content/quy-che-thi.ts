@@ -17,7 +17,7 @@
 import type { Level, Skill } from "@/lib/db/schema";
 
 /** Phiên bản quy chế. Mỗi bài thi ghi lại phiên bản đã áp dụng cho nó. */
-export const REGULATION_VERSION = "1.0";
+export const REGULATION_VERSION = "2.0";
 
 /** Kết quả xếp lớp có hiệu lực bao lâu trước khi nên kiểm tra lại. */
 export const RESULT_VALID_DAYS = 180;
@@ -37,11 +37,18 @@ export const LISTEN_LIMIT: Record<Level, number> = {
   B2: 2,
 };
 
-/** Thời lượng khuyến nghị cho từng phần, tính bằng phút. Không cắt ngang bài. */
+/**
+ * Thời lượng khuyến nghị cho từng phần, tính bằng phút. Không cắt ngang bài.
+ *
+ * Ngắn hơn bản trước vì bài đã đổi cách chạy: thay vì bò từ A1 lên B2, bài
+ * phân nhánh theo sức người làm và chỉ hỏi khoảng 18 câu chấm máy. Ghi 38 phút
+ * cho một bài thật ra dài 20 phút là tự dựng lên một rào cản không có thật -
+ * người học nhìn con số rồi hẹn "để hôm khác".
+ */
 export const SECTION_MINUTES: Record<Skill, number> = {
-  reading: 12,
-  listening: 8,
-  writing: 15,
+  reading: 8,
+  listening: 5,
+  writing: 12,
   speaking: 3,
 };
 
@@ -58,16 +65,17 @@ export const SECTIONS: Section[] = [
   {
     skill: "reading",
     title: "Đọc hiểu và cấu trúc",
-    what: "Câu ngắn, đoạn văn và bài tập điền từ, đi từ A1 lên B2.",
+    what: "Ba khối câu ngắn, đoạn văn và bài tập điền từ. Khối đầu để định mức, hai khối sau chọn theo kết quả của bạn.",
     rules: [
       "Mỗi câu chỉ trả lời một lần, không quay lại câu đã làm.",
-      "Làm dưới một nửa số câu ở một cấp thì phần này dừng tại đó — không hỏi tiếp câu khó hơn.",
+      "Làm tốt thì khối sau khó lên, làm đuối thì khối sau nhẹ xuống — bài đi theo sức bạn.",
+      "Làm rất thấp ở khối dễ nhất thì phần này dừng: đã đủ căn cứ để xếp lớp, hỏi thêm chỉ mất thời gian của bạn.",
     ],
   },
   {
     skill: "listening",
     title: "Nghe hiểu",
-    what: "Câu và đoạn thoại tiếng Đức được đọc lên, kèm câu hỏi hiểu ý.",
+    what: "Hai khối câu và đoạn thoại tiếng Đức được đọc lên, kèm câu hỏi hiểu ý. Bắt đầu ở mức vừa với phần Đọc của bạn.",
     rules: [
       `Mỗi đoạn được nghe tối đa ${LISTEN_LIMIT.A1} lần. Hệ thống đếm và hiện số lần còn lại.`,
       "Nghe chậm tính là một lần nghe.",
@@ -98,6 +106,17 @@ export const SECTIONS: Section[] = [
  * Cam kết của người làm bài. Tick vào là một hành động có ý nghĩa: nó được ghi
  * vào hồ sơ bài thi cùng thời điểm và địa chỉ IP.
  */
+/**
+ * Quyền của người làm bài. Đặt ngay trước phần cam kết, vì một bản quy chế chỉ
+ * liệt kê nghĩa vụ thì đọc như một cái bẫy.
+ */
+export const LEARNER_RIGHTS = [
+  "Bạn dừng bài bất cứ lúc nào. Phần đã làm vẫn được chấm và bạn vẫn nhận được khoá học phù hợp, kết quả chỉ ghi rõ là bài dừng sớm.",
+  "Mỗi lần làm là một đề khác, rút từ ngân hàng câu hỏi và tránh những câu bạn đã gặp lần trước.",
+  "Bạn làm lại bài bất cứ lúc nào; kết quả mới thay cho kết quả cũ.",
+  "Kỹ năng nào không đủ bằng chứng thì được ghi là chưa đánh giá được, chứ không bị đoán bừa một mức.",
+];
+
 export const HONESTY_PLEDGE = [
   "Tôi tự làm bài một mình, không nhờ người khác trả lời hộ.",
   "Tôi không dùng từ điển, công cụ dịch hay trợ lý AI trong lúc làm bài.",
@@ -108,8 +127,8 @@ export const HONESTY_PLEDGE = [
 export const SCORING = [
   {
     skill: "reading" as Skill,
-    how: "Chấm tự động theo đáp án chuẩn. Mức của bạn là cấp cao nhất mà bạn làm đúng từ 60% trở lên.",
-    confidence: "Độ tin cậy tăng theo số cấp bạn làm qua, tối đa 90%.",
+    how: "Chấm tự động theo đáp án chuẩn. Mức của bạn là cấp cao nhất mà bạn làm đúng từ 60% trở lên trong khối của cấp đó.",
+    confidence: "Độ tin cậy tăng theo số khối bạn làm qua, tối đa 90%. Bài dừng sớm thì độ tin cậy bị hạ.",
   },
   {
     skill: "listening" as Skill,

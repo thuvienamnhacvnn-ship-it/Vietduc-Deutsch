@@ -4,6 +4,8 @@ import { getDb } from "@/lib/db";
 import { assessmentSessions, responses, type Skill } from "@/lib/db/schema";
 import { apiUser } from "@/lib/auth/guard";
 import {
+  examSeed,
+  seenCodesFor,
   autoIsCorrect,
   estimateTotal,
   listensLeftFor,
@@ -11,7 +13,7 @@ import {
   nextItem,
   publicItem,
   questionVersionIdFor,
-  readingLevelSoFar,
+
   recordElapsed,
   type SessionState,
 } from "@/lib/placement";
@@ -135,7 +137,10 @@ export async function POST(request: Request) {
     if (isCorrect !== null) state.correct[code] = isCorrect;
   }
 
-  const next = nextItem(state, readingLevelSoFar(state));
+  const next = nextItem(state, {
+    seed: examSeed(session),
+    avoid: await seenCodesFor(auth.user.id, session.id),
+  });
   // Đóng dấu thời điểm phát câu kế tiếp trước khi lưu, để chỉ ghi database một
   // lần cho cả câu vừa trả lời lẫn câu sắp hiện.
   if (next) markServed(state, next.code);

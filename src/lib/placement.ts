@@ -13,10 +13,9 @@ import {
   type Skill,
 } from "@/lib/db/schema";
 import {
+  ALL_SPEAK_ITEMS,
+  ALL_WRITE_ITEMS,
   AUTO_ITEMS,
-  LEVEL_ORDER,
-  SPEAK_ITEMS,
-  WRITE_ITEMS,
   gapIsCorrect,
   type GapItem,
   type McqItem,
@@ -24,6 +23,14 @@ import {
   type WriteItem,
 } from "@/content/placement";
 import { LISTEN_LIMIT, REGULATION_VERSION, examCode } from "@/content/quy-che-thi";
+import {
+  FULL_LENGTH,
+  extendPlan,
+  pickProductionItems,
+  skillLevelOf,
+  startPlan,
+  type ExamPlan,
+} from "@/lib/de-thi";
 
 /**
  * Bài kiểm tra xếp lớp.
@@ -40,13 +47,17 @@ import { LISTEN_LIMIT, REGULATION_VERSION, examCode } from "@/content/quy-che-th
  *    dài và các cấu trúc bắt buộc, nên độ tin cậy của nó thấp và bằng chứng ghi
  *    rõ đã kiểm những gì.
  *
- * Thứ tự bài: Đọc và cấu trúc (A1 lên B2), rồi Nghe (A1 lên B2), rồi Viết, rồi
- * Nói. Trong mỗi kỹ năng, làm hết một cấp rồi mới lên cấp trên; làm dưới 50%
- * một cấp thì dừng kỹ năng đó - hỏi tiếp câu khó hơn chỉ tốn thời gian của
- * người học mà không thêm thông tin gì.
+ * Đường đi của bài nằm ở `src/lib/de-thi.ts`: ba khối Đọc rồi hai khối Nghe,
+ * mỗi khối được chọn cấp độ theo kết quả khối trước, rồi một đề Viết và một đề
+ * Nói ở đúng mức người học đang cho thấy. Mỗi phiên rút một đề khác từ ngân
+ * hàng, nên thi lại không phải là làm lại đúng đề cũ.
+ *
+ * Người học có quyền DỪNG giữa chừng. Dừng không phải là hỏng bài: những gì đã
+ * làm vẫn được chấm, chỉ là độ tin cậy thấp hơn và kết quả ghi rõ là bài dừng
+ * sớm. Bắt người ta làm hết mới cho kết quả thì phần đông sẽ bỏ ngang và không
+ * nhận được gì cả.
  */
 
-const PASS_TO_CONTINUE = 0.5;
 const PASS_TO_CLAIM_LEVEL = 0.6;
 
 export type PublicItem = {
@@ -87,6 +98,13 @@ export type SessionState = {
   stopped: Skill[];
   /** Người học tự bỏ qua phần Nói. */
   skippedSpeaking?: boolean;
+  /**
+   * Đề của phiên này: các khối đã phát và cấp độ của từng khối. Sinh từ hạt
+   * giống riêng của phiên nên mỗi lần thi là một đề khác.
+   */
+  plan?: ExamPlan;
+  /** Người học chủ động dừng bài. Bài vẫn được chấm trên phần đã làm. */
+  endedEarly?: boolean;
 
   /* ---- hồ sơ điều kiện làm bài (quy chế 1.0) ---- */
 
@@ -115,56 +133,42 @@ export const EMPTY_STATE: SessionState = {
 /* ------------------------------------------------------- chọn câu kế tiếp */
 
 /**
- * Các câu chấm tự động của một kỹ năng ở một cấp: trắc nghiệm trước, điền sau.
- * Thứ tự cố ý - người học quen tay với dạng chọn rồi mới phải tự gõ.
- */
-function autoBlock(skill: Skill, level: Level): (McqItem | GapItem)[] {
-  const block = AUTO_ITEMS.filter((i) => i.skill === skill && i.level === level);
-  return [...block.filter((i) => i.kind === "mcq"), ...block.filter((i) => i.kind === "gap")];
-}
-
-/**
- * Điểm của một cấp trong một kỹ năng: đúng bao nhiêu trên tổng đã LÀM.
- * Câu bị bỏ qua không nằm ở cả tử số lẫn mẫu số.
- */
-function blockScore(state: SessionState, skill: Skill, level: Level) {
-  const skipped = state.skipped ?? [];
-  const block = autoBlock(skill, level);
-  const done = block.filter((i) => state.answered.includes(i.code) && !skipped.includes(i.code));
-  const right = done.filter((i) => state.correct[i.code]).length;
-  return { done: done.length, total: block.length, right, ratio: done.length ? right / done.length : 0 };
-}
-
-/**
  * Câu tiếp theo, hoặc null khi đã xong. Đây là toàn bộ logic điều phối bài thi
  * và nó cố ý ở một chỗ để đọc được từ trên xuống.
  */
-export function nextItem(state: SessionState, writeLevel?: Level): PlacementItem | null {
-  // 1. Đọc và cấu trúc, rồi Nghe. Cùng một quy tắc cho cả hai.
-  for (const skill of ["reading", "listening"] as const) {
-    if (state.stopped.includes(skill)) continue;
+export function nextItem(
+  state: SessionState,
+  options: { seed?: string; avoid?: string[] } = {},
+): PlacementItem | null {
+  const avoid = options.avoid ?? [];
 
-    for (const level of LEVEL_ORDER) {
-      const block = autoBlock(skill, level);
-      if (block.length === 0) continue;
+  // Chưa có đề thì dựng khối định tuyến. Hạt giống là của phiên, không phải của
+  // lần gọi - tải lại trang không được đổi đề đang làm dở.
+  if (!state.plan) state.plan = startPlan(options.seed ?? String(Date.now()), avoid);
+  const plan = state.plan;
 
-      const remaining = block.filter((i) => !state.answered.includes(i.code));
-      if (remaining.length > 0) return remaining[0]!;
-
-      // Hết một cấp: làm dưới ngưỡng thì dừng kỹ năng này, không hỏi cấp cao hơn.
-      if (blockScore(state, skill, level).ratio < PASS_TO_CONTINUE) {
-        state.stopped.push(skill);
-        break;
+  for (let guard = 0; guard < 8; guard++) {
+    for (const stage of plan.stages) {
+      const remaining = stage.codes.filter((c) => !state.answered.includes(c));
+      if (remaining.length > 0) {
+        const item = AUTO_ITEMS.find((i) => i.code === remaining[0]);
+        if (item) return item;
+        // Mã trong đề mà không còn trong ngân hàng: coi như đã làm và đi tiếp,
+        // chứ không để người học kẹt ở một câu không tồn tại.
+        state.answered.push(remaining[0]!);
+        state.skipped.push(remaining[0]!);
       }
     }
+    if (!extendPlan(plan, state.correct, state.answered, state.skipped, avoid)) break;
   }
 
-  // 2. Viết: một đề, ở đúng cấp mà phần Đọc gợi ý.
-  const write = WRITE_ITEMS.find((i) => i.level === (writeLevel ?? "A1"));
+  // Hết phần chấm máy: chọn đề Viết và đề Nói ở đúng mức vừa đo được.
+  pickProductionItems(plan, state.correct, state.answered, state.skipped, avoid);
+
+  const write = ALL_WRITE_ITEMS.find((i) => i.code === plan.writeCode);
   if (write && !state.answered.includes(write.code)) return write;
 
-  // 3. Nói: một đề, và bỏ qua được.
-  const speak = SPEAK_ITEMS[0];
+  const speak = ALL_SPEAK_ITEMS.find((i) => i.code === plan.speakCode);
   if (speak && !state.answered.includes(speak.code) && !state.skippedSpeaking) return speak;
 
   return null;
@@ -172,30 +176,20 @@ export function nextItem(state: SessionState, writeLevel?: Level): PlacementItem
 
 /** Mức tạm thời của kỹ năng Đọc, dùng để chọn đề Viết cho vừa sức. */
 export function readingLevelSoFar(state: SessionState): Level {
-  let best: Level = "A1";
-  for (const level of LEVEL_ORDER) {
-    const score = blockScore(state, "reading", level);
-    if (score.done > 0 && score.ratio >= PASS_TO_CLAIM_LEVEL) best = level;
-  }
-  return best;
+  if (!state.plan) return "A1";
+  return skillLevelOf(state.plan, "reading", state.correct, state.answered, state.skipped).level;
 }
 
-/** Tổng số câu ước lượng còn phải làm, chỉ để vẽ thanh tiến độ. */
+/**
+ * Tổng số câu để vẽ thanh tiến độ.
+ *
+ * Luôn là độ dài một bài đầy đủ, kể cả khi các khối sau chưa được sinh ra. Nếu
+ * lấy số câu đã sinh làm mẫu số thì thanh tiến độ chạy tới gần cuối rồi tụt về
+ * giữa mỗi lần bài mở thêm một khối - người làm bài sẽ nghĩ là máy hỏng.
+ */
 export function estimateTotal(state: SessionState): number {
-  let total = 0;
-  for (const skill of ["reading", "listening"] as const) {
-    for (const level of LEVEL_ORDER) {
-      total += autoBlock(skill, level).length;
-      if (
-        state.answered.some((c) => autoBlock(skill, level).some((i) => i.code === c)) &&
-        blockScore(state, skill, level).done === autoBlock(skill, level).length &&
-        blockScore(state, skill, level).ratio < PASS_TO_CONTINUE
-      ) {
-        break;
-      }
-    }
-  }
-  return total + 2; // một đề Viết, một đề Nói
+  const answered = state.answered.length;
+  return Math.max(FULL_LENGTH, answered);
 }
 
 /**
@@ -307,9 +301,10 @@ export function scoreSession(
   const results: SkillResult[] = [];
 
   for (const skill of ["reading", "listening"] as const) {
-    const blocks = LEVEL_ORDER.map((level) => ({ level, ...blockScore(state, skill, level) })).filter(
-      (b) => b.done > 0,
-    );
+    const measured = state.plan
+      ? skillLevelOf(state.plan, skill, state.correct, state.answered, state.skipped)
+      : { level: "A1" as Level, blocks: [] };
+    const blocks = measured.blocks;
 
     if (blocks.length === 0) {
       results.push({
@@ -322,14 +317,12 @@ export function scoreSession(
       continue;
     }
 
-    // Mức cao nhất mà người học đạt ngưỡng. Không đạt ngưỡng ở cấp nào thì mức
-    // là A1 - đó là điểm bắt đầu, không phải "không đánh giá được".
-    let level: Level = "A1";
-    for (const b of blocks) if (b.ratio >= PASS_TO_CLAIM_LEVEL) level = b.level;
+    const level = measured.level;
 
-    // Càng làm nhiều cấp thì kết luận càng chắc. Trần 0.9: một bài trắc nghiệm
-    // ngắn không bao giờ đáng tin tuyệt đối.
-    const confidence = Math.min(0.9, 0.4 + 0.13 * blocks.length);
+    // Càng làm nhiều khối thì kết luận càng chắc. Trần 0.9: một bài trắc nghiệm
+    // ngắn không bao giờ đáng tin tuyệt đối. Dừng sớm thì hạ thêm - kết quả vẫn
+    // dùng được để xếp lớp, nhưng phải nói rõ là nó mỏng hơn.
+    const confidence = Math.min(0.9, 0.4 + 0.15 * blocks.length) * (state.endedEarly ? 0.7 : 1);
 
     results.push({
       skill,
@@ -337,8 +330,13 @@ export function scoreSession(
       confidence,
       insufficientEvidence: false,
       evidence: {
-        blocks: blocks.map((b) => ({ level: b.level, right: b.right, done: b.done })),
-        rule: `Đạt mức khi làm đúng từ ${Math.round(PASS_TO_CLAIM_LEVEL * 100)}% trở lên ở cấp đó.`,
+        blocks: blocks.map((b) => ({
+          level: b.routing ? "A1+A2" : b.level,
+          right: b.right,
+          done: b.done,
+        })),
+        rule: `Đạt mức khi làm đúng từ ${Math.round(PASS_TO_CLAIM_LEVEL * 100)}% trở lên ở khối của cấp đó.`,
+        endedEarly: state.endedEarly ?? false,
       },
     });
   }
@@ -499,8 +497,43 @@ export async function writingResponseFor(sessionId: number, userId: number) {
   const raw = rows[0]?.raw as { code?: string; text?: string } | undefined;
   if (!raw?.code || typeof raw.text !== "string") return null;
 
-  const item = WRITE_ITEMS.find((i) => i.code === raw.code);
+  const item = ALL_WRITE_ITEMS.find((i) => i.code === raw.code);
   return item ? { item, text: raw.text } : null;
+}
+
+/**
+ * Hạt giống sinh đề của một phiên.
+ *
+ * Buộc vào id và thời điểm bắt đầu của chính phiên đó, nên: cùng một phiên thì
+ * mọi lần gọi ra cùng một đề (tải lại trang không đổi đề), còn hai phiên khác
+ * nhau thì đề khác nhau.
+ */
+export function examSeed(session: { id: number; startedAt: Date | string | null }): string {
+  const at = session.startedAt ? new Date(session.startedAt).getTime() : 0;
+  return `${session.id}:${at}`;
+}
+
+/**
+ * Những câu học viên đã gặp ở các lần thi TRƯỚC.
+ *
+ * Bộ tạo đề tránh chúng khi còn câu mới. Không có bước này thì "mỗi lần một đề
+ * khác" chỉ đúng trên lý thuyết: hai phiên rút ngẫu nhiên từ cùng một ô vẫn hay
+ * trùng nhau, và người thi lại sau một tuần sẽ gặp lại đúng câu cũ.
+ */
+export async function seenCodesFor(userId: number, exceptSessionId?: number): Promise<string[]> {
+  const db = await getDb();
+  const rows = await db
+    .select({ id: assessmentSessions.id, state: assessmentSessions.resumeState })
+    .from(assessmentSessions)
+    .where(and(eq(assessmentSessions.userId, userId), eq(assessmentSessions.kind, "placement")));
+
+  const codes = new Set<string>();
+  for (const row of rows) {
+    if (exceptSessionId && row.id === exceptSessionId) continue;
+    const state = row.state as SessionState | null;
+    for (const c of state?.answered ?? []) codes.add(c);
+  }
+  return [...codes];
 }
 
 /* -------------------------------------------------- điều kiện làm bài (quy chế) */

@@ -1,4 +1,15 @@
-import type { Level, Skill } from "@/lib/db/schema";
+import type { Level } from "@/lib/db/schema";
+import type {
+  GapItem,
+  McqItem,
+  PlacementItem,
+  SpeakItem,
+  WriteItem,
+} from "@/content/placement-types";
+import { A1_GAP, A1_LISTENING, A1_MCQ, A1_SPEAK, A1_WRITE } from "@/content/de/a1";
+import { A2_GAP, A2_LISTENING, A2_MCQ, A2_SPEAK, A2_WRITE } from "@/content/de/a2";
+import { B1_GAP, B1_LISTENING, B1_MCQ, B1_SPEAK, B1_WRITE } from "@/content/de/b1";
+import { B2_GAP, B2_LISTENING, B2_MCQ, B2_SPEAK, B2_WRITE } from "@/content/de/b2";
 
 /**
  * Ngân hàng câu hỏi xếp lớp.
@@ -13,76 +24,13 @@ import type { Level, Skill } from "@/lib/db/schema";
  * Nội dung tiếng Đức viết mới cho Lingora, không sao chép giáo trình thương mại.
  */
 
-export type McqItem = {
-  code: string;
-  kind: "mcq";
-  level: Level;
-  skill: Skill;
-  /** Câu dẫn. Tiếng Đức cho phần nội dung, tiếng Việt cho phần hỏi. */
-  prompt: string;
-  /** Đoạn văn đọc, nếu có. */
-  passage?: string;
-  /**
-   * Câu tiếng Đức sẽ được đọc lên cho phần Nghe. Người học không nhìn thấy chữ
-   * này - đó là điểm khác biệt giữa kỹ năng Nghe và kỹ năng Đọc.
-   */
-  audioText?: string;
-  options: string[];
-  answer: number;
-  /** Vì sao đáp án đúng, viết cho người học đọc sau khi làm xong. */
-  why: string;
-};
-
-/**
- * Câu điền đáp án: người học GÕ từ vào chỗ trống thay vì chọn trong bốn phương
- * án. Khó hơn trắc nghiệm thật sự - không đoán mò được, và nó đo được việc nhớ
- * hình thái từ chứ không chỉ nhận ra mặt chữ.
- */
-export type GapItem = {
-  code: string;
-  kind: "gap";
-  level: Level;
-  skill: Skill;
-  /** Câu có dấu ___ ở chỗ cần điền. */
-  prompt: string;
-  passage?: string;
-  audioText?: string;
-  /** Gợi ý dạng nguyên thể hoặc nghĩa, để đây không thành câu đố mẹo. */
-  hint: string;
-  /**
-   * Mọi cách viết được chấp nhận. Luôn ghi cả biến thể không dấu Đức
-   * (heisse cho heiße) - người học gõ trên bàn phím Việt không có ß.
-   */
-  accept: string[];
-  why: string;
-};
-
-export type WriteItem = {
-  code: string;
-  kind: "write";
-  level: Level;
-  skill: "writing";
-  prompt: string;
-  hint: string;
-  minWords: number;
-  /**
-   * Những dấu hiệu KIỂM TRA ĐƯỢC bằng máy: từ khóa chủ đề và cấu trúc bắt buộc.
-   * Chúng cho một tín hiệu thật nhưng hẹp, nên điểm viết luôn được đánh dấu là
-   * sơ bộ cho tới khi có người hoặc mô hình chấm theo rubric đầy đủ.
-   */
-  expectPatterns: { label: string; any: string[] }[];
-};
-
-export type SpeakItem = {
-  code: string;
-  kind: "speak";
-  level: Level;
-  skill: "speaking";
-  prompt: string;
-  hint: string;
-};
-
-export type PlacementItem = McqItem | GapItem | WriteItem | SpeakItem;
+export type {
+  McqItem,
+  GapItem,
+  WriteItem,
+  SpeakItem,
+  PlacementItem,
+} from "@/content/placement-types";
 
 /* ------------------------------------------------------------------ A1 */
 
@@ -614,16 +562,53 @@ export const SPEAK_ITEMS: SpeakItem[] = [
 ];
 
 /** Toàn bộ câu trắc nghiệm, đã xếp theo cấp độ tăng dần. */
-export const MCQ_ITEMS: McqItem[] = [...A1, ...A2, ...B1, ...B2];
+export const MCQ_ITEMS: McqItem[] = [
+  ...A1,
+  ...A1_MCQ,
+  ...A1_LISTENING,
+  ...A2,
+  ...A2_MCQ,
+  ...A2_LISTENING,
+  ...B1,
+  ...B1_MCQ,
+  ...B1_LISTENING,
+  ...B2,
+  ...B2_MCQ,
+  ...B2_LISTENING,
+];
 
 /** Câu chấm tự động được: trắc nghiệm và điền. Dùng chung một quy tắc chấm. */
-export const AUTO_ITEMS: (McqItem | GapItem)[] = [...MCQ_ITEMS, ...GAP_ITEMS];
-
-export const ALL_ITEMS: PlacementItem[] = [
+export const AUTO_ITEMS: (McqItem | GapItem)[] = [
   ...MCQ_ITEMS,
   ...GAP_ITEMS,
+  ...A1_GAP,
+  ...A2_GAP,
+  ...B1_GAP,
+  ...B2_GAP,
+];
+
+/** Mọi đề Viết, gồm bộ gốc và bộ mở rộng. */
+export const ALL_WRITE_ITEMS: WriteItem[] = [
   ...WRITE_ITEMS,
+  ...A1_WRITE,
+  ...A2_WRITE,
+  ...B1_WRITE,
+  ...B2_WRITE,
+];
+
+/** Mọi đề Nói, gồm bộ gốc và bộ mở rộng. */
+export const ALL_SPEAK_ITEMS: SpeakItem[] = [
   ...SPEAK_ITEMS,
+  ...A1_SPEAK,
+  ...A2_SPEAK,
+  ...B1_SPEAK,
+  ...B2_SPEAK,
+];
+
+export const ALL_ITEMS: PlacementItem[] = [
+  ...AUTO_ITEMS,
+  ...ALL_WRITE_ITEMS,
+  ...ALL_SPEAK_ITEMS,
 ];
 
 /**

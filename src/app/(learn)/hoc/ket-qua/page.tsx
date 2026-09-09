@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
 import { skillScores, SKILL_LABEL_VI, type Skill } from "@/lib/db/schema";
 import { CURRICULUM } from "@/content/curriculum";
+import { recommendCourse } from "@/content/khoa-hoc";
 import { DISCLAIMER, RESULT_VALID_DAYS, SCORING } from "@/content/quy-che-thi";
 import { PrintButton } from "@/components/PrintButton";
 
@@ -74,6 +75,19 @@ export default async function ResultPage() {
     : null;
   const plan = CURRICULUM.find((c) => c.level === startLevel);
 
+  // Khoá học đề xuất. Một mức CEFR chưa phải là lời khuyên: người học cần biết
+  // ngày mai vào lớp nào, học bao nhiêu giờ, và phải bù kỹ năng gì.
+  const endedEarly = [...evidenceFor.values()].some((ev) => ev.endedEarly === true);
+  const recommendation = recommendCourse(
+    skills.map((s) => ({
+      skill: s.skill,
+      level: s.level ?? null,
+      confidence: s.confidence,
+      insufficientEvidence: s.unknown,
+    })),
+    endedEarly,
+  );
+
   if (assessed.length === 0 && rows.length === 0) {
     return (
       <>
@@ -103,22 +117,73 @@ export default async function ResultPage() {
         </p>
       </div>
 
-      {startLevel && (
-        <div className="result-hero">
+{/*
+        Khoá học đề xuất đứng TRƯỚC bảng điểm từng kỹ năng.
+        Người học mở trang này để biết "vậy giờ tôi học gì", không phải để đọc
+        bốn con số. Bằng chứng nằm ngay bên dưới cho ai muốn xem.
+      */}
+      <section className="course-pick">
+        <div className="course-pick__head">
+          <span className="course-pick__code">{recommendation.course.code}</span>
           <div>
-            <p className="result-hero__label">Điểm bắt đầu đề xuất</p>
-            <p className="result-hero__level">{startLevel}</p>
-          </div>
-          <div className="result-hero__body">
-            <h2>{plan?.headline}</h2>
-            <p>
-              Chúng tôi lấy mức <strong>thấp nhất</strong> trong các kỹ năng đã đo được làm điểm
-              bắt đầu. Bắt đầu ở mức cao hơn sẽ khiến bạn hụt hơi đúng ở kỹ năng yếu nhất, và đó là
-              lý do phổ biến nhất khiến người học bỏ giữa chừng.
-            </p>
+            <p className="course-pick__label">Khoá học phù hợp với bạn</p>
+            <h2>{recommendation.course.name}</h2>
           </div>
         </div>
-      )}
+
+        <p className="course-pick__reason">{recommendation.reason}</p>
+
+        <dl className="course-pick__facts">
+          <div>
+            <dt>Mức bắt đầu</dt>
+            <dd>{startLevel ?? recommendation.course.level}</dd>
+          </div>
+          <div>
+            <dt>Thời lượng</dt>
+            <dd>{recommendation.course.hours} giờ học</dd>
+          </div>
+          <div>
+            <dt>Học xong làm được</dt>
+            <dd>{recommendation.course.outcome}</dd>
+          </div>
+        </dl>
+
+        <div className="course-pick__focus">
+          <h3>Nội dung chính</h3>
+          <ul>
+            {recommendation.course.focus.map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
+        </div>
+
+        {recommendation.support.length > 0 && (
+          <div className="course-pick__support">
+            <h3>Cần bù thêm</h3>
+            <ul>
+              {recommendation.support.map((sup) => (
+                <li key={sup.skill}>{sup.note}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {recommendation.endedEarly && (
+          <p className="course-pick__flag">
+            Bài này bạn dừng giữa chừng, nên kết quả mỏng hơn bình thường. Khoá ở trên vẫn dùng
+            được để bắt đầu; làm hết bài một lần nữa sẽ cho kết quả sát hơn.
+          </p>
+        )}
+
+        {recommendation.nextCourse && (
+          <p className="course-pick__next">
+            Sau khoá này: <strong>{recommendation.nextCourse.code}</strong> —{" "}
+            {recommendation.nextCourse.name}
+          </p>
+        )}
+
+        {plan?.headline && <p className="course-pick__plan">{plan.headline}</p>}
+      </section>
 
       <div className="result-grid">
         {skills.map((s) => {

@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   },
   description: brand.promise.vi,
   applicationName: brand.name,
+  // Cho bản cài về màn hình chính trên iOS: iOS không đọc manifest cho phần
+  // này, phải khai riêng thì mở ra mới không còn thanh địa chỉ.
+  appleWebApp: { capable: true, title: brand.name, statusBarStyle: "default" },
   icons: {
     icon: [{ url: "/brand/favicon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/brand/favicon.svg" }],
@@ -32,6 +35,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // Khoá thu phóng KHÔNG được đặt ở đây: người học lớn tuổi cần phóng to chữ.
+  // Chỉ đặt viewport-fit để trang tràn ra vùng tai thỏ, còn phần nội dung thì
+  // các thanh dính đã tự trừ safe-area trong CSS.
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#FAF7F4" },
     { media: "(prefers-color-scheme: dark)", color: "#17100F" },

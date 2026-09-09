@@ -2166,3 +2166,332 @@ table.data tr:last-child td {
     height: 30px;
   }
 }
+
+
+/* ============================================================ KHOÁ ĐỀ XUẤT */
+
+/*
+ * Khối kết quả quan trọng nhất: người học mở trang kết quả để biết "vậy giờ
+ * tôi học gì". Nó đứng trước bảng điểm từng kỹ năng và được vẽ như một tấm
+ * thẻ lớp học, không như một ô thông báo.
+ */
+.course-pick {
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--gold) 22%, transparent), transparent 62%),
+    var(--brand-fill);
+  color: var(--on-brand-fill);
+  border-radius: var(--r-xl);
+  padding: var(--s-7);
+  margin-bottom: var(--s-8);
+}
+
+.course-pick h2,
+.course-pick h3 {
+  color: var(--on-brand-fill);
+}
+
+.course-pick__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+  margin-bottom: var(--s-5);
+}
+
+.course-pick__code {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 76px;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, #fff 92%, transparent);
+  color: var(--brand-fill);
+  font-size: var(--fs-2xl);
+  font-weight: 760;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.course-pick__label {
+  margin: 0 0 2px;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--on-brand-fill) 78%, transparent);
+}
+
+.course-pick__head h2 {
+  margin: 0;
+  font-size: var(--fs-xl);
+  line-height: 1.25;
+}
+
+.course-pick__reason {
+  margin: 0 0 var(--s-5);
+  max-width: 68ch;
+  color: color-mix(in srgb, var(--on-brand-fill) 92%, transparent);
+}
+
+.course-pick__facts {
+  display: grid;
+  gap: var(--s-4);
+  margin: 0 0 var(--s-5);
+  padding: var(--s-5) 0;
+  border-top: 1px solid color-mix(in srgb, #fff 26%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, #fff 26%, transparent);
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+}
+
+.course-pick__facts dt {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--on-brand-fill) 72%, transparent);
+  margin-bottom: 3px;
+}
+
+.course-pick__facts dd {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.course-pick__focus ul,
+.course-pick__support ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.course-pick__focus h3,
+.course-pick__support h3 {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 var(--s-3);
+  color: color-mix(in srgb, var(--on-brand-fill) 72%, transparent);
+}
+
+.course-pick__focus li {
+  font-size: var(--fs-sm);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, #fff 16%, transparent);
+}
+
+.course-pick__support {
+  margin-top: var(--s-5);
+}
+
+.course-pick__support li {
+  width: 100%;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  padding-left: var(--s-4);
+  border-left: 3px solid var(--gold-light);
+}
+
+.course-pick__flag,
+.course-pick__next,
+.course-pick__plan {
+  margin: var(--s-5) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--on-brand-fill) 88%, transparent);
+}
+
+.course-pick__flag {
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, #000 18%, transparent);
+}
+
+/* ================================================== DỪNG BÀI GIỮA CHỪNG */
+
+.test-stop__open {
+  display: block;
+  margin: var(--s-6) auto 0;
+  padding: var(--s-2) var(--s-3);
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.test-stop__open:hover {
+  color: var(--brand);
+}
+
+.test-stop {
+  margin-top: var(--s-6);
+  padding: var(--s-5);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+}
+
+.test-stop p {
+  margin: var(--s-2) 0 var(--s-4);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.test-stop__row {
+  display: flex;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+/* ==================================================== BÀI THI TRÊN ĐIỆN THOẠI */
+
+/*
+ * Trên điện thoại, bài kiểm tra phải cầm như một ứng dụng chứ không như một
+ * trang web: một câu chiếm trọn màn hình, thanh tiến độ dính trên, nút trả lời
+ * dính dưới trong tầm ngón cái, và không có gì khác trong khung nhìn.
+ *
+ * `env(safe-area-inset-bottom)` là phần bị thanh cử chỉ của iPhone che. Không
+ * trừ ra thì nút "Trả lời" nằm đúng dưới vạch home và bấm không ăn.
+ */
+@media (max-width: 719px) {
+  .test-card {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    margin-inline: calc(var(--s-6) * -1);
+    padding: var(--s-5) var(--s-5) calc(var(--s-6) + env(safe-area-inset-bottom, 0px));
+    min-height: calc(100dvh - 64px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .test-progress {
+    position: sticky;
+    top: 60px;
+    z-index: 5;
+    margin: calc(var(--s-5) * -1) calc(var(--s-5) * -1) var(--s-5);
+    padding: var(--s-3) var(--s-5);
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .test-prompt {
+    font-size: var(--fs-xl);
+    line-height: 1.35;
+  }
+
+  /* Ô chọn to bằng ngón tay: 56px là ngưỡng dưới của một mục bấm được chắc
+     chắn trên điện thoại đang cầm một tay. */
+  .test-option {
+    min-height: 56px;
+    font-size: var(--fs-md);
+  }
+
+  .test-actions {
+    position: sticky;
+    bottom: 0;
+    margin: auto calc(var(--s-5) * -1) 0;
+    padding: var(--s-4) var(--s-5) calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--paper) 96%, transparent);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+  }
+
+  .test-actions .btn--block {
+    min-height: 52px;
+    font-size: var(--fs-md);
+  }
+
+  .test-saved {
+    order: 99;
+  }
+
+  .course-pick {
+    padding: var(--s-5);
+    border-radius: var(--r-lg);
+  }
+
+  .course-pick__head {
+    gap: var(--s-4);
+  }
+
+  .course-pick__code {
+    min-width: 62px;
+    font-size: var(--fs-xl);
+  }
+}
+
+/* ============================================ THANH DƯỚI KIỂU ỨNG DỤNG */
+
+/*
+ * Trên điện thoại, khu học viên có thanh điều hướng ở ĐÁY màn hình - đúng chỗ
+ * ngón cái với tới, và đúng thói quen của mọi ứng dụng học tập. Menu ba gạch ở
+ * góc trên là ngôn ngữ của trang web, không phải của ứng dụng: nó giấu mất
+ * đường đi và bắt người dùng bấm hai lần cho mọi thứ.
+ *
+ * Thanh này chỉ có ở khu học viên. Trang công khai vẫn dùng header thường, vì
+ * ở đó người dùng đang đọc chứ không đang thao tác.
+ */
+.tabbar {
+  display: none;
+}
+
+@media (max-width: 719px) {
+  .tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 2px;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--paper) 96%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-top: 1px solid var(--line);
+  }
+
+  .tabbar__item {
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    min-height: 52px;
+    border-radius: var(--r-md);
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 560;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .tabbar__item svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .tabbar__item[aria-current="page"] {
+    color: var(--brand);
+    background: color-mix(in srgb, var(--brand) 10%, transparent);
+  }
+
+  /* Chừa chỗ cho thanh dưới, nếu không thì nó đè lên nội dung cuối trang. */
+  .app-main {
+    padding-bottom: calc(var(--s-12) + 64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Thanh trên của khu học viên rút gọn hết mức: đã có thanh dưới lo việc đi
+     lại, phần trên chỉ còn nhận diện và tài khoản. */
+  .app-nav__burger {
+    display: none;
+  }
+}

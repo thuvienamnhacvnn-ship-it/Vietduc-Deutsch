@@ -728,3 +728,37 @@
     color: #000 !important;
   }
 }
+
+/*
+ * Quyền của người làm bài, đặt trước khối cam kết.
+ *
+ * Cố ý KHÔNG vẽ giống khối cam kết: cam kết là ràng buộc (nền vàng, viền đậm),
+ * còn đây là điều làm người ta yên tâm bấm bắt đầu. Hai khối trông giống nhau
+ * thì mắt lướt qua cả hai.
+ */
+.test-rights {
+  margin-bottom: var(--s-5);
+  padding: var(--s-5);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+}
+
+.test-rights h2 {
+  font-size: var(--fs-md);
+  margin-bottom: var(--s-3);
+}
+
+.test-rights ul {
+  margin: 0;
+  padding-left: var(--s-5);
+  display: grid;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.test-rights ul li {
+  list-style: disc;
+}

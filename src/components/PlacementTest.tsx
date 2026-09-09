@@ -4,7 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiPost } from "@/lib/api-client";
 import { SpeakingRecorder } from "@/components/SpeakingRecorder";
-import { HONESTY_PLEDGE, LISTEN_LIMIT, SECTIONS, SECTION_MINUTES } from "@/content/quy-che-thi";
+import {
+  HONESTY_PLEDGE,
+  LEARNER_RIGHTS,
+  LISTEN_LIMIT,
+  SECTIONS,
+  SECTION_MINUTES,
+} from "@/content/quy-che-thi";
 
 type Item = {
   code: string;
@@ -74,6 +80,10 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
   const [playing, setPlaying] = useState(false);
   const [pendingNext, setPendingNext] = useState<Item | null>(null);
   const [pendingDone, setPendingDone] = useState(false);
+  // Người học bấm "tôi dừng ở đây": hỏi lại một lần rồi mới nộp. Dừng bài là
+  // việc không lùi lại được, nhưng cũng không được giấu đi - xem ghi chú ở chỗ
+  // vẽ nút.
+  const [askStop, setAskStop] = useState(false);
   const startedRef = useRef(false);
   const autoPlayedRef = useRef<string | null>(null);
 
@@ -233,10 +243,17 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
     setListensLeft(next.listensLeft ?? null);
   }
 
-  async function finish() {
+  /**
+   * Nộp bài. `stop` là người học tự dừng giữa chừng: phần đã làm vẫn được chấm
+   * và vẫn ra một khoá học, chỉ là kết quả được ghi rõ là bài dừng sớm.
+   */
+  async function finish(stop = false) {
     if (!sessionId) return;
     setPhase("finishing");
-    const result = await apiPost("/api/xep-lop/ket-thuc", { sessionId });
+    const result = await apiPost("/api/xep-lop/ket-thuc", {
+      sessionId,
+      ...(stop ? { stop: true } : {}),
+    });
     if (!result.ok) {
       setError(result.error.message);
       setPhase("question");
@@ -292,6 +309,18 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
             </li>
           ))}
         </ol>
+
+        {/* Quyền đứng TRƯỚC cam kết. Người sắp làm bài cần biết mình được
+            dừng lúc nào cũng được - đó là thứ quyết định họ có bấm bắt đầu hay
+            không, chứ không phải danh sách nghĩa vụ. */}
+        <div className="test-rights">
+          <h2>Bạn được quyền</h2>
+          <ul>
+            {LEARNER_RIGHTS.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </div>
 
         <div className="test-pledge">
           <h2>Cam kết của bạn</h2>
@@ -569,6 +598,48 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
           </>
         )}
       </div>
+
+      {/*
+        Lối ra danh dự.
+
+        Người học đuối sức mà không có nút dừng thì họ vẫn dừng - bằng cách đóng
+        tab, và khi đó họ không nhận được gì cả. Cho dừng đàng hoàng thì phần đã
+        làm vẫn thành một kết quả và một khoá học để bắt đầu, còn hệ thống thì
+        biết bài này dừng sớm nên độ tin cậy thấp hơn.
+      */}
+      {askStop ? (
+        <div className="test-stop" role="group" aria-label="Dừng bài kiểm tra">
+          <strong>Dừng ở đây và xem kết quả?</strong>
+          <p>
+            Những câu bạn đã làm vẫn được chấm và bạn vẫn nhận được khoá học phù hợp. Kết quả sẽ
+            được ghi là bài dừng sớm, và bạn làm lại lúc nào cũng được.
+          </p>
+          <div className="test-stop__row">
+            <button
+              type="button"
+              className="btn btn--secondary btn--sm"
+              onClick={() => void finish(true)}
+              disabled={busy}
+            >
+              Dừng và xem kết quả
+            </button>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={() => setAskStop(false)}
+              disabled={busy}
+            >
+              Làm tiếp
+            </button>
+          </div>
+        </div>
+      ) : (
+        item.index > 1 && (
+          <button type="button" className="test-stop__open" onClick={() => setAskStop(true)}>
+            Tôi dừng ở đây
+          </button>
+        )
+      )}
 
       <p className="test-saved">
         Mỗi câu được lưu ngay khi bạn trả lời. Đóng tab giữa chừng cũng không mất bài.

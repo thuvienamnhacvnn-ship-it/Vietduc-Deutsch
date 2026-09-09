@@ -11,10 +11,21 @@ import {
   writingResponseFor,
   type SessionState,
 } from "@/lib/placement";
+import { recommendCourse } from "@/content/khoa-hoc";
 import { clientIp, hit, tooMany } from "@/lib/rate-limit";
 import { audit } from "@/lib/audit";
 
-const Body = z.object({ sessionId: z.number().int().positive() });
+const Body = z.object({
+  sessionId: z.number().int().positive(),
+  /**
+   * Người học chủ động DỪNG bài giữa chừng.
+   *
+   * Dừng không phải là hủy: phần đã làm vẫn được chấm và vẫn ra một khoá học để
+   * bắt đầu. Bắt phải làm hết mới cho kết quả thì người đuối sức sẽ đóng tab và
+   * không nhận được gì - trong khi những câu họ đã làm đã đủ để xếp lớp.
+   */
+  stop: z.boolean().optional(),
+});
 
 /**
  * Nộp bài và tính kết quả bốn kỹ năng.
@@ -65,17 +76,26 @@ export async function POST(request: Request) {
   }
 
   const state = session.resumeState as SessionState;
+  if (parsed.data.stop) state.endedEarly = true;
   const writing = await writingResponseFor(session.id, auth.user.id);
 
   // Người học có thể đã ghi âm bài Nói. Điều đó chưa đủ để chấm - vẫn thiếu bộ
   // phân tích giọng nói - nhưng nó quyết định câu giải thích trả về cho họ.
   const spokeAudio = await hasSpeakingAudio(session.id, auth.user.id);
   const results = scoreSession(state, writing, spokeAudio);
+  const recommendation = recommendCourse(results, state.endedEarly ?? false);
 
   // Hồ sơ điều kiện làm bài: mã bài thi, thời gian từng phần, số lượt nghe đã
   // dùng, cam kết đã ký. Một kết quả không kèm hồ sơ thì không ai kiểm chứng
   // được nó được tạo ra trong điều kiện nào.
   const record = examRecordOf(session.id, new Date(session.startedAt), new Date(), state);
+
+  if (parsed.data.stop) {
+    await db
+      .update(assessmentSessions)
+      .set({ resumeState: state })
+      .where(eq(assessmentSessions.id, session.id));
+  }
 
   await finishSession(auth.user.id, session.id, results, record);
   await audit({
@@ -85,6 +105,8 @@ export async function POST(request: Request) {
     entityId: session.id,
     after: {
       record,
+      endedEarly: state.endedEarly ?? false,
+      course: recommendation.course.code,
       results: results.map((r) => ({
         skill: r.skill,
         level: r.level,
@@ -94,5 +116,5 @@ export async function POST(request: Request) {
     ip: clientIp(request),
   });
 
-  return Response.json({ ok: true, results, record });
+  return Response.json({ ok: true, results, record, recommendation });
 }

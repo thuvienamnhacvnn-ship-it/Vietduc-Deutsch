@@ -4,6 +4,8 @@ import { getDb } from "@/lib/db";
 import { assessmentSessions } from "@/lib/db/schema";
 import { apiUser } from "@/lib/auth/guard";
 import {
+  examSeed,
+  seenCodesFor,
   EMPTY_STATE,
   estimateTotal,
   listensLeftFor,
@@ -11,7 +13,6 @@ import {
   nextItem,
   openSessionFor,
   publicItem,
-  readingLevelSoFar,
   type SessionState,
 } from "@/lib/placement";
 import { REGULATION_VERSION } from "@/content/quy-che-thi";
@@ -87,7 +88,10 @@ export async function POST(request: Request) {
   }
 
   const state = session.resumeState as SessionState;
-  const item = nextItem(state, readingLevelSoFar(state));
+  const item = nextItem(state, {
+    seed: examSeed(session),
+    avoid: await seenCodesFor(auth.user.id, session.id),
+  });
 
   if (item) {
     // Ghi thời điểm phát câu ra để đo thời gian làm bài. Chỉ ghi lần đầu, nên

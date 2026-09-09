@@ -35,6 +35,10 @@ const B2_ESSAY = [
   "Andererseits fehlt vielen Lernenden der persönliche Kontakt, obwohl moderne Programme das teilweise ausgleichen können.",
   "Wer sich schlecht selbst motivieren kann, braucht meiner Erfahrung nach eine feste Gruppe und klare Termine.",
   "Zusammenfassend finde ich beide Formen sinnvoll, denn sie ergänzen sich gegenseitig und jeder Lernende ist anders.",
+  // Đề B2 có hai bản và bản dài hơn cần 90 từ. Bài mẫu phải vượt ngưỡng dài
+  // nhất, nếu không thì kiểm thử đỏ hay xanh tuỳ vào đề nào được rút ra.
+  "Zwar braucht selbstständiges Lernen viel Disziplin, allerdings gewinnt man dadurch Freiheit bei der Zeiteinteilung.",
+  "Deshalb halte ich eine Mischung aus festen Terminen und freien Übungsphasen für den sinnvollsten Weg.",
 ].join(" ");
 
 /**
@@ -44,12 +48,36 @@ const B2_ESSAY = [
 const GAP_ANSWERS = {
   "A1-F-01": "heisse",
   "A1-F-02": "wohnst",
+  "A1-F-03": "ist",
+  "A1-F-04": "bist",
+  "A1-F-05": "dem",
+  "A1-F-06": "fahren",
+  "A1-F-07": "spielt",
+  "A1-F-08": "was",
   "A2-F-01": "bin",
   "A2-F-02": "weil",
+  "A2-F-03": "wenn",
+  "A2-F-04": "als",
+  "A2-F-05": "den",
+  "A2-F-06": "gearbeitet",
+  "A2-F-07": "fuer",
+  "A2-F-08": "aufstehen",
   "B1-F-01": "wurde",
   "B1-F-02": "haette",
+  "B1-F-03": "auf",
+  "B1-F-04": "deren",
+  "B1-F-05": "damit",
+  "B1-F-06": "vermietet",
+  "B1-F-07": "trotz",
+  "B1-F-08": "wuerde",
   "B2-F-01": "Trotz",
   "B2-F-02": "hätte",
+  "B2-F-03": "indem",
+  "B2-F-04": "als",
+  "B2-F-05": "trotz",
+  "B2-F-06": "bearbeitet",
+  "B2-F-07": "an",
+  "B2-F-08": "desto",
 };
 
 function makeClient() {
@@ -140,13 +168,15 @@ async function main() {
   const runA = await takeTest(beginner, wrong);
 
   const readingSeenA = runA.seen.filter((s) => s.skill === "reading");
+  // Khối đầu là khối ĐỊNH TUYẾN, cố ý trộn A1 với A2 - thấy câu A2 ở đây là
+  // đúng thiết kế. Điều phải kiểm là bài KHÔNG leo lên B1, B2.
   check(
-    "sai hết A1 thì KHÔNG bị hỏi tiếp câu A2 phần Đọc",
-    readingSeenA.every((s) => s.level === "A1"),
+    "sai hết thì bài không leo lên B1/B2 phần Đọc",
+    readingSeenA.every((s) => s.level === "A1" || s.level === "A2"),
     readingSeenA.map((s) => s.level).join(","),
   );
   check(
-    "bài dừng sớm, không bắt làm hết 28 câu",
+    "chạm sàn thì bài dừng sớm, không bắt làm hết 28 câu",
     runA.seen.length < 20,
     `${runA.seen.length} câu`,
   );
@@ -216,6 +246,55 @@ async function main() {
     levelOf(rB, "speaking")?.level === null,
   );
 
+  /* ---- khoá học đề xuất ---- */
+  const recB = doneB.body.recommendation;
+  check("kết quả kèm khoá học đề xuất", Boolean(recB?.course?.code), JSON.stringify(recB?.course ?? null));
+  check(
+    "khoá đề xuất bám mức THẤP nhất trong các kỹ năng đo được",
+    recB?.course?.level === "B2",
+    recB?.course?.code,
+  );
+  check("khoá đề xuất có số giờ học", typeof recB?.course?.hours === "number" && recB.course.hours > 0);
+  check("khoá đề xuất nói rõ vì sao", typeof recB?.reason === "string" && recB.reason.length > 30);
+  check("có khoá đi tiếp sau đó", Boolean(recB?.nextCourse) || recB?.course?.code === "B2.2");
+
+  /* --------------------------------------- 2c. thi lại phải ra đề khác */
+  console.log("\nThi lại lần hai");
+  const repeater = await newLearner("thi-lai");
+  const runC1 = await takeTest(repeater, right);
+  await finish(repeater, runC1.sessionId);
+  const runC2 = await takeTest(repeater, right);
+  await finish(repeater, runC2.sessionId);
+
+  const set1 = runC1.seen.filter((s) => s.kind === "mcq" || s.kind === "gap").map((s) => s.code);
+  const set2 = runC2.seen.filter((s) => s.kind === "mcq" || s.kind === "gap").map((s) => s.code);
+  const overlap = set2.filter((c) => set1.includes(c));
+  check("lần hai không phải là đúng đề cũ", set1.join(",") !== set2.join(","), `${set1.length} vs ${set2.length} câu`);
+  check(
+    "lần hai gặp lại rất ít câu cũ",
+    overlap.length <= Math.floor(set2.length / 3),
+    `trùng ${overlap.length}/${set2.length} câu`,
+  );
+
+  /* ---------------------------------- 2d. dừng giữa chừng vẫn có kết quả */
+  console.log("\nDừng giữa chừng");
+  const stopper = await newLearner("dung-giua");
+  const runD = await takeTest(stopper, right, 4);
+  const stopped = await stopper("/api/xep-lop/ket-thuc", {
+    method: "POST",
+    body: JSON.stringify({ sessionId: runD.sessionId, stop: true }),
+  });
+  check("dừng giữa chừng vẫn nộp được bài", stopped.status === 200, `nhận ${stopped.status}`);
+  check("dừng giữa chừng vẫn có khoá học để bắt đầu", Boolean(stopped.body.recommendation?.course?.code));
+  check("kết quả ghi rõ là bài dừng sớm", stopped.body.recommendation?.endedEarly === true);
+  const readD = levelOf(stopped.body.results, "reading");
+  check("phần đã làm vẫn được chấm", Boolean(readD) && readD.insufficientEvidence === false, JSON.stringify(readD));
+  check(
+    "dừng sớm thì độ tin cậy bị hạ xuống",
+    readD.confidence < 0.7,
+    String(readD?.confidence),
+  );
+
   /* ------------------------------------- 2b. chấm câu điền, gõ không dấu Đức */
   console.log("\nCâu điền đáp án");
   const typer = await newLearner("go-tay");
@@ -237,9 +316,9 @@ async function main() {
   }
 
   check(
-    "gõ heisse (không có ß) vẫn được chấm ĐÚNG",
+    "câu điền gõ không có ký tự Đức vẫn được chấm ĐÚNG",
     gapFeedback?.fb?.correct === true,
-    `${gapFeedback?.sent} -> ${JSON.stringify(gapFeedback?.fb)}`,
+    `${gapFeedback?.code} = "${gapFeedback?.sent}" -> ${JSON.stringify(gapFeedback?.fb)}`,
   );
   check(
     "câu điền trả về từ cần điền để người học đối chiếu",
@@ -386,7 +465,13 @@ async function main() {
     typeof record?.code === "string" && record.code.startsWith("VD-XL-"),
     record?.code,
   );
-  check("hồ sơ ghi phiên bản quy chế", record?.regulation === "1.0", record?.regulation);
+  // Không ghim con số: quy chế đổi thì số phải đổi theo, kiểm thử chỉ cần bảo
+  // đảm hồ sơ CÓ ghi phiên bản nào đó.
+  check(
+    "hồ sơ ghi phiên bản quy chế",
+    typeof record?.regulation === "string" && /^[0-9]+[.][0-9]+$/.test(record.regulation),
+    record?.regulation,
+  );
   check("hồ sơ ghi thời điểm ký cam kết", Boolean(record?.pledgedAt), record?.pledgedAt);
   check(
     "hồ sơ đếm số câu đã làm",

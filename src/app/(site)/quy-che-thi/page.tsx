@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   DISCLAIMER,
   HONESTY_PLEDGE,
+  LEARNER_RIGHTS,
   LISTEN_LIMIT,
   REGULATION_VERSION,
   RESULT_VALID_DAYS,
@@ -84,6 +85,13 @@ export default function RegulationPage() {
               điểm không còn nói lên khả năng nghe hiểu nữa.
             </p>
           </div>
+
+          <h2 style={{ marginTop: "var(--s-9)" }}>Quyền của bạn khi làm bài</h2>
+          <ul className="tick">
+            {LEARNER_RIGHTS.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
 
           <h2 style={{ marginTop: "var(--s-9)" }}>Cam kết của người làm bài</h2>
           <ul className="tick">
