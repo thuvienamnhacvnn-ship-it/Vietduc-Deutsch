@@ -97,6 +97,23 @@ async function main() {
   /* ------------------------------------------------------------ bước mở đầu */
   console.log("Bắt đầu luồng");
   const opener = makeClient();
+  /*
+   * Bộ này kiểm luồng ĐĂNG NHẬP GOOGLE MÔ PHỎNG, thứ chỉ tồn tại khi chưa có
+   * khóa Google thật. Cắm khóa thật vào là bản mô phỏng tắt - đó là điều đúng
+   * đắn, không phải hỏng - nên ở đây phải bỏ qua chứ không được báo đỏ.
+   *
+   * Không bỏ qua thì mỗi lần ai đó cấu hình Google xong sẽ thấy 24 phép kiểm
+   * chuyển sang thất bại và tưởng mình vừa làm hỏng thứ gì.
+   */
+  const suckhoe = await fetch(new URL("/api/suc-khoe", BASE)).then((r) => r.json());
+  if (suckhoe?.adapters?.oauth_google === "live") {
+    console.log(
+      "BỎ QUA: máy này đang dùng khóa Google THẬT, nên bản mô phỏng đã tắt.\n" +
+        "Bộ kiểm thử này chỉ chạy khi chưa cấu hình GOOGLE_CLIENT_ID.\n",
+    );
+    process.exit(0);
+  }
+
   const start = await opener("/api/auth/google?tiep=/hoc");
   check("GET /api/auth/google chuyển hướng", start.status === 302, `nhận ${start.status}`);
   check("có đặt cookie state", opener.jar.has("lingora_oauth"));
