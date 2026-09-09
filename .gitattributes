@@ -1,0 +1,13 @@
+# Script shell PHẢI dùng xuống dòng LF.
+#
+# Máy phát triển là Windows nên git mặc định đưa CRLF vào tệp lúc checkout.
+# Một tệp .sh có CRLF thì trên Linux báo "No such file or directory" - vì nó đi
+# tìm trình thông dịch tên "/usr/bin/env bash\r". Lỗi này đã xảy ra thật với
+# scripts/deploy.sh ngay lần chạy đầu trên VPS.
+*.sh text eol=lf
+
+# Ảnh không phải văn bản: đừng đụng vào byte nào.
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
