@@ -85,6 +85,13 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
   // vẽ nút.
   const [askStop, setAskStop] = useState(false);
   const startedRef = useRef(false);
+  // Một thẻ <audio> duy nhất, tạo một lần rồi dùng lại. Tạo thẻ mới mỗi lần
+  // phát thì Safari trên iPhone coi lần phát thứ hai là "không do người dùng
+  // bấm" và chặn im lặng.
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Engine của trường đang đọc, hay giọng máy của trình duyệt. Quyết định câu
+  // giải thích dưới hai nút nghe.
+  const [voiceSource, setVoiceSource] = useState<"engine" | "trinh-duyet" | null>(null);
   const autoPlayedRef = useRef<string | null>(null);
 
   /* --------------------------------------------------------- giọng đọc */
@@ -111,13 +118,19 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
    */
   const playAudio = useCallback(
     async (slow: boolean) => {
-      if (!sessionId || !item || !germanVoice) return;
+      if (!sessionId || !item) return;
       setPlaying(true);
       setError(null);
 
-      const result = await apiPost<{ text: string; listensLeft: number }>("/api/xep-lop/nghe", {
+      const result = await apiPost<{
+        text?: string;
+        audio?: string;
+        voice?: "engine" | "trinh-duyet";
+        listensLeft: number;
+      }>("/api/xep-lop/nghe", {
         sessionId,
         code: item.code,
+        slow,
       });
 
       if (!result.ok) {
@@ -128,6 +141,31 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
       }
 
       setListensLeft(result.data.listensLeft);
+      setVoiceSource(result.data.voice ?? null);
+
+      // Ưu tiên âm thanh thật do engine của trường đọc.
+      if (result.data.audio) {
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+        }
+        const el = audioRef.current ?? new Audio();
+        audioRef.current = el;
+        el.src = result.data.audio;
+        // Nghe chậm phát ở 0.75 tốc độ. Đây là chỗ đọc chậm KHÔNG méo giọng:
+        // trình phát giữ nguyên cao độ, khác hẳn giọng máy đọc chậm nghe như
+        // băng rè.
+        el.playbackRate = slow ? 0.75 : 1;
+        el.onended = () => setPlaying(false);
+        el.onerror = () => setPlaying(false);
+        void el.play().catch(() => setPlaying(false));
+        return;
+      }
+
+      // Không có engine: rơi về giọng đọc sẵn của trình duyệt.
+      if (!result.data.text || !germanVoice) {
+        setPlaying(false);
+        return;
+      }
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(result.data.text);
       utterance.voice = germanVoice;
@@ -184,13 +222,13 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
   // Lượt nghe đầu tiên phát tự động, đúng như trong phòng thi: đề được đọc lên
   // một lần, người làm bài không phải đi tìm nút.
   useEffect(() => {
-    if (phase !== "question" || !item?.needsAudio || !germanVoice) return;
+    if (phase !== "question" || !item?.needsAudio) return;
     if (autoPlayedRef.current === item.code) return;
     if ((item.listensLeft ?? 0) <= 0) return;
     autoPlayedRef.current = item.code;
     const timer = setTimeout(() => void playAudio(false), 400);
     return () => clearTimeout(timer);
-  }, [item, phase, germanVoice, playAudio]);
+  }, [item, phase, playAudio]);
 
   /* ------------------------------------------------------------ gửi bài */
 
@@ -200,6 +238,10 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
     setError(null);
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
+    }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
 
     const result = await apiPost<{ feedback: Feedback; item: Item | null; done: boolean }>(
@@ -383,6 +425,15 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
           : true;
 
   const outOfListens = Boolean(item.needsAudio && listensLeft !== null && listensLeft <= 0);
+  /*
+   * Không nghe được BẰNG CÁCH NÀO CẢ: không có engine của trường mà máy cũng
+   * không có giọng tiếng Đức.
+   *
+   * Chỉ biết chắc điều này sau lần phát đầu tiên - trước đó `voiceSource` còn
+   * null. Nên trước lần phát đầu, nút luôn mở: khoá sẵn nút chỉ vì trình duyệt
+   * thiếu giọng thì người có engine cũng không bấm được.
+   */
+  const noVoiceAtAll = voiceSource === "trinh-duyet" && !germanVoice;
 
   return (
     <div className="test-card">
@@ -416,7 +467,7 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
               type="button"
               className="btn btn--solid btn--sm"
               onClick={() => void playAudio(false)}
-              disabled={!germanVoice || playing || outOfListens || Boolean(feedback)}
+              disabled={noVoiceAtAll || playing || outOfListens || Boolean(feedback)}
             >
               {playing ? "Đang phát…" : "▶ Nghe"}
             </button>
@@ -424,7 +475,7 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
               type="button"
               className="btn btn--secondary btn--sm"
               onClick={() => void playAudio(true)}
-              disabled={!germanVoice || playing || outOfListens || Boolean(feedback)}
+              disabled={noVoiceAtAll || playing || outOfListens || Boolean(feedback)}
             >
               Nghe chậm
             </button>
@@ -435,11 +486,13 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
             )}
           </div>
           <p className="test-audio__note">
-            {!germanVoice
+            {noVoiceAtAll
               ? "Máy của bạn chưa có giọng tiếng Đức nên không phát được câu này. Bấm Bỏ qua để đi tiếp; câu bỏ qua không bị tính là sai."
               : outOfListens
                 ? "Đã hết lượt nghe. Hãy trả lời theo những gì bạn nghe được — đó chính là điều bài kiểm tra muốn đo."
-                : "Nghe chậm cũng tính là một lượt. Đọc bằng giọng đọc sẵn có của trình duyệt."}
+                : voiceSource === "trinh-duyet"
+                  ? "Nghe chậm cũng tính là một lượt. Câu này đang đọc bằng giọng máy sẵn có của trình duyệt."
+                  : "Nghe chậm cũng tính là một lượt."}
           </p>
         </div>
       )}

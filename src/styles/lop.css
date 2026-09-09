@@ -1,0 +1,330 @@
+/* ============================================================== LỚP HỌC NÓI */
+
+/*
+ * Phòng học nói và danh sách buổi học.
+ *
+ * Bố cục cố ý giống một ứng dụng nhắn tin: dòng chảy hội thoại ở giữa, thanh
+ * nhập dính đáy. Người học đã biết cách dùng một màn hình như thế mà không phải
+ * học lại, và đó là điều duy nhất trong buổi học họ không phải học.
+ */
+
+.lesson-grid {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+}
+
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color var(--motion-fast) var(--ease),
+    transform var(--motion-fast) var(--ease),
+    box-shadow var(--motion-fast) var(--ease);
+}
+
+.lesson-card:hover {
+  border-color: var(--brand);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+.lesson-card__top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-bottom: var(--s-2);
+}
+
+.lesson-card h2 {
+  font-size: var(--fs-lg);
+  margin: 0;
+}
+
+.lesson-card p {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin: 0;
+  flex: 1;
+}
+
+.lesson-card__go {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--brand);
+  margin-top: var(--s-3);
+}
+
+/* ------------------------------------------------------------ phòng học */
+
+.lop {
+  display: flex;
+  flex-direction: column;
+  /* Trừ chiều cao thanh trên. Phòng học chiếm trọn phần còn lại của màn hình:
+     một hội thoại bị kẹp trong một khung cao 400px thì mỗi lượt mới lại đẩy
+     lượt trước ra khỏi tầm nhìn. */
+  min-height: calc(100dvh - 64px);
+}
+
+.lop__head h1 {
+  font-size: var(--fs-2xl);
+  margin: var(--s-3) 0 var(--s-2);
+}
+
+.lop__situation {
+  color: var(--muted);
+  margin: 0;
+}
+
+.lop__goal {
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-left: 3px solid var(--gold);
+  background: var(--paper-sunken);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  font-size: var(--fs-sm);
+}
+
+.lop__stream {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-6) 0;
+}
+
+.lop-turn {
+  max-width: 42rem;
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+}
+
+/* Lượt của người học nằm bên phải và tô nền thương hiệu - cùng quy ước với mọi
+   ứng dụng nhắn tin, nên không ai phải đọc chú thích để biết ai đang nói. */
+.lop-turn[data-who="toi"] {
+  align-self: flex-end;
+  background: var(--brand-fill);
+  border-color: var(--brand-fill);
+  color: var(--on-brand-fill);
+}
+
+.lop-turn__de {
+  margin: 0;
+  font-size: var(--fs-lg);
+  line-height: 1.45;
+}
+
+.lop-turn__vi {
+  margin: var(--s-2) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* Khối sửa lỗi: một lỗi, tô bằng vàng chứ không tô đỏ. Màu đỏ ở đây là màu
+   thương hiệu, và một khung đỏ giữa buổi học đọc như một lời mắng. */
+.lop-turn__fix {
+  margin-top: var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--gold) 16%, var(--paper-sunken));
+  border: 1px solid var(--gold-deep);
+}
+
+.lop-turn__fix p {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.lop-turn__fix s {
+  color: var(--muted);
+}
+
+.lop-turn__why {
+  margin-top: var(--s-2) !important;
+  color: var(--muted);
+}
+
+.lop-turn__hint {
+  margin: var(--s-3) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  font-style: italic;
+}
+
+.lop__typing {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.lop__note {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin: 0 0 var(--s-3);
+}
+
+/* --------------------------------------------------------- thanh nói */
+
+.lop__bar {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4) 0 calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+}
+
+/*
+ * Nút nói là nút BẤM GIỮ, không phải bấm-để-bật rồi bấm-để-tắt.
+ *
+ * Bấm hai lần thì người học hay quên tắt, và bản ghi dài ba phút toàn tiếng ồn
+ * phòng khách. Giữ nút thì thời gian nói khớp đúng với lúc tay còn đặt trên
+ * màn hình.
+ */
+.lop__mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  min-height: 56px;
+  border: 1px solid var(--brand-fill);
+  border-radius: var(--r-pill);
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
+  font-size: var(--fs-md);
+  font-weight: 620;
+  cursor: pointer;
+  /* Giữ nút trên điện thoại không được biến thành thao tác chọn chữ hay cuộn
+     trang, nếu không thì vừa giữ vừa kéo là mất bản ghi. */
+  touch-action: none;
+  user-select: none;
+  transition:
+    background-color var(--motion-fast) var(--ease),
+    transform var(--motion-fast) var(--ease);
+}
+
+.lop__mic:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.lop__mic.is-on {
+  background: var(--band);
+  border-color: var(--band);
+  transform: scale(0.99);
+}
+
+.lop__type {
+  display: flex;
+  gap: var(--s-3);
+}
+
+.lop__type input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--fs-md);
+}
+
+.lop__type input:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+@media (max-width: 719px) {
+  .lop__bar {
+    margin-inline: calc(var(--s-6) * -1);
+    padding-inline: var(--s-6);
+  }
+
+  .lop-turn {
+    max-width: 100%;
+  }
+
+  .lop__type input {
+    font-size: var(--fs-md);
+  }
+}
+
+/* ============================================================== THẺ ÔN TẬP */
+
+.the-on {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.the-on__count {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: var(--s-4);
+}
+
+.the-on__card {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-7) var(--s-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper-raised);
+  text-align: center;
+  min-height: 260px;
+  align-content: center;
+}
+
+.the-on__label {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+
+.the-on__front {
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--s-4);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--brand) 60%, transparent);
+}
+
+.the-on__back {
+  font-size: var(--fs-2xl);
+  font-weight: 620;
+  margin: 0;
+  color: var(--brand);
+}
+
+.the-on__why {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin: var(--s-3) 0 0;
+}
+
+.the-on__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+  margin-top: var(--s-5);
+}
+
+.the-on__row .btn {
+  min-height: 52px;
+}

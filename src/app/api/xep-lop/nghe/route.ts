@@ -7,6 +7,7 @@ import { consumeListen, listensLeftFor, type SessionState } from "@/lib/placemen
 import { itemByCode } from "@/content/placement";
 import { LISTEN_LIMIT } from "@/content/quy-che-thi";
 import { hit, tooMany } from "@/lib/rate-limit";
+import { speakGerman } from "@/lib/adapters/giong-noi";
 
 const Body = z.object({
   sessionId: z.number().int().positive(),
@@ -22,6 +23,14 @@ const Body = z.object({
  * phát lại được.
  *
  * Nghe chậm cũng tính là một lượt - nó vẫn là một lần được nghe lại nội dung.
+ *
+ * Có engine giọng nói thì route trả về ÂM THANH THẬT và KHÔNG trả chữ. Đó là
+ * khác biệt lớn nhất giữa một bài kiểm tra nghe thật và một bài đọc chép chậm:
+ * giọng đọc sẵn của trình duyệt đọc tiếng Đức bằng ngữ điệu máy, đọc sai trọng
+ * âm, và trên nhiều máy Việt Nam thì không có giọng tiếng Đức nào cả.
+ *
+ * Chưa có engine thì vẫn trả chữ như trước để trình duyệt tự đọc, và giao diện
+ * dán nhãn rằng đây là giọng máy của thiết bị.
  */
 export async function POST(request: Request) {
   const auth = await apiUser();
@@ -97,11 +106,24 @@ export async function POST(request: Request) {
     .set({ resumeState: state })
     .where(eq(assessmentSessions.id, sessionId));
 
-  return Response.json({
-    text: item.audioText,
+  const common = {
     listensLeft: left,
     limit: LISTEN_LIMIT[item.level],
     used: LISTEN_LIMIT[item.level] - left,
     remainingBefore: listensLeftFor(state, code, item.level),
-  });
+  };
+
+  try {
+    const spoken = await speakGerman(item.audioText, "anna");
+    if (spoken.mode === "live") {
+      // Không kèm `text`: có âm thanh rồi thì gửi thêm chữ là tự tay biến bài
+      // Nghe thành bài Đọc.
+      return Response.json({ ...common, audio: spoken.audio, voice: "engine" });
+    }
+    return Response.json({ ...common, text: item.audioText, voice: "trinh-duyet" });
+  } catch {
+    // Engine hỏng KHÔNG được làm hỏng bài thi. Lượt nghe đã trừ rồi, nên phải
+    // trả về thứ gì đó nghe được: rơi về giọng của trình duyệt và nói rõ.
+    return Response.json({ ...common, text: item.audioText, voice: "trinh-duyet" });
+  }
 }

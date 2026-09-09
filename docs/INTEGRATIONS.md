@@ -5,36 +5,40 @@ bản cài đặt: `live` và `mock`. Bản mock **luôn** trả về `mode: "mo
 diện hiển thị nhãn đó cho người dùng. Không có khóa thì hệ thống vẫn chạy đủ
 luồng ở chế độ mock - và không bao giờ được báo cáo là đã tích hợp thật.
 
-Trạng thái hôm nay: **toàn bộ đang ở `mock`**. Chưa có khóa dịch vụ nào trong dự
-án này. Đây là trạng thái BLOCKED trong `ACCEPTANCE.md`, không phải PASS.
+**Ba dịch vụ nặng nhất KHÔNG còn là dịch vụ ngoài nữa.** Đọc tiếng Đức, nghe
+tiếng Đức và bộ giảng dạy đã chuyển sang phần mềm mã nguồn mở chạy trên máy chủ
+của trường - không khóa, không tính tiền theo lượt. Xem `docs/ENGINE-TU-HOST.md`
+để biết cài gì, đo được bao nhiêu, và nối vào ứng dụng thế nào.
 
-## LLM - Claude (suy luận và giảng dạy)
+Những dịch vụ còn lại (email, thanh toán thẻ, đăng nhập Google) vẫn ở `mock` cho
+tới khi chủ dự án cung cấp tài khoản. Bản mock **luôn** tự khai là mock.
+
+## Bộ giảng dạy - TỰ HOST
 
 - Adapter: `src/lib/adapters/llm.ts`
-- Biến môi trường: `ANTHROPIC_API_KEY`, `LINGORA_LLM_MODEL`
-- Cần khi kích hoạt: tài khoản Anthropic, chọn model theo tài liệu chính thức tại
-  thời điểm triển khai, đặt hạn mức chi tiêu.
-- Lưu ý: **không** ghi tên model cứng trong code sản phẩm; tên đọc từ cấu hình để
-  không tuyên bố năng lực chưa kiểm chứng.
+- Biến: `LINGORA_LLM_URL`, `LINGORA_LLM_TOKEN`, `LINGORA_LLM_MODEL`
+- Chạy llama.cpp với model GGUF mã nguồn mở, phơi ra theo chuẩn OpenAI. Chuẩn đó
+  được chọn để đổi model hoặc đổi engine sau này không phải sửa code.
+- `ANTHROPIC_API_KEY` vẫn được chấp nhận nếu chủ dự án muốn trả tiền cho dịch
+  vụ ngoài, nhưng đó không còn là đường mặc định.
 
-## STT - nhận dạng giọng nói
+## Nghe tiếng Đức (STT) - TỰ HOST
 
-- Adapter: `src/lib/adapters/stt.ts`
-- Biến: `LINGORA_STT_PROVIDER`, `LINGORA_STT_KEY`
-- Ứng viên cần đánh giá khi có ngân sách: dịch vụ hỗ trợ tiếng Đức có streaming và
-  VAD. Phải kiểm thật với giọng người Việt nói tiếng Đức trước khi chốt.
-- Bản mock trả transcript giả có nhãn; nó **không** được dùng để chấm kỹ năng Nói.
+- Adapter: `src/lib/adapters/giong-noi.ts`
+- Biến: `LINGORA_VOICE_URL`, `LINGORA_VOICE_TOKEN` (dùng chung với phần đọc)
+- whisper.cpp, hai model: `nhanh` cho lớp học, `ky` cho chấm bài.
+- Thiếu engine: lớp học vẫn dùng được bằng cách gõ; KHÔNG có transcript giả nào
+  được sinh ra.
 
-## TTS - tổng hợp giọng nói tiếng Đức
+## Đọc tiếng Đức (TTS) - TỰ HOST
 
-- Adapter: `src/lib/adapters/tts.ts`
-- Biến: `LINGORA_TTS_PROVIDER`, `LINGORA_TTS_KEY`, `LINGORA_TTS_VOICE_ANNA`,
-  `LINGORA_TTS_VOICE_LUKAS`
-- Fallback là `speechSynthesis` của trình duyệt, **có nhãn "giọng dự phòng của
-  trình duyệt"** hiển thị cho người học. Fallback này không được tính là đã tích
-  hợp TTS.
-- Trước khi chốt nhà cung cấp: nghe kiểm tra thật giọng đọc tiếng Đức, kiểm cách
-  đọc tên riêng và tốc độ chậm.
+- Adapter: `src/lib/adapters/giong-noi.ts`
+- Biến: `LINGORA_VOICE_URL`, `LINGORA_VOICE_TOKEN`
+- piper với giọng `de_DE-thorsten-medium`, nhanh hơn thời gian thực 12 lần trên
+  CPU, câu đã đọc được lưu đệm.
+- Thiếu engine: rơi về `speechSynthesis` của trình duyệt, **có nhãn** cho người
+  học biết đó là giọng máy của thiết bị. Fallback này không được tính là đã có
+  giọng đọc.
 
 ## Avatar
 
@@ -44,6 +48,11 @@ Trạng thái hôm nay: **toàn bộ đang ở `mock`**. Chưa có khóa dịch 
   rõ điều đó thay vì gợi ý là đã có.
 
 ## Thanh toán
+
+**Cách mặc định là chuyển khoản ngân hàng**, xem `src/lib/thanh-toan.ts`. Nó
+không cần nhà cung cấp nào, chỉ cần ba biến `LINGORA_BANK_*` và một người đối
+chiếu sao kê ở `/quan-tri/don-hang`. Phần dưới đây chỉ cần khi chủ trường muốn
+mở thêm cách trả tiền.
 
 - Adapter: `src/lib/adapters/payments/` (`paypal.ts`, `card.ts`)
 - Biến: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`,

@@ -9,11 +9,12 @@
     "start": "next start -p 3055",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node tests/smoke.mjs && node tests/google.mjs && node tests/xep-lop.mjs",
+    "test": "node tests/smoke.mjs && node tests/google.mjs && node tests/xep-lop.mjs && node tests/lop-hoc.mjs",
     "db:push": "tsx scripts/db-push.ts",
     "seed": "tsx scripts/seed.ts",
     "logo": "tsx scripts/logo.ts",
-    "assets": "tsx scripts/assets.ts"
+    "assets": "tsx scripts/assets.ts",
+    "icon:app": "tsx scripts/icon-app.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",

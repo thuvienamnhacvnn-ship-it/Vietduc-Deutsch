@@ -4,12 +4,12 @@ import { requireUser } from "@/lib/auth/guard";
 
 const ITEMS: NavItem[] = [
   { href: "/hoc", label: "Bảng học" },
+  { href: "/hoc/lop", label: "Lớp học nói" },
+  { href: "/hoc/on-tap", label: "Ôn tập" },
   { href: "/hoc/xep-lop", label: "Kiểm tra trình độ" },
   { href: "/hoc/ket-qua", label: "Kết quả" },
-  { href: "/hoc/lo-trinh", label: "Lộ trình", soon: true },
-  { href: "/hoc/on-tap", label: "Ôn tập", soon: true },
   { href: "/hoc/ho-so", label: "Hồ sơ" },
-  { href: "/hoc/goi-hoc", label: "Gói học", soon: true },
+  { href: "/hoc/goi-hoc", label: "Gói học" },
 ];
 
 /**
@@ -18,8 +18,8 @@ const ITEMS: NavItem[] = [
  */
 const TABS: Tab[] = [
   { href: "/hoc", label: "Học", icon: "home" },
-  { href: "/hoc/xep-lop", label: "Kiểm tra", icon: "test" },
-  { href: "/hoc/ket-qua", label: "Kết quả", icon: "result" },
+  { href: "/hoc/lop", label: "Lớp nói", icon: "class" },
+  { href: "/hoc/on-tap", label: "Ôn tập", icon: "review" },
   { href: "/hoc/ho-so", label: "Hồ sơ", icon: "me" },
 ];
 

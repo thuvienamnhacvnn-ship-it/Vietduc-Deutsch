@@ -18,6 +18,9 @@ import { eq } from "drizzle-orm";
 import { getDb } from "../src/lib/db";
 import {
   courses,
+  lessonVersions,
+  lessons,
+  modules,
   objectives,
   planVersions,
   plans,
@@ -30,6 +33,7 @@ import {
 import { hashPassword } from "../src/lib/auth/password";
 import { CURRICULUM } from "../src/content/curriculum";
 import { ALL_ITEMS } from "../src/content/placement";
+import { LESSONS } from "../src/content/bai-hoc";
 
 function demoPassword(): string {
   // Đủ dài để không phải mật khẩu yếu nếu ai đó lỡ để tài khoản demo trên máy
@@ -108,6 +112,70 @@ async function main() {
       });
     }
     void created;
+  }
+
+  /* ------------------------------------------------ 12 buổi học nói mẫu */
+
+  /*
+   * Bài học vào cơ sở dữ liệu ở trạng thái CHỜ DUYỆT, không phải đã xuất bản.
+   *
+   * Nội dung do máy soạn thì phải có người đọc trước khi học viên học - đó là
+   * ràng buộc của chính bản giao việc. Cổng quản trị có nút duyệt; trước khi ai
+   * đó bấm, lớp học chỉ mở cho biên tập viên xem thử và dán nhãn bản nháp.
+   */
+  let seededLessons = 0;
+  for (const lesson of LESSONS) {
+    const courseSlug = `tieng-duc-${lesson.level.toLowerCase()}`;
+    const course = await db
+      .select({ id: courses.id })
+      .from(courses)
+      .where(eq(courses.slug, courseSlug))
+      .limit(1);
+    if (!course[0]) continue;
+
+    const moduleSlug = `noi-${lesson.level.toLowerCase()}`;
+    let mod = await db
+      .select({ id: modules.id })
+      .from(modules)
+      .where(eq(modules.slug, moduleSlug))
+      .limit(1);
+    if (!mod[0]) {
+      mod = await db
+        .insert(modules)
+        .values({
+          courseId: course[0].id,
+          slug: moduleSlug,
+          title: `Luyện nói ${lesson.level}`,
+          position: 1,
+        })
+        .returning({ id: modules.id });
+    }
+
+    const existing = await db
+      .select({ id: lessons.id })
+      .from(lessons)
+      .where(eq(lessons.slug, lesson.code.toLowerCase()))
+      .limit(1);
+    if (existing[0]) continue;
+
+    const created = await db
+      .insert(lessons)
+      .values({
+        moduleId: mod[0]!.id,
+        slug: lesson.code.toLowerCase(),
+        title: lesson.title,
+        position: seededLessons,
+        estimatedMinutes: 20,
+      })
+      .returning({ id: lessons.id });
+
+    await db.insert(lessonVersions).values({
+      lessonId: created[0]!.id,
+      version: 1,
+      body: lesson,
+      reviewState: "in_review",
+    });
+    seededLessons += 1;
   }
 
   /* --------------------------------------------------- ngân hàng câu hỏi */
@@ -242,6 +310,7 @@ async function main() {
   }
 
   console.log(`\nĐã nạp dữ liệu demo. Câu hỏi xếp lớp mới nạp: ${newQuestions}.`);
+  console.log(`Buổi học nói mới nạp: ${seededLessons} (đang CHỜ DUYỆT trong /quan-tri/bai-hoc).`);
   if (credentials.length > 0) {
     console.log("\nTài khoản demo (mật khẩu chỉ hiện một lần, không lưu ở đâu cả):");
     console.log(credentials.join("\n"));

@@ -118,6 +118,46 @@ Bản đồ dùng OpenStreetMap chứ không dùng bản nhúng thương mại: 
 cookie, nên được phép có mặt trước khi người dùng trả lời thông báo cookie -
 đúng như trang quyền riêng tư đã hứa.
 
+## Giai đoạn 3-4-5: đã dựng những gì
+
+Toàn bộ phần AI chạy trên máy chủ của trường bằng phần mềm mã nguồn mở, không
+mua dịch vụ theo lượt. Chi tiết và số đo thật ở `docs/ENGINE-TU-HOST.md`.
+
+**Giai đoạn 3 - lớp học nói và bộ giảng dạy**
+
+- `src/lib/adapters/giong-noi.ts` - đọc và nghe tiếng Đức qua engine tự host
+  (piper + whisper.cpp). Bài thi phần Nghe giờ phát ÂM THANH THẬT và không gửi
+  kèm chữ; thiếu engine thì rơi về giọng trình duyệt và nói rõ điều đó.
+- `src/lib/adapters/llm.ts` - bộ giảng dạy qua chuẩn OpenAI, mặc định trỏ vào
+  llama.cpp trên máy chủ. Thiếu engine thì KHÔNG bịa lời giảng, trả 503 kèm câu
+  giải thích.
+- `src/lib/lop-hoc.ts` + `/hoc/lop` - buổi học nói: người học nói hoặc gõ,
+  Anna đáp bằng tiếng Đức có tiếng đọc, kèm nghĩa tiếng Việt và TỐI ĐA MỘT lỗi
+  được sửa mỗi lượt.
+
+**Giai đoạn 4 - nội dung và ôn tập**
+
+- 12 buổi học nói (`src/content/bai-hoc.ts`), nạp vào cơ sở dữ liệu ở trạng
+  thái CHỜ DUYỆT. Học viên không thấy bài chưa duyệt.
+- `/quan-tri/bai-hoc` - màn hình duyệt: bày ra toàn bộ nội dung sẽ đến tay học
+  viên, ghi lại ai duyệt và lúc nào.
+- Ôn tập ngắt quãng: mỗi lỗi được sửa trong lớp thành một thẻ; `/hoc/on-tap`
+  hỏi lại đúng lúc trí nhớ bắt đầu mờ. Thuật toán ở
+  `src/lib/lop-hoc-db.ts`.
+
+**Giai đoạn 5 - bán hàng và vận hành**
+
+- Cách trả tiền mặc định là CHUYỂN KHOẢN, không phải cổng thẻ: cổng thẻ và
+  PayPal cần tài khoản thương gia đứng tên pháp nhân, không tự dựng được.
+- `/hoc/goi-hoc` đặt đơn và nhận mã chuyển khoản; `/quan-tri/don-hang` là
+  chỗ quản trị đối chiếu sao kê rồi cấp quyền học, có ghi chú bắt buộc và nhật
+  ký.
+- Giá chưa được chủ trường duyệt thì SERVER từ chối đặt mua, không chỉ ẩn nút.
+
+**Chưa xong, nói rõ:** máy chủ giảng dạy (llama.cpp) chưa được cài trên VPS -
+lệnh cài nằm sẵn trong `docs/ENGINE-TU-HOST.md`. Trước khi cài xong thì lớp
+học nói mở được, xem được bài, nhưng chưa có câu trả lời của giáo viên.
+
 ## Bước tiếp theo (giai đoạn 2)
 
 1. Cố vấn Mia: luồng hỏi mục tiêu, lưu vào `learner_profiles`, sinh lộ trình đề
@@ -133,12 +173,13 @@ cookie, nên được phép có mặt trước khi người dùng trả lời th
 
 | Việc | Chặn phần nào |
 |---|---|
-| Khóa Anthropic + hạn mức chi tiêu | toàn bộ giảng dạy và chấm bài (giai đoạn 3) |
+| ~~Khóa Anthropic~~ | KHÔNG CẦN NỮA - bộ giảng dạy chạy tự host, xem `docs/ENGINE-TU-HOST.md` |
 | OAuth client của Google (`GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`) | đăng nhập Google thật; hiện chạy mô phỏng ở máy dev, tắt hẳn ở production |
-| Nhà cung cấp STT và TTS tiếng Đức + khóa | lớp học giọng nói (giai đoạn 3) |
+| ~~Nhà cung cấp STT và TTS~~ | KHÔNG CẦN NỮA - engine giọng nói đã chạy trên máy chủ của trường |
 | Nhà cung cấp email giao dịch + khóa | email xác minh thật (hiện ghi ra `data/outbox/`) |
 | Mã số doanh nghiệp, mã số thuế, người chịu trách nhiệm nội dung (tên và trụ sở đã có) | công khai trang, mở bán |
 | Tài khoản nhận tiền | mở bán (giai đoạn 5) |
-| Tài khoản PayPal + nhà cung cấp thẻ | thanh toán (giai đoạn 5) |
+| Số tài khoản ngân hàng của trường | hiện thông tin chuyển khoản trên trang gói học |
+| Tài khoản PayPal + nhà cung cấp thẻ | chỉ cần nếu muốn thêm cách trả tiền ngoài chuyển khoản |
 | Duyệt điều khoản, chính sách hủy và hoàn tiền | công khai trang, mở bán |
 | Chốt giá kinh doanh thật | hiện giá trong seed là giá tham khảo, `approved_for_sale = false` |

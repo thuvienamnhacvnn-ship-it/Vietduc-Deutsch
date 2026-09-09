@@ -33,12 +33,17 @@ export function adapterMode(
     | "oauth_google",
 ): AdapterMode {
   switch (service) {
+    // Mô hình ngôn ngữ cũng tự host (llama.cpp + model mã nguồn mở), phơi ra
+    // theo chuẩn OpenAI để đổi mô hình không phải sửa code. Vẫn chấp nhận khóa
+    // Anthropic nếu chủ dự án chọn dùng dịch vụ trả tiền.
     case "llm":
-      return has("ANTHROPIC_API_KEY") ? "live" : "mock";
+      return has("LINGORA_LLM_URL") || has("ANTHROPIC_API_KEY") ? "live" : "mock";
+    // Nghe và đọc chạy trên CÙNG một engine tự host (piper + whisper.cpp), nên
+    // chúng dùng chung một cặp biến môi trường. Không còn "provider" và "key"
+    // của một dịch vụ bán theo lượt: engine là của trường.
     case "stt":
-      return has("LINGORA_STT_PROVIDER", "LINGORA_STT_KEY") ? "live" : "mock";
     case "tts":
-      return has("LINGORA_TTS_PROVIDER", "LINGORA_TTS_KEY") ? "live" : "mock";
+      return has("LINGORA_VOICE_URL", "LINGORA_VOICE_TOKEN") ? "live" : "mock";
     case "avatar":
       // v1 avatar chạy cục bộ; "live" ở đây nghĩa là có dịch vụ đồng bộ khẩu hình.
       return has("LINGORA_AVATAR_PROVIDER", "LINGORA_AVATAR_KEY") ? "live" : "mock";

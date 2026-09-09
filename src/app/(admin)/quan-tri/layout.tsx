@@ -4,10 +4,11 @@ import { requireStaff } from "@/lib/auth/guard";
 const ITEMS: NavItem[] = [
   { href: "/quan-tri", label: "Tổng quan" },
   { href: "/quan-tri/hoc-vien", label: "Học viên" },
+  { href: "/quan-tri/bai-hoc", label: "Duyệt bài học" },
+  { href: "/quan-tri/don-hang", label: "Đơn hàng" },
   { href: "/quan-tri/giao-trinh", label: "Giáo trình", soon: true },
   { href: "/quan-tri/cau-hoi", label: "Câu hỏi", soon: true },
   { href: "/quan-tri/agent", label: "AI Agent", soon: true },
-  { href: "/quan-tri/goi-hoc", label: "Gói học", soon: true },
   { href: "/quan-tri/van-hanh", label: "Vận hành", soon: true },
 ];
 

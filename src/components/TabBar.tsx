@@ -18,7 +18,11 @@ import { usePathname } from "next/navigation";
  * dòng, còn một thư viện icon là thêm một phụ thuộc và vài chục KB cho cả trang.
  */
 
-export type Tab = { href: string; label: string; icon: "home" | "test" | "result" | "me" };
+export type Tab = {
+  href: string;
+  label: string;
+  icon: "home" | "class" | "review" | "test" | "result" | "me";
+};
 
 const ICONS: Record<Tab["icon"], React.ReactNode> = {
   home: (
@@ -36,6 +40,19 @@ const ICONS: Record<Tab["icon"], React.ReactNode> = {
   result: (
     <>
       <path d="M5 19V11M12 19V5M19 19v-6" />
+    </>
+  ),
+  class: (
+    <>
+      <path d="M4 5.5h6a2.5 2.5 0 0 1 2 1 2.5 2.5 0 0 1 2-1h6" />
+      <path d="M4 5.5V18h6a2.5 2.5 0 0 1 2 1 2.5 2.5 0 0 1 2-1h6V5.5" />
+      <path d="M12 6.5V19" />
+    </>
+  ),
+  review: (
+    <>
+      <path d="M20 12a8 8 0 1 1-2.4-5.7" />
+      <path d="M20 4v4h-4" />
     </>
   ),
   me: (
