@@ -7,10 +7,25 @@ Thương hiệu đổi tập trung ở `src/lib/brand.ts`. Hệ màu lấy trự
 (`npx tsx scripts/lay-mau-logo.ts`) — xem `src/styles/tokens.css` và
 `docs/ASSETS.md`.
 
-> **Trạng thái:** giai đoạn 0 và 1 hoàn tất — nền tảng, giao diện, tài khoản và
-> cơ sở dữ liệu chạy thật. Mọi dịch vụ ngoài (Claude, STT, TTS, email, thanh
-> toán, đăng nhập Google) đang chạy adapter **mock có nhãn**. Chưa mở bán, chưa thu tiền.
-> Đọc `PROJECT_STATE.md` và `ACCEPTANCE.md` để biết chính xác cái gì đã chạy.
+## Trạng thái
+
+**Chạy thật:** tài khoản và phân quyền, bài kiểm tra xếp lớp phân nhánh nhiều
+giai đoạn, lớp học nói, ôn tập ngắt quãng, duyệt nội dung, đặt gói học bằng
+chuyển khoản. 130 kiểm thử end-to-end đều xanh.
+
+**Ba dịch vụ AI nặng nhất KHÔNG mua theo lượt** — chúng chạy trên máy chủ của
+trường bằng phần mềm mã nguồn mở (piper, whisper.cpp, llama.cpp). Cài đặt, số đo
+thật và quyết định kiến trúc ở `docs/ENGINE-TU-HOST.md`.
+
+**Còn ở chế độ mock có nhãn:** email giao dịch, thanh toán thẻ và PayPal, đăng
+nhập Google, lưu trữ đám mây, avatar khẩu hình. Thiếu cấu hình thì adapter tự
+khai là mock và giao diện dán nhãn — không có màn hình giả nào được trình bày
+như thật.
+
+**Chưa mở bán, chưa thu tiền của ai.** Giá trong dữ liệu mẫu là giá tham khảo và
+server từ chối đặt mua cho tới khi chủ trường duyệt.
+
+`PROJECT_STATE.md` và `ACCEPTANCE.md` ghi chính xác từng mục.
 
 ## Yêu cầu
 
@@ -46,10 +61,13 @@ không được lưu trong tệp nào.
 | `npm run seed` | nạp dữ liệu demo có nhãn |
 | `npm run logo` | sinh lại favicon và ảnh chia sẻ (logo chính là tệp của khách) |
 | `npx tsx scripts/lay-mau-logo.ts <png>` | đo màu và độ tương phản từ một tệp ảnh |
-| `npm test` | chạy cả hai bộ test end-to-end (server phải đang chạy) |
-| `node tests/smoke.mjs` | 37 kiểm tra nền tảng và phân quyền |
+| `npm test` | chạy cả bốn bộ test end-to-end (server phải đang chạy) |
+| `npm run dat-quyen -- <email> admin` | đặt vai trò cho một tài khoản |
+| `npm run icon:app` | sinh icon cho bản cài về màn hình chính |
+| `node tests/smoke.mjs` | 38 kiểm tra nền tảng và phân quyền |
 | `node tests/google.mjs` | 24 kiểm tra luồng đăng nhập Google |
-| `node tests/xep-lop.mjs` | 27 kiểm tra bài kiểm tra trình độ |
+| `node tests/xep-lop.mjs` | 53 kiểm tra bài kiểm tra xếp lớp |
+| `node tests/lop-hoc.mjs` | 15 kiểm tra lớp học, ôn tập và gói học |
 
 ## Đổi schema
 
@@ -87,9 +105,23 @@ code nào.
 | `docs/DATA_MODEL.md` | vì sao các bảng có hình dạng như vậy |
 | `docs/ROUTES.md` | hợp đồng route và API |
 | `docs/UI_SYSTEM.md` | hệ thiết kế |
-| `docs/INTEGRATIONS.md` | dịch vụ ngoài và checklist kích hoạt |
+| `docs/ENGINE-TU-HOST.md` | engine giọng nói và bộ giảng dạy tự host: cài đặt, số đo, giới hạn |
+| `docs/INTEGRATIONS.md` | dịch vụ ngoài còn lại và checklist kích hoạt |
 | `docs/ASSETS.md` | danh mục tài nguyên hình ảnh |
 | `docs/adr/` | quyết định kiến trúc và trade-off |
+
+## Việc của người thật
+
+Ba việc hệ thống cố ý KHÔNG tự làm, vì chúng cần một người chịu trách nhiệm:
+
+1. **Duyệt bài học.** Nội dung do máy soạn nằm ở trạng thái chờ duyệt cho tới
+   khi một biên tập viên đọc và bấm duyệt tại `/quan-tri/bai-hoc`. Học viên
+   không thấy bài chưa duyệt.
+2. **Đối chiếu sao kê và cấp quyền học.** Học viên đặt gói rồi chuyển khoản kèm
+   mã; quản trị tìm mã trong sao kê ngân hàng rồi xác nhận tại
+   `/quan-tri/don-hang`. Không có webhook ngân hàng nào tự làm việc này.
+3. **Duyệt giá.** Giá trong dữ liệu mẫu là giá tham khảo. Server từ chối mọi đơn
+   trên gói chưa được duyệt bán.
 
 ## Nguyên tắc của dự án này
 
