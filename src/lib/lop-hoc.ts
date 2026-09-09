@@ -230,13 +230,18 @@ export async function classTurn(args: {
    * "einem". Người học nhìn hai vế gần như giống hệt nhau và không hiểu mình
    * sai chỗ nào.
    *
-   * Chỉ chặn kiểu NỐI ĐUÔI. Lỗi thiếu từ ở giữa - "habe Hund" thành "habe einen
-   * Hund" - vẫn được giữ, vì đó là sửa thật.
+   * Ranh giới phải là MỘT TỪ MỚI, không phải vài ký tự. Bản đầu tiên viết
+   * "dung.startsWith(sai)" và nó chặn oan ngay lời chữa đúng nhất trong ngày:
+   * "seit zwei Jahre" thành "seit zwei Jahren" - đuôi danh từ số nhiều, đúng
+   * kiểu lỗi mà người Việt học tiếng Đức hay mắc. Phải là "sai + dấu cách" thì
+   * mới là nối thêm từ.
+   *
+   * Lỗi thiếu từ ở giữa - "habe Hund" thành "habe einen Hund" - vẫn được giữ.
    */
   if (correction) {
     const sai = goiVeBanPhim(correction.wrong);
     const dung = goiVeBanPhim(correction.right);
-    if (dung.startsWith(sai)) correction = null;
+    if (dung.startsWith(sai + " ")) correction = null;
   }
 
   return {
