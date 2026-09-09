@@ -3,6 +3,8 @@ import { sql } from "drizzle-orm";
 import { requireStaff } from "@/lib/auth/guard";
 import { getDb } from "@/lib/db";
 import { adapterStatus } from "@/lib/config";
+import { voiceHealth } from "@/lib/adapters/giong-noi";
+import { llmHealth } from "@/lib/adapters/llm";
 import { agentRuns, auditLogs, lessonVersions, users } from "@/lib/db/schema";
 
 export const metadata: Metadata = { title: "Quản trị" };
@@ -28,6 +30,24 @@ async function count(table: Parameters<typeof sql>[0] extends never ? never : st
 export default async function AdminHome() {
   await requireStaff("/quan-tri");
   const status = adapterStatus();
+
+  /*
+   * Engine tự host được HỎI THẲNG, không chỉ đọc biến môi trường.
+   *
+   * Có biến môi trường không có nghĩa là engine còn sống: máy chủ có thể đã tắt,
+   * đường hầm SSH có thể đã đứt, model có thể chưa nạp xong. Trước đây bảng này
+   * chỉ nói "live" dựa trên việc biến có được đặt hay không - và đó đúng là kiểu
+   * bảng điều khiển báo xanh trong lúc lớp học đang hỏng.
+   *
+   * Hai lời gọi này có hạn 5 giây và không bao giờ ném lỗi ra ngoài, nên trang
+   * quản trị vẫn mở được khi engine chết.
+   */
+  const [voice, llm] = await Promise.all([voiceHealth(), llmHealth()]);
+  const engineDetail: Record<string, { ok: boolean; detail: string }> = {
+    llm,
+    stt: voice,
+    tts: voice,
+  };
 
   const [learners, publishedLessons, agentCalls, recent] = await Promise.all([
     count("users"),
@@ -99,21 +119,36 @@ export default async function AdminHome() {
                 <tr>
                   <th>Dịch vụ</th>
                   <th>Trạng thái</th>
+                  <th>Engine</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(status).map(([key, mode]) => (
-                  <tr key={key}>
-                    <td>{SERVICE_VI[key] ?? key}</td>
-                    <td>
-                      {mode === "live" ? (
-                        <span className="badge badge--success">live</span>
-                      ) : (
-                        <span className="mock-tag">mock</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {Object.entries(status).map(([key, mode]) => {
+                  const health = engineDetail[key];
+                  return (
+                    <tr key={key}>
+                      <td>{SERVICE_VI[key] ?? key}</td>
+                      <td>
+                        {mode === "live" ? (
+                          <span className="badge badge--success">live</span>
+                        ) : (
+                          <span className="mock-tag">mock</span>
+                        )}
+                      </td>
+                      <td style={{ whiteSpace: "normal" }}>
+                        {health ? (
+                          health.ok ? (
+                            <span>{health.detail}</span>
+                          ) : (
+                            <span style={{ color: "var(--brand)" }}>{health.detail}</span>
+                          )
+                        ) : (
+                          <span style={{ color: "var(--muted)" }}>—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -128,7 +163,10 @@ export default async function AdminHome() {
           <ul className="tick" style={{ marginBottom: 0 }}>
             <li>Thông tin pháp nhân, tài khoản nhận tiền và thông tin thuế của doanh nghiệp.</li>
             <li>Điều khoản, chính sách hủy và hoàn tiền được người chịu trách nhiệm duyệt.</li>
-            <li>Kết nối PayPal và một nhà cung cấp thẻ, kiểm thử sandbox trước khi bật live.</li>
+            <li>
+              Số tài khoản ngân hàng của trường trong biến <code>LINGORA_BANK_*</code> — đây là
+              cách nhận tiền mặc định, không cần cổng thanh toán nào.
+            </li>
             <li>Nội dung và bộ đánh giá của cấp độ được bán đã qua duyệt.</li>
             <li>Chuyển cờ <code>approved_for_sale</code> của bản giá tương ứng sang true.</li>
           </ul>
