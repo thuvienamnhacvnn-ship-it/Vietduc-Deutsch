@@ -75,8 +75,8 @@ mở thêm cách trả tiền.
 | Tên app người học nhìn thấy | Viet Duc - Deutsch |
 | Trạng thái | In production — mọi tài khoản Google đăng nhập được, không cần danh sách test user |
 | Phạm vi | `openid email profile` — chỉ tên và địa chỉ email, không đọc Gmail |
-| JavaScript origin | `https://deutsch.57-129-45-199.sslip.io` |
-| Redirect URI | `https://deutsch.57-129-45-199.sslip.io/api/auth/google/callback` |
+| JavaScript origin | `https://deutsch.57-129-45-199.sslip.io` và `http://localhost:3055` |
+| Redirect URI | `https://deutsch.57-129-45-199.sslip.io/api/auth/google/callback` và `http://localhost:3055/api/auth/google/callback` |
 
 Khoá nằm trong `.env.production` trên máy chủ (quyền 600), KHÔNG có trong Git.
 
@@ -88,6 +88,12 @@ Redirect URI phải khớp tuyệt đối từng ký tự với `LINGORA_APP_URL
 
 Phạm vi chỉ gồm dữ liệu không nhạy cảm nên Google **không bắt thẩm định**. Thêm
 logo cho app thì mới phải qua thẩm định - đó là lý do phần logo để trống.
+
+Máy phát triển cũng được khai trong cùng một OAuth client, nên nút Google ở
+`localhost:3055` chạy thật chứ không còn là bản mô phỏng. Địa chỉ phải là
+**localhost**, không phải 127.0.0.1: Google chỉ miễn trừ http cho tên
+`localhost`, còn `127.0.0.1` thì phải khai riêng - và redirect_uri gửi đi phải
+khớp từng ký tự với cái đã đăng ký.
 
 Luồng cố ý KHÔNG đặt `prompt=select_account`: học viên nào đang đăng nhập sẵn
 một tài khoản Google trên máy thì bấm một lần là vào thẳng, không phải chọn lại.
