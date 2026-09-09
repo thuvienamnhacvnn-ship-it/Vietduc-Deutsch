@@ -95,7 +95,7 @@ async function newLearner(tag) {
  * Đáp án đúng của mọi câu trong ngân hàng đều là chỉ số 0.
  */
 async function takeTest(client, strategy, stopAfter = Infinity) {
-  const start = await client("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  const start = await client("/api/xep-lop/bat-dau", { method: "POST", body: JSON.stringify({ pledge: true }) });
   if (start.status !== 200) throw new Error(`bắt đầu thất bại: ${start.status}`);
 
   let item = start.body.item;
@@ -219,7 +219,7 @@ async function main() {
   /* ------------------------------------- 2b. chấm câu điền, gõ không dấu Đức */
   console.log("\nCâu điền đáp án");
   const typer = await newLearner("go-tay");
-  const startT = await typer("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  const startT = await typer("/api/xep-lop/bat-dau", { method: "POST", body: JSON.stringify({ pledge: true }) });
   let cur = startT.body.item;
   let gapFeedback = null;
   let wrongFeedback = null;
@@ -249,7 +249,7 @@ async function main() {
 
   // Một câu điền sai phải bị chấm sai, không phải cái gì cũng đúng.
   const wrongTyper = await newLearner("go-sai");
-  const startW = await wrongTyper("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  const startW = await wrongTyper("/api/xep-lop/bat-dau", { method: "POST", body: JSON.stringify({ pledge: true }) });
   let curW = startW.body.item;
   while (curW && !wrongFeedback) {
     const payload = { sessionId: startW.body.sessionId, code: curW.code };
@@ -268,7 +268,7 @@ async function main() {
   const runC = await takeTest(quitter, right, 3);
   check("đã làm 3 câu rồi dừng", runC.seen.length === 3);
 
-  const again = await quitter("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  const again = await quitter("/api/xep-lop/bat-dau", { method: "POST", body: JSON.stringify({ pledge: true }) });
   check("quay lại được nhận diện là tiếp tục", again.body.resumed === true);
   check("không tạo phiên mới", again.body.sessionId === runC.sessionId, `${runC.sessionId} vs ${again.body.sessionId}`);
   check(
@@ -280,6 +280,118 @@ async function main() {
     "không hỏi lại câu đã làm",
     !runC.seen.some((s) => s.code === again.body.item?.code),
     again.body.item?.code,
+  );
+
+  /* ------------------------------------------------------------- quy chế */
+  console.log("\nQuy chế bài thi");
+
+  // Không ký cam kết thì không có bài thi nào được tạo.
+  const noPledge = await newLearner("chua-cam-ket");
+  const refused = await noPledge("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  check(
+    "chưa ký cam kết thì không bắt đầu được bài",
+    refused.status === 409 && refused.body?.error?.code === "pledge_required",
+    `${refused.status} ${refused.body?.error?.code}`,
+  );
+
+  const pledged = await noPledge("/api/xep-lop/bat-dau", {
+    method: "POST",
+    body: JSON.stringify({ pledge: true }),
+  });
+  check("ký cam kết rồi thì bài bắt đầu", pledged.status === 200 && pledged.body.item);
+
+  // Giới hạn số lần nghe phải chặn ở SERVER, không phải chỉ ẩn nút.
+  const listener = await newLearner("nghe");
+  const startL = await listener("/api/xep-lop/bat-dau", {
+    method: "POST",
+    body: JSON.stringify({ pledge: true }),
+  });
+  let curL = startL.body.item;
+  const sid = startL.body.sessionId;
+
+  // Câu hỏi gửi ra không được kèm chữ tiếng Đức, nếu không client tự phát lại.
+  check(
+    "câu hỏi KHÔNG kèm chữ tiếng Đức của phần nghe",
+    !JSON.stringify(startL.body).includes("speakText"),
+    "",
+  );
+
+  // Trả lời đúng cho tới khi gặp câu Nghe đầu tiên.
+  let listenItem = null;
+  while (curL && !listenItem) {
+    if (curL.needsAudio) {
+      listenItem = curL;
+      break;
+    }
+    const payload = { sessionId: sid, code: curL.code };
+    if (curL.kind === "mcq") payload.choice = 0;
+    else if (curL.kind === "gap") payload.text = GAP_ANSWERS[curL.code] ?? "?";
+    else payload.skip = true;
+    const res = await listener("/api/xep-lop/tra-loi", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    curL = res.body.item;
+  }
+
+  check("bài có câu cần nghe", Boolean(listenItem), JSON.stringify(listenItem?.code));
+
+  if (listenItem) {
+    check(
+      "câu nghe được cấp sẵn số lượt còn lại",
+      typeof listenItem.listensLeft === "number" && listenItem.listensLeft > 0,
+      String(listenItem.listensLeft),
+    );
+
+    const limit = listenItem.listensLeft;
+    const plays = [];
+    for (let i = 0; i < limit + 1; i++) {
+      const res = await listener("/api/xep-lop/nghe", {
+        method: "POST",
+        body: JSON.stringify({ sessionId: sid, code: listenItem.code }),
+      });
+      plays.push({ status: res.status, left: res.body?.listensLeft, hasText: Boolean(res.body?.text) });
+    }
+
+    check(
+      `${limit} lượt đầu đều được cấp chữ để đọc`,
+      plays.slice(0, limit).every((p) => p.status === 200 && p.hasText),
+      JSON.stringify(plays),
+    );
+    check(
+      "lượt vượt quá bị server từ chối, không phải chỉ ẩn nút",
+      plays[limit].status === 409,
+      `nhận ${plays[limit].status}`,
+    );
+    check(
+      "lượt bị từ chối KHÔNG kèm chữ tiếng Đức",
+      plays[limit].hasText === false,
+      JSON.stringify(plays[limit]),
+    );
+    check(
+      "số lượt còn lại giảm dần đúng",
+      plays[0].left === limit - 1,
+      `sau lượt đầu còn ${plays[0].left}`,
+    );
+  }
+
+  // Hồ sơ bài thi phải có trong kết quả.
+  const recorder = await newLearner("ho-so");
+  const runR = await takeTest(recorder, wrong);
+  const doneR = await finish(recorder, runR.sessionId);
+  const record = doneR.body?.record;
+  check("kết quả kèm hồ sơ bài thi", Boolean(record), JSON.stringify(record));
+  check(
+    "hồ sơ có mã bài thi dạng VD-XL",
+    typeof record?.code === "string" && record.code.startsWith("VD-XL-"),
+    record?.code,
+  );
+  check("hồ sơ ghi phiên bản quy chế", record?.regulation === "1.0", record?.regulation);
+  check("hồ sơ ghi thời điểm ký cam kết", Boolean(record?.pledgedAt), record?.pledgedAt);
+  check(
+    "hồ sơ đếm số câu đã làm",
+    record?.itemsAnswered === runR.seen.length,
+    `${record?.itemsAnswered} vs ${runR.seen.length}`,
   );
 
   /* ------------------------------------------------------------ bảo mật */
@@ -296,13 +408,13 @@ async function main() {
   );
 
   const anon = makeClient();
-  const anonStart = await anon("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  const anonStart = await anon("/api/xep-lop/bat-dau", { method: "POST", body: JSON.stringify({ pledge: true }) });
   check("khách chưa đăng nhập không bắt đầu được bài", anonStart.status === 401, `nhận ${anonStart.status}`);
 
   // Đáp án không được lộ trong dữ liệu gửi ra trình duyệt. Dùng lại tài khoản
   // vừa tạo thay vì tạo thêm một cái nữa - mỗi lần đăng ký đều tiêu một suất
   // trong hạn mức theo IP, và bộ test không nên tự làm mình hết suất.
-  const peekStart = await other("/api/xep-lop/bat-dau", { method: "POST", body: "{}" });
+  const peekStart = await other("/api/xep-lop/bat-dau", { method: "POST", body: JSON.stringify({ pledge: true }) });
   const raw = JSON.stringify(peekStart.body);
   check(
     "câu hỏi gửi ra KHÔNG kèm đáp án hay lời giải",

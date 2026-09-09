@@ -44,7 +44,11 @@ Trạng thái: `DONE` (đã chạy thật) · `MOCK` (chạy bằng mock/sandbox
 | C-01 | Mia — cố vấn tuyển sinh: hỏi mục tiêu, kinh nghiệm, thời gian, hạn, ngôn ngữ hỗ trợ | 2 | TODO |
 | C-02 | Onboarding từng bước, lưu và tiếp tục, quay lại được | 2 | TODO |
 | C-03 | Kiểm tra nhanh (gợi ý) tách khỏi kiểm tra xếp lớp đầy đủ | 2 | TODO |
-| C-04 | Đánh giá Nghe: câu tiếng Đức đọc lên, nghe lại không giới hạn | 2 | DONE |
+| C-13 | Quy chế thi công khai: cấu trúc, điều kiện, cách chấm, hiệu lực | 2 | DONE |
+| C-14 | Cam kết trung thực bắt buộc trước khi bài bắt đầu, có ghi thời điểm | 2 | DONE |
+| C-15 | Hồ sơ bài thi: mã, thời gian từng phần, lượt nghe đã dùng, phiên bản quy chế | 2 | DONE |
+| C-16 | Phiếu kết quả in được, ghi rõ không phải chứng chỉ CEFR | 2 | DONE |
+| C-04 | Đánh giá Nghe: số lần phát lại theo cấu hình, ĐẾM Ở SERVER | 2 | DONE |
 | C-05 | Đánh giá Đọc: đoạn văn theo cấp độ, đáp án có giải thích | 2 | DONE |
 | C-06 | Đánh giá Viết: đề mở + rubric; hiện chấm được phần kiểm tự động | 2 | WIP |
 | C-07 | Đánh giá Nói: thu âm thật qua micro và lưu làm bằng chứng; chấm cần dịch vụ giọng nói | 2 | WIP |

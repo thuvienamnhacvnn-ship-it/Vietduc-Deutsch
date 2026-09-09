@@ -30,6 +30,7 @@ export function SiteFooter() {
             <Link href="/dang-ky">Tạo tài khoản</Link>
             <Link href="/dang-nhap">Đăng nhập</Link>
             <Link href="/cau-hoi">Câu hỏi thường gặp</Link>
+            <Link href="/quy-che-thi">Quy chế kiểm tra xếp lớp</Link>
           </div>
           <div>
             <h3 className="site-footer__h">Pháp lý</h3>

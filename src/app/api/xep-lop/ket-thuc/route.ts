@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { assessmentSessions } from "@/lib/db/schema";
 import { apiUser } from "@/lib/auth/guard";
 import {
+  examRecordOf,
   finishSession,
   hasSpeakingAudio,
   scoreSession,
@@ -71,15 +72,27 @@ export async function POST(request: Request) {
   const spokeAudio = await hasSpeakingAudio(session.id, auth.user.id);
   const results = scoreSession(state, writing, spokeAudio);
 
-  await finishSession(auth.user.id, session.id, results);
+  // Hồ sơ điều kiện làm bài: mã bài thi, thời gian từng phần, số lượt nghe đã
+  // dùng, cam kết đã ký. Một kết quả không kèm hồ sơ thì không ai kiểm chứng
+  // được nó được tạo ra trong điều kiện nào.
+  const record = examRecordOf(session.id, new Date(session.startedAt), new Date(), state);
+
+  await finishSession(auth.user.id, session.id, results, record);
   await audit({
     actorUserId: auth.user.id,
     action: "placement.finish",
     entity: "assessment_sessions",
     entityId: session.id,
-    after: results.map((r) => ({ skill: r.skill, level: r.level, unknown: r.insufficientEvidence })),
+    after: {
+      record,
+      results: results.map((r) => ({
+        skill: r.skill,
+        level: r.level,
+        unknown: r.insufficientEvidence,
+      })),
+    },
     ip: clientIp(request),
   });
 
-  return Response.json({ ok: true, results });
+  return Response.json({ ok: true, results, record });
 }

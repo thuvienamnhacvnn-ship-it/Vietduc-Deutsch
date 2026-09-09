@@ -1393,82 +1393,218 @@ table.data tr:last-child td {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--motion) var(--ease),
+    border-color var(--motion) var(--ease),
+    box-shadow var(--motion) var(--ease);
 }
 
+/* Chưa cuộn thì header hoà vào trang; cuộn rồi mới tách ra bằng bóng và đường
+   kẻ. Một cái viền cố định ngay dưới hero làm trang trông như bị cắt ngang. */
+.site-header[data-scrolled] {
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  border-bottom-color: var(--line);
+  box-shadow: var(--shadow-1);
+}
+
+/* Panel mobile đang mở thì header phải đục hoàn toàn, nếu không chữ của trang
+   phía sau lộ qua lớp mờ. */
+.site-header[data-open] {
+  background: var(--paper);
+  border-bottom-color: var(--line);
+}
+
+/*
+ * Ba vùng: logo | menu | nút. Lưới `auto 1fr auto` giữ menu ở đúng giữa header
+ * bất kể logo rộng bao nhiêu - flex thì menu bị đẩy dính vào logo và bỏ trống
+ * cả khoảng giữa.
+ */
 .site-header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--s-4);
-  min-height: 76px;
+  min-height: 66px;
 }
 
 .site-header__brand {
-  color: var(--brand);
   text-decoration: none;
   flex: none;
+  display: flex;
+  align-items: center;
 }
+
+/* ---- menu giữa: một dải pill ---- */
 
 .site-header__nav {
   display: none;
-  gap: var(--s-5);
-  margin-inline-start: var(--s-4);
+  justify-self: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--paper-sunken) 70%, transparent);
+  border: 1px solid var(--line);
 }
 
 .site-header__link {
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
   color: var(--ink);
   text-decoration: none;
   font-size: var(--fs-sm);
   font-weight: 560;
-  padding: var(--s-2) 0;
-  border-bottom: 2px solid transparent;
   white-space: nowrap;
+  transition:
+    background-color var(--motion-fast) var(--ease),
+    color var(--motion-fast) var(--ease);
 }
 
 .site-header__link:hover {
+  background: var(--paper-raised);
   color: var(--brand);
-  border-bottom-color: var(--gold-deep);
 }
 
+/* Trang đang mở được tô nguyên viên đỏ. Trắng trên #CA2427 đạt 5.5:1. */
 .site-header__link[aria-current="page"] {
-  color: var(--brand);
-  border-bottom-color: var(--brand);
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
 }
+
+/* ---- cụm nút phải ---- */
 
 .site-header__actions {
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: var(--s-2);
-  margin-inline-start: auto;
   min-width: 0;
 }
 
 /* Hai lớp, vì .btn cũng đặt display và cũng chỉ có một lớp. */
-.site-header .site-header__signin {
+.site-header .site-header__signin,
+.site-header .site-header__theme {
   display: none;
 }
 
+.site-header__burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--ease),
+    background-color var(--motion-fast) var(--ease);
+}
+
+.site-header__burger:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* Ba vạch biến thành dấu X: vạch giữa mờ đi, hai vạch ngoài chụm vào giữa rồi
+   xoay. Cùng một hình, không đổi phần tử, nên nút không nhảy khi bấm. */
+.burger__lines line {
+  transform-origin: 10px 10px;
+  transition:
+    transform var(--motion) var(--ease),
+    opacity var(--motion-fast) var(--ease);
+}
+
+.burger__lines[data-open] line:nth-child(1) {
+  transform: translateY(4px) rotate(45deg);
+}
+
+.burger__lines[data-open] line:nth-child(2) {
+  opacity: 0;
+}
+
+.burger__lines[data-open] line:nth-child(3) {
+  transform: translateY(-4px) rotate(-45deg);
+}
+
+/* ---- panel mobile ---- */
+
 .site-header__mobile {
   border-top: 1px solid var(--line);
-  background: var(--paper-raised);
-  padding-block: var(--s-4);
+  background: var(--paper);
+  padding-block: var(--s-3) var(--s-6);
+  box-shadow: var(--shadow-2);
 }
 
 .site-header__mobile-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
   color: var(--ink);
   text-decoration: none;
+  font-size: var(--fs-lg);
   font-weight: 560;
-  padding: var(--s-3) 0;
-  border-bottom: 1px solid var(--line);
+  padding: var(--s-4) var(--s-3);
+  border-radius: var(--r-md);
+}
+
+.site-header__mobile-link span {
+  color: var(--muted);
+  font-size: var(--fs-xl);
+  line-height: 1;
+}
+
+.site-header__mobile-link:hover {
+  background: var(--paper-sunken);
+  color: var(--brand);
+}
+
+.site-header__mobile-link[aria-current="page"] {
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
+}
+
+.site-header__mobile-link[aria-current="page"] span {
+  color: var(--on-brand-fill);
+}
+
+.site-header__mobile-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line);
+}
+
+.site-header__mobile-foot .btn--block {
+  width: auto;
+  flex: 1;
+}
+
+.site-header__mobile-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-left: auto;
+  font-size: var(--fs-sm);
+  color: var(--muted);
 }
 
 @media (min-width: 900px) {
   .site-header .site-header__nav,
   .site-header .site-header__signin {
     display: flex;
+  }
+  .site-header .site-header__theme {
+    display: inline-flex;
   }
   .site-header .site-header__burger,
   .site-header .site-header__mobile {

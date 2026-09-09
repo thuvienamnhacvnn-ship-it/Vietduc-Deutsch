@@ -23,6 +23,7 @@ import {
   type PlacementItem,
   type WriteItem,
 } from "@/content/placement";
+import { LISTEN_LIMIT, REGULATION_VERSION, examCode } from "@/content/quy-che-thi";
 
 /**
  * Bài kiểm tra xếp lớp.
@@ -58,8 +59,13 @@ export type PublicItem = {
   options?: string[];
   hint?: string;
   minWords?: number;
-  /** Câu tiếng Đức để trình duyệt đọc lên. Chỉ có ở câu Nghe. */
-  speakText?: string;
+  /**
+   * Câu này cần nghe audio. Chữ tiếng Đức KHÔNG nằm ở đây - nó được cấp từng
+   * lượt qua /api/xep-lop/nghe để server đếm được số lần nghe.
+   */
+  needsAudio?: boolean;
+  /** Số lần còn được nghe. Chỉ có nghĩa khi `needsAudio`. */
+  listensLeft?: number;
   /** Số thứ tự và tổng ước lượng, để vẽ thanh tiến độ. */
   index: number;
   total: number;
@@ -81,9 +87,30 @@ export type SessionState = {
   stopped: Skill[];
   /** Người học tự bỏ qua phần Nói. */
   skippedSpeaking?: boolean;
+
+  /* ---- hồ sơ điều kiện làm bài (quy chế 1.0) ---- */
+
+  /** Thời điểm người học ký cam kết trung thực. Chưa ký thì chưa được làm bài. */
+  pledgedAt?: string;
+  /** Phiên bản quy chế áp dụng cho chính bài thi này. */
+  regulation?: string;
+  /** Số lần đã nghe từng đoạn audio. SERVER đếm, không phải client. */
+  listens?: Record<string, number>;
+  /** Thời điểm server phát mỗi câu ra, để đo thời gian làm bài. */
+  servedAt?: Record<string, string>;
+  /** Tổng số giây đã dùng cho từng kỹ năng. */
+  sectionSeconds?: Record<string, number>;
 };
 
-export const EMPTY_STATE: SessionState = { answered: [], correct: {}, skipped: [], stopped: [] };
+export const EMPTY_STATE: SessionState = {
+  answered: [],
+  correct: {},
+  skipped: [],
+  stopped: [],
+  listens: {},
+  servedAt: {},
+  sectionSeconds: {},
+};
 
 /* ------------------------------------------------------- chọn câu kế tiếp */
 
@@ -171,8 +198,20 @@ export function estimateTotal(state: SessionState): number {
   return total + 2; // một đề Viết, một đề Nói
 }
 
-/** Bản gửi ra trình duyệt: đã bỏ đáp án và lời giải thích. */
-export function publicItem(item: PlacementItem, index: number, total: number): PublicItem {
+/**
+ * Bản gửi ra trình duyệt: đã bỏ đáp án, lời giải thích, và cả câu tiếng Đức của
+ * phần Nghe.
+ *
+ * Bỏ câu tiếng Đức là điều kiện để giới hạn số lần nghe có thật. Gửi kèm nó thì
+ * client giữ sẵn chữ và phát lại bao nhiêu lần cũng được, và "được nghe tối đa
+ * hai lần" chỉ còn là một dòng chữ trong quy chế.
+ */
+export function publicItem(
+  item: PlacementItem,
+  index: number,
+  total: number,
+  listensLeft?: number,
+): PublicItem {
   const base = {
     code: item.code,
     level: item.level,
@@ -188,9 +227,8 @@ export function publicItem(item: PlacementItem, index: number, total: number): P
       kind: "mcq",
       passage: item.passage,
       options: item.options,
-      // Câu Nghe: trình duyệt cần chữ để đọc lên, nhưng giao diện KHÔNG hiển thị
-      // nó - hiện ra thì bài Nghe biến thành bài Đọc.
-      speakText: item.audioText,
+      needsAudio: Boolean(item.audioText),
+      listensLeft: item.audioText ? listensLeft : undefined,
     };
   }
   if (item.kind === "gap") {
@@ -200,7 +238,8 @@ export function publicItem(item: PlacementItem, index: number, total: number): P
       kind: "gap",
       passage: item.passage,
       hint: item.hint,
-      speakText: item.audioText,
+      needsAudio: Boolean(item.audioText),
+      listensLeft: item.audioText ? listensLeft : undefined,
     };
   }
   if (item.kind === "write") {
@@ -384,6 +423,12 @@ export async function finishSession(
   userId: number,
   sessionId: number,
   results: SkillResult[],
+  /**
+   * Hồ sơ điều kiện làm bài, ghim vào TỪNG dòng điểm. Một mức trình độ mà không
+   * kèm điều kiện tạo ra nó thì không kiểm chứng được: nghe lại mấy lần, làm
+   * trong bao lâu, có ký cam kết không.
+   */
+  record?: ExamRecord,
 ): Promise<void> {
   const db = await getDb();
 
@@ -401,7 +446,9 @@ export async function finishSession(
       levelEstimate: r.level,
       confidence: r.confidence,
       insufficientEvidence: r.insufficientEvidence,
-      evidence: r.evidence,
+      evidence: record
+        ? { ...(r.evidence as Record<string, unknown>), examRecord: record }
+        : r.evidence,
       rubricVersionId: r.skill === "writing" ? (rubric[0]?.id ?? null) : null,
     });
   }
@@ -454,4 +501,87 @@ export async function writingResponseFor(sessionId: number, userId: number) {
 
   const item = WRITE_ITEMS.find((i) => i.code === raw.code);
   return item ? { item, text: raw.text } : null;
+}
+
+/* -------------------------------------------------- điều kiện làm bài (quy chế) */
+
+/** Số lần còn được nghe một đoạn. Trả 0 khi đã hết. */
+export function listensLeftFor(state: SessionState, code: string, level: Level): number {
+  const used = state.listens?.[code] ?? 0;
+  return Math.max(0, LISTEN_LIMIT[level] - used);
+}
+
+/**
+ * Ghi nhận một lượt nghe và trả về số lần còn lại, hoặc null khi đã hết.
+ * Đếm ở server là điểm khác nhau giữa một quy định và một quy định có hiệu lực.
+ */
+export function consumeListen(
+  state: SessionState,
+  code: string,
+  level: Level,
+): number | null {
+  if (!state.listens) state.listens = {};
+  const used = state.listens[code] ?? 0;
+  if (used >= LISTEN_LIMIT[level]) return null;
+  state.listens[code] = used + 1;
+  return LISTEN_LIMIT[level] - state.listens[code];
+}
+
+/** Đánh dấu thời điểm server phát một câu ra, để đo thời gian làm câu đó. */
+export function markServed(state: SessionState, code: string): void {
+  if (!state.servedAt) state.servedAt = {};
+  if (!state.servedAt[code]) state.servedAt[code] = new Date().toISOString();
+}
+
+/**
+ * Số giây người học đã dùng cho một câu, và cộng dồn vào tổng của kỹ năng.
+ *
+ * Chặn trên 30 phút cho một câu: người học mở tab rồi đi ăn trưa không nên biến
+ * thành một con số vô nghĩa trong hồ sơ bài thi.
+ */
+export function recordElapsed(state: SessionState, code: string, skill: Skill): number {
+  const served = state.servedAt?.[code];
+  if (!served) return 0;
+  const seconds = Math.min(1800, Math.round((Date.now() - new Date(served).getTime()) / 1000));
+  if (!state.sectionSeconds) state.sectionSeconds = {};
+  state.sectionSeconds[skill] = (state.sectionSeconds[skill] ?? 0) + seconds;
+  return seconds;
+}
+
+export type ExamRecord = {
+  code: string;
+  regulation: string;
+  startedAt: string;
+  completedAt: string | null;
+  /** Tổng thời gian làm bài, tính bằng phút. */
+  minutes: number;
+  sectionSeconds: Record<string, number>;
+  pledgedAt: string | null;
+  /** Tổng số lượt nghe đã dùng trên toàn bài. */
+  listensUsed: number;
+  itemsAnswered: number;
+  itemsSkipped: number;
+};
+
+/** Hồ sơ điều kiện làm bài, in trên phiếu kết quả và lưu trong audit. */
+export function examRecordOf(
+  sessionId: number,
+  startedAt: Date,
+  completedAt: Date | null,
+  state: SessionState,
+): ExamRecord {
+  const sectionSeconds = state.sectionSeconds ?? {};
+  const total = Object.values(sectionSeconds).reduce((a, b) => a + b, 0);
+  return {
+    code: examCode(sessionId, startedAt),
+    regulation: state.regulation ?? REGULATION_VERSION,
+    startedAt: startedAt.toISOString(),
+    completedAt: completedAt ? completedAt.toISOString() : null,
+    minutes: Math.max(1, Math.round(total / 60)),
+    sectionSeconds,
+    pledgedAt: state.pledgedAt ?? null,
+    listensUsed: Object.values(state.listens ?? {}).reduce((a, b) => a + b, 0),
+    itemsAnswered: state.answered.length,
+    itemsSkipped: (state.skipped ?? []).length,
+  };
 }

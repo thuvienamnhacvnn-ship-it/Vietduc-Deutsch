@@ -4,27 +4,29 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiPost } from "@/lib/api-client";
 import { SpeakingRecorder } from "@/components/SpeakingRecorder";
+import { HONESTY_PLEDGE, LISTEN_LIMIT, SECTIONS, SECTION_MINUTES } from "@/content/quy-che-thi";
 
 type Item = {
   code: string;
   kind: "mcq" | "gap" | "write" | "speak";
-  level: string;
+  level: "A1" | "A2" | "B1" | "B2";
   skill: string;
   prompt: string;
   passage?: string;
   options?: string[];
   hint?: string;
   minWords?: number;
-  speakText?: string;
+  /** Câu này có phần nghe. Chữ tiếng Đức KHÔNG nằm ở đây. */
+  needsAudio?: boolean;
+  /** Số lượt nghe còn lại, do server cấp. */
+  listensLeft?: number;
   index: number;
   total: number;
 };
 
 type Feedback = {
   correct: boolean;
-  /** Chỉ số đáp án đúng, chỉ có ở câu trắc nghiệm. */
   answer: number | null;
-  /** Từ cần điền, chỉ có ở câu điền. */
   expected: string | null;
   why: string;
 } | null;
@@ -39,11 +41,17 @@ const SKILL_LABEL: Record<string, string> = {
 /**
  * Bài kiểm tra xếp lớp: mỗi màn một câu.
  *
- * Vì sao một câu một màn: người học đang ở mức A1 mà nhìn thấy hai mươi câu
- * tiếng Đức cùng lúc thì bỏ ngay. Một câu, một nút, một thanh tiến độ.
+ * QUY CHẾ được THI HÀNH ở đây, không chỉ được trưng bày:
  *
- * Câu Nghe được đọc bằng bộ đọc sẵn có của trình duyệt và giao diện nói rõ điều
- * đó. Đây là bản dự phòng có nhãn, không phải dịch vụ giọng nói của Lingora.
+ *  - Bài chỉ bắt đầu sau khi người học ký cam kết trung thực; server từ chối
+ *    tạo phiên nếu chưa có cam kết.
+ *  - Câu tiếng Đức của phần Nghe KHÔNG nằm trong dữ liệu câu hỏi. Mỗi lần nghe
+ *    là một request tới server và server đếm. Nghe chậm cũng tính một lượt.
+ *  - Thời gian làm từng câu do server đo từ lúc phát câu ra, không tin đồng hồ
+ *    của client.
+ *
+ * Một câu một màn: người học ở mức A1 nhìn thấy hai mươi câu tiếng Đức cùng lúc
+ * thì bỏ ngay.
  */
 export function PlacementTest() {
   const router = useRouter();
@@ -56,13 +64,14 @@ export function PlacementTest() {
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"loading" | "intro" | "question" | "finishing">("loading");
   const [resumed, setResumed] = useState(false);
+  const [pledged, setPledged] = useState(false);
   const [germanVoice, setGermanVoice] = useState<SpeechSynthesisVoice | null>(null);
-  /** Câu kế tiếp, giữ lại trong lúc người học đang đọc lời giải thích. */
+  const [listensLeft, setListensLeft] = useState<number | null>(null);
+  const [playing, setPlaying] = useState(false);
   const [pendingNext, setPendingNext] = useState<Item | null>(null);
   const [pendingDone, setPendingDone] = useState(false);
-  /** Đã gửi xong đoạn ghi âm cho đề Nói đang mở. */
-  const [recorded, setRecorded] = useState(false);
   const startedRef = useRef(false);
+  const autoPlayedRef = useRef<string | null>(null);
 
   /* --------------------------------------------------------- giọng đọc */
 
@@ -70,7 +79,6 @@ export function PlacementTest() {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     const pick = () => {
       const voices = window.speechSynthesis.getVoices();
-      // Ưu tiên giọng de-DE; không có thì bất kỳ giọng tiếng Đức nào.
       const de =
         voices.find((v) => v.lang?.toLowerCase() === "de-de") ??
         voices.find((v) => v.lang?.toLowerCase().startsWith("de")) ??
@@ -83,47 +91,85 @@ export function PlacementTest() {
     return () => window.speechSynthesis.removeEventListener("voiceschanged", pick);
   }, []);
 
-  const speak = useCallback(
-    (germanText: string, slow = false) => {
-      if (!germanVoice || typeof window === "undefined") return;
+  /**
+   * Xin một lượt nghe rồi phát. Chữ tiếng Đức chỉ đến từ server và chỉ đến đúng
+   * số lần quy chế cho phép - đó là điều làm cho giới hạn có hiệu lực thật.
+   */
+  const playAudio = useCallback(
+    async (slow: boolean) => {
+      if (!sessionId || !item || !germanVoice) return;
+      setPlaying(true);
+      setError(null);
+
+      const result = await apiPost<{ text: string; listensLeft: number }>("/api/xep-lop/nghe", {
+        sessionId,
+        code: item.code,
+      });
+
+      if (!result.ok) {
+        setError(result.error.message);
+        if (result.error.code === "listen_limit") setListensLeft(0);
+        setPlaying(false);
+        return;
+      }
+
+      setListensLeft(result.data.listensLeft);
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(germanText);
+      const utterance = new SpeechSynthesisUtterance(result.data.text);
       utterance.voice = germanVoice;
       utterance.lang = germanVoice.lang || "de-DE";
       utterance.rate = slow ? 0.7 : 0.92;
+      utterance.onend = () => setPlaying(false);
+      utterance.onerror = () => setPlaying(false);
       window.speechSynthesis.speak(utterance);
     },
-    [germanVoice],
+    [sessionId, item, germanVoice],
   );
 
   /* ----------------------------------------------------------- bắt đầu */
 
-  useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
+  const load = useCallback(async (pledge: boolean) => {
+    const result = await apiPost<{
+      sessionId: number;
+      item: Item | null;
+      done: boolean;
+      resumed: boolean;
+    }>("/api/xep-lop/bat-dau", pledge ? { pledge: true } : {});
 
-    apiPost<{ sessionId: number; item: Item | null; done: boolean; resumed: boolean }>(
-      "/api/xep-lop/bat-dau",
-      {},
-    ).then((result) => {
-      if (!result.ok) {
-        setError(result.error.message);
+    if (!result.ok) {
+      // Chưa ký cam kết là trạng thái bình thường của người mới, không phải lỗi.
+      if (result.error.code === "pledge_required") {
         setPhase("intro");
         return;
       }
-      setSessionId(result.data.sessionId);
-      setResumed(result.data.resumed);
-      setItem(result.data.item);
-      setPhase(result.data.resumed ? "question" : "intro");
-    });
+      setError(result.error.message);
+      setPhase("intro");
+      return;
+    }
+
+    setSessionId(result.data.sessionId);
+    setResumed(result.data.resumed);
+    setItem(result.data.item);
+    setListensLeft(result.data.item?.listensLeft ?? null);
+    setPhase("question");
   }, []);
 
-  // Câu Nghe tự đọc một lần khi hiện ra, để người học không phải tìm nút.
   useEffect(() => {
-    if (phase !== "question" || !item?.speakText) return;
-    const timer = setTimeout(() => speak(item.speakText!), 350);
+    if (startedRef.current) return;
+    startedRef.current = true;
+    void load(false);
+  }, [load]);
+
+  // Lượt nghe đầu tiên phát tự động, đúng như trong phòng thi: đề được đọc lên
+  // một lần, người làm bài không phải đi tìm nút.
+  useEffect(() => {
+    if (phase !== "question" || !item?.needsAudio || !germanVoice) return;
+    if (autoPlayedRef.current === item.code) return;
+    if ((item.listensLeft ?? 0) <= 0) return;
+    autoPlayedRef.current = item.code;
+    const timer = setTimeout(() => void playAudio(false), 400);
     return () => clearTimeout(timer);
-  }, [item, phase, speak]);
+  }, [item, phase, germanVoice, playAudio]);
 
   /* ------------------------------------------------------------ gửi bài */
 
@@ -141,8 +187,6 @@ export function PlacementTest() {
         sessionId,
         code: item.code,
         ...(item.kind === "mcq" ? { choice: choice ?? -1 } : {}),
-        // Câu điền và bài viết dùng chung ô `text`. Thiếu "gap" ở đây từng làm
-        // mọi câu điền bị chấm sai vì server không nhận được gì.
         ...(item.kind === "gap" || item.kind === "write" ? { text } : {}),
         ...(skip ? { skip: true } : {}),
       },
@@ -155,7 +199,6 @@ export function PlacementTest() {
     }
 
     if (result.data.feedback) {
-      // Dừng lại cho người học đọc lời giải thích, rồi mới sang câu sau.
       setFeedback(result.data.feedback);
       setPendingNext(result.data.item);
       setPendingDone(result.data.done);
@@ -170,13 +213,13 @@ export function PlacementTest() {
     setFeedback(null);
     setChoice(null);
     setText("");
-    setRecorded(false);
     setBusy(false);
     if (done || !next) {
       void finish();
       return;
     }
     setItem(next);
+    setListensLeft(next.listensLeft ?? null);
   }
 
   async function finish() {
@@ -211,33 +254,50 @@ export function PlacementTest() {
   }
 
   if (phase === "intro") {
+    const totalMinutes = Object.values(SECTION_MINUTES).reduce((a, b) => a + b, 0);
     return (
       <div className="test-card test-intro">
-        <span className="badge badge--gold">Khoảng 10–15 phút</span>
-        <h1>Xem bạn đang ở đâu</h1>
+        <span className="badge badge--gold">Khoảng {totalMinutes} phút</span>
+        <h1>Quy chế bài kiểm tra xếp lớp</h1>
         <p className="lede" style={{ fontSize: "var(--fs-md)" }}>
-          Bốn phần, mỗi màn một câu. Sai cũng không sao — mục đích là tìm đúng điểm bắt đầu cho
-          bạn, không phải chấm đỗ trượt.
+          Đọc kỹ trước khi bắt đầu. Kết quả này dùng để xếp bạn vào đúng cấp độ, nên điều kiện làm
+          bài quyết định kết quả có dùng được hay không.
         </p>
 
         <ol className="test-steps">
-          <li>
-            <strong>Đọc và cấu trúc</strong>
-            <span>Câu ngắn và đoạn văn, từ dễ lên khó. Sai nhiều thì dừng sớm.</span>
-          </li>
-          <li>
-            <strong>Nghe</strong>
-            <span>Câu tiếng Đức được đọc lên. Nghe lại bao nhiêu lần cũng được.</span>
-          </li>
-          <li>
-            <strong>Viết</strong>
-            <span>Một đề ngắn, vừa đúng mức bạn vừa làm được ở phần Đọc.</span>
-          </li>
-          <li>
-            <strong>Nói</strong>
-            <span>Không bắt buộc. Bỏ qua được nếu hôm nay bạn không tiện nói.</span>
-          </li>
+          {SECTIONS.map((section) => (
+            <li key={section.skill}>
+              <strong>
+                {section.title} · khoảng {SECTION_MINUTES[section.skill]} phút
+              </strong>
+              <span>
+                {section.what}
+                <ul className="test-rules">
+                  {section.rules.map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ul>
+              </span>
+            </li>
+          ))}
         </ol>
+
+        <div className="test-pledge">
+          <h2>Cam kết của bạn</h2>
+          <ul>
+            {HONESTY_PLEDGE.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={pledged}
+              onChange={(event) => setPledged(event.target.checked)}
+            />
+            <span>Tôi đã đọc quy chế và cam kết làm bài trung thực.</span>
+          </label>
+        </div>
 
         {!germanVoice && (
           <p className="test-note">
@@ -255,10 +315,16 @@ export function PlacementTest() {
         <button
           type="button"
           className="btn btn--primary btn--block"
-          onClick={() => setPhase("question")}
-          disabled={!item}
+          disabled={!pledged || busy}
+          onClick={async () => {
+            setBusy(true);
+            setError(null);
+            await load(true);
+            setBusy(false);
+          }}
         >
-          Bắt đầu
+          {busy && <span className="spinner" aria-hidden="true" />}
+          Tôi cam kết và bắt đầu làm bài
         </button>
       </div>
     );
@@ -275,6 +341,8 @@ export function PlacementTest() {
         : item.kind === "write"
           ? text.trim().split(/\s+/).filter(Boolean).length >= 5
           : true;
+
+  const outOfListens = Boolean(item.needsAudio && listensLeft !== null && listensLeft <= 0);
 
   return (
     <div className="test-card">
@@ -301,35 +369,45 @@ export function PlacementTest() {
         </blockquote>
       )}
 
-      {item.speakText && (
+      {item.needsAudio && (
         <div className="test-audio">
           <div className="test-audio__buttons">
             <button
               type="button"
               className="btn btn--solid btn--sm"
-              onClick={() => speak(item.speakText!)}
-              disabled={!germanVoice}
+              onClick={() => void playAudio(false)}
+              disabled={!germanVoice || playing || outOfListens || Boolean(feedback)}
             >
-              ▶ Nghe
+              {playing ? "Đang phát…" : "▶ Nghe"}
             </button>
             <button
               type="button"
               className="btn btn--secondary btn--sm"
-              onClick={() => speak(item.speakText!, true)}
-              disabled={!germanVoice}
+              onClick={() => void playAudio(true)}
+              disabled={!germanVoice || playing || outOfListens || Boolean(feedback)}
             >
               Nghe chậm
             </button>
+            {listensLeft !== null && (
+              <span className="test-audio__count" aria-live="polite">
+                Còn <strong>{listensLeft}</strong>/{LISTEN_LIMIT[item.level]} lượt nghe
+              </span>
+            )}
           </div>
           <p className="test-audio__note">
-            {germanVoice
-              ? "Đọc bằng giọng đọc sẵn có của trình duyệt. Nghe lại bao nhiêu lần cũng được."
-              : "Máy của bạn chưa có giọng tiếng Đức nên không phát được câu này. Bạn bấm Bỏ qua để đi tiếp."}
+            {!germanVoice
+              ? "Máy của bạn chưa có giọng tiếng Đức nên không phát được câu này. Bấm Bỏ qua để đi tiếp; câu bỏ qua không bị tính là sai."
+              : outOfListens
+                ? "Đã hết lượt nghe. Hãy trả lời theo những gì bạn nghe được — đó chính là điều bài kiểm tra muốn đo."
+                : "Nghe chậm cũng tính là một lượt. Đọc bằng giọng đọc sẵn có của trình duyệt."}
           </p>
         </div>
       )}
 
-      <h2 className="test-prompt" lang={item.kind === "mcq" && !item.passage && !item.speakText ? "de" : undefined}>
+      <h2
+        className="test-prompt"
+        lang={item.kind === "mcq" && !item.passage && !item.needsAudio ? "de" : undefined}
+      >
         {item.prompt}
       </h2>
 
@@ -415,16 +493,13 @@ export function PlacementTest() {
         <div className="test-speak">
           <p>{item.hint}</p>
 
-          <SpeakingRecorder
-            sessionId={sessionId}
-            code={item.code}
-            onSaved={() => setRecorded(true)}
-          />
+          <SpeakingRecorder sessionId={sessionId} code={item.code} onSaved={() => undefined} />
 
           <p className="test-note" style={{ marginTop: "var(--s-5)" }}>
-            Đoạn ghi âm được gửi thẳng lên máy chủ Lingora và không đi đâu khác. Hiện chưa có bộ
-            phân tích giọng nói để chấm, nên kỹ năng Nói vẫn được ghi là <strong>chưa đánh giá
-            được</strong> — chúng tôi giữ bản ghi làm bằng chứng thay vì đoán một mức điểm cho bạn.
+            Đoạn ghi âm được gửi thẳng lên máy chủ Việt Đức và không đi đâu khác. Hiện chưa có bộ
+            phân tích giọng nói để chấm, nên kỹ năng Nói vẫn được ghi là{" "}
+            <strong>chưa đánh giá được</strong> — chúng tôi giữ bản ghi làm bằng chứng thay vì đoán
+            một mức điểm cho bạn.
           </p>
         </div>
       )}
@@ -465,10 +540,10 @@ export function PlacementTest() {
               disabled={!canSubmit || busy}
             >
               {busy && <span className="spinner" aria-hidden="true" />}
-              {item.kind === "speak" ? (recorded ? "Xong, đi tiếp" : "Tôi đã nói xong") : "Trả lời"}
+              {item.kind === "speak" ? "Tôi đã nói xong" : "Trả lời"}
             </button>
             {(item.kind === "speak" ||
-              (item.speakText && !germanVoice) ||
+              (item.needsAudio && !germanVoice) ||
               item.kind === "gap" ||
               item.kind === "write") && (
               <button

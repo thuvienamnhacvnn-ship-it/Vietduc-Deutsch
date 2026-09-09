@@ -68,7 +68,7 @@
   gap: var(--s-2);
 }
 
-.test-steps li {
+.test-steps > li {
   counter-increment: step;
   display: grid;
   grid-template-columns: 30px 1fr;
@@ -78,11 +78,11 @@
   border-bottom: 1px solid var(--line);
 }
 
-.test-steps li:last-child {
+.test-steps > li:last-child {
   border-bottom: none;
 }
 
-.test-steps li::before {
+.test-steps > li::before {
   content: counter(step);
   display: grid;
   place-items: center;
@@ -110,7 +110,7 @@
   line-height: 1.55;
 }
 
-.test-steps li::before {
+.test-steps > li::before {
   grid-row: span 2;
 }
 
@@ -569,4 +569,162 @@
   font-weight: 600;
   margin: 0;
   max-width: none;
+}
+
+/* ---------------------------------------------------- quy chế và cam kết */
+
+.test-rules {
+  margin: var(--s-2) 0 0;
+  padding-left: var(--s-5);
+  display: grid;
+  gap: 2px;
+}
+
+.test-rules li {
+  list-style: disc;
+  color: var(--muted);
+}
+
+.test-pledge {
+  margin-bottom: var(--s-6);
+  padding: var(--s-5);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--gold) 14%, var(--paper-sunken));
+  border: 1px solid var(--gold-deep);
+}
+
+.test-pledge h2 {
+  font-size: var(--fs-md);
+  margin-bottom: var(--s-3);
+}
+
+.test-pledge ul {
+  margin: 0 0 var(--s-4);
+  padding-left: var(--s-5);
+  display: grid;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+
+.test-pledge ul li {
+  list-style: disc;
+}
+
+.test-pledge .check {
+  margin-bottom: 0;
+  font-size: var(--fs-md);
+  font-weight: 560;
+}
+
+/* Số lượt nghe còn lại: đứng cạnh hai nút nghe, không phải chú thích nhỏ ở dưới
+   - đây là thông tin người làm bài cần thấy TRƯỚC khi bấm. */
+.test-audio__count {
+  font-size: var(--fs-sm);
+  color: var(--on-gold);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.test-audio__count strong {
+  font-size: var(--fs-lg);
+}
+
+/* ------------------------------------------------------- hồ sơ bài thi */
+
+.exam-record {
+  margin-top: var(--s-8);
+  border-left: 4px solid var(--brand-fill);
+}
+
+.exam-record__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-5);
+}
+
+.exam-record__head h2 {
+  font-size: var(--fs-lg);
+  margin: 0;
+}
+
+/* Mã bài thi là thứ người học đọc cho bộ phận hỗ trợ qua điện thoại, nên nó
+   phải dễ đọc từng ký tự: font đều nét, giãn chữ rộng. */
+.exam-record__code {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.06em;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+}
+
+.exam-record__grid {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin: 0 0 var(--s-5);
+}
+
+.exam-record__grid dt {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.exam-record__grid dd {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 560;
+}
+
+.exam-record__valid {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin-bottom: var(--s-4);
+  max-width: none;
+}
+
+/* Bản in: bỏ điều hướng và nút, giữ lại phiếu kết quả. Người học in ra để nộp
+   cho văn phòng tuyển sinh, và họ không cần thanh menu trên tờ giấy. */
+@media print {
+  .app-nav,
+  .site-header,
+  .site-footer,
+  .test-actions,
+  .exam-record__print,
+  .page-head p {
+    display: none !important;
+  }
+
+  .app-main {
+    padding: 0;
+  }
+
+  .card,
+  .result-card,
+  .exam-record {
+    break-inside: avoid;
+    box-shadow: none;
+    border-color: #999;
+  }
+
+  .result-hero {
+    background: none !important;
+    color: #000 !important;
+    border: 2px solid #000;
+  }
+
+  .result-hero__level,
+  .result-hero__label,
+  .result-hero__body h2,
+  .result-hero__body p {
+    color: #000 !important;
+  }
 }

@@ -6,6 +6,8 @@ import { getDb } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
 import { skillScores, SKILL_LABEL_VI, type Skill } from "@/lib/db/schema";
 import { CURRICULUM } from "@/content/curriculum";
+import { DISCLAIMER, RESULT_VALID_DAYS, SCORING } from "@/content/quy-che-thi";
+import { PrintButton } from "@/components/PrintButton";
 
 export const metadata: Metadata = { title: "Kết quả kiểm tra" };
 
@@ -38,12 +40,30 @@ export default async function ResultPage() {
     .where(eq(skillScores.userId, user.id))
     .orderBy(desc(skillScores.createdAt));
 
+  type ExamRecord = {
+    code: string;
+    regulation: string;
+    startedAt: string;
+    completedAt: string | null;
+    minutes: number;
+    pledgedAt: string | null;
+    listensUsed: number;
+    itemsAnswered: number;
+    itemsSkipped: number;
+  };
   const evidenceFor = new Map<string, Record<string, unknown>>();
   for (const row of rows) {
     if (!evidenceFor.has(row.skill)) {
       evidenceFor.set(row.skill, (row.evidence ?? {}) as Record<string, unknown>);
     }
   }
+
+  // Hồ sơ bài thi được ghim vào từng dòng điểm của cùng một lần làm bài, nên
+  // dòng mới nhất nào có nó cũng cho ra cùng một kết quả.
+  const record =
+    ([...evidenceFor.values()]
+      .map((ev) => ev.examRecord)
+      .find(Boolean) as ExamRecord | undefined) ?? null;
 
   const assessed = skills.filter((s) => !s.unknown);
   const known = assessed.map((s) => s.level!).filter(Boolean);
@@ -168,6 +188,92 @@ export default async function ResultPage() {
           );
         })}
       </div>
+
+      {/*
+        Hồ sơ bài thi. Một mức trình độ không kèm điều kiện tạo ra nó thì không
+        kiểm chứng được: làm bao lâu, nghe lại mấy lần, có ký cam kết không.
+        Đây là phần biến kết quả từ một con số thành một phiếu dùng được.
+      */}
+      {record && (
+        <section className="card exam-record">
+          <div className="exam-record__head">
+            <h2>Hồ sơ bài thi</h2>
+            <span className="exam-record__code">{record.code}</span>
+          </div>
+
+          <dl className="exam-record__grid">
+            <div>
+              <dt>Ngày làm bài</dt>
+              <dd>{new Date(record.startedAt).toLocaleString("vi-VN")}</dd>
+            </div>
+            <div>
+              <dt>Thời gian làm</dt>
+              <dd>{record.minutes} phút</dd>
+            </div>
+            <div>
+              <dt>Số câu đã làm</dt>
+              <dd>
+                {record.itemsAnswered}
+                {record.itemsSkipped > 0 ? ` (bỏ qua ${record.itemsSkipped})` : ""}
+              </dd>
+            </div>
+            <div>
+              <dt>Lượt nghe đã dùng</dt>
+              <dd>{record.listensUsed}</dd>
+            </div>
+            <div>
+              <dt>Quy chế áp dụng</dt>
+              <dd>
+                <a href="/quy-che-thi">Phiên bản {record.regulation}</a>
+              </dd>
+            </div>
+            <div>
+              <dt>Cam kết trung thực</dt>
+              <dd>
+                {record.pledgedAt
+                  ? `đã ký ${new Date(record.pledgedAt).toLocaleString("vi-VN")}`
+                  : "không có"}
+              </dd>
+            </div>
+          </dl>
+
+          <p className="exam-record__valid">
+            Kết quả có giá trị tham khảo trong {RESULT_VALID_DAYS} ngày kể từ ngày làm bài.
+          </p>
+
+          <PrintButton />
+        </section>
+      )}
+
+      <section className="card" style={{ marginTop: "var(--s-8)" }}>
+        <h2 style={{ fontSize: "var(--fs-lg)" }}>Cách chấm từng kỹ năng</h2>
+        <div className="table-scroll">
+          <table className="data">
+            <thead>
+              <tr>
+                <th>Kỹ năng</th>
+                <th>Cách chấm</th>
+                <th>Độ tin cậy</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SCORING.map((row) => (
+                <tr key={row.skill}>
+                  <td>{SKILL_LABEL_VI[row.skill]}</td>
+                  <td style={{ whiteSpace: "normal" }}>{row.how}</td>
+                  <td style={{ whiteSpace: "normal" }}>{row.confidence}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <ul className="tick" style={{ marginTop: "var(--s-5)", marginBottom: 0 }}>
+          {DISCLAIMER.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </section>
 
       <div className="card" style={{ marginTop: "var(--s-8)" }}>
         <h2 style={{ fontSize: "var(--fs-lg)" }}>Bước tiếp theo</h2>

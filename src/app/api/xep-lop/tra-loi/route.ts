@@ -1,15 +1,18 @@
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
-import { assessmentSessions, responses } from "@/lib/db/schema";
+import { assessmentSessions, responses, type Skill } from "@/lib/db/schema";
 import { apiUser } from "@/lib/auth/guard";
 import {
   autoIsCorrect,
   estimateTotal,
+  listensLeftFor,
+  markServed,
   nextItem,
   publicItem,
   questionVersionIdFor,
   readingLevelSoFar,
+  recordElapsed,
   type SessionState,
 } from "@/lib/placement";
 import { itemByCode } from "@/content/placement";
@@ -86,10 +89,12 @@ export async function POST(request: Request) {
   if (!Array.isArray(state.skipped)) state.skipped = [];
 
   // Phần Nói được phép bỏ qua: không có mic, đang ở chỗ đông người, hoặc đơn
-  // giản là hôm nay không muốn nói.
-  if (item.kind === "speak" && skip) {
-    state.skippedSpeaking = true;
-  } else if (!state.answered.includes(code)) {
+  // giản là hôm nay không muốn nói. Việc bỏ qua vẫn được GHI LẠI như mọi câu
+  // khác - nó là một sự kiện có thật của bài thi, và hồ sơ bài thi phải đếm
+  // đúng số câu đã đi qua.
+  if (item.kind === "speak" && skip) state.skippedSpeaking = true;
+
+  if (!state.answered.includes(code)) {
     const questionVersionId = await questionVersionIdFor(code);
     if (!questionVersionId) {
       return Response.json(
@@ -98,14 +103,17 @@ export async function POST(request: Request) {
       );
     }
 
+    // Thời gian làm câu này, tính từ lúc server phát nó ra. Vào hồ sơ bài thi.
+    const seconds = recordElapsed(state, code, item.skill as Skill);
+
     const raw =
       item.kind === "mcq"
-        ? { code, choice: skip ? null : (choice ?? null), skipped: Boolean(skip) }
+        ? { code, choice: skip ? null : (choice ?? null), skipped: Boolean(skip), seconds }
         : item.kind === "gap"
-          ? { code, text: skip ? "" : (text ?? ""), skipped: Boolean(skip) }
+          ? { code, text: skip ? "" : (text ?? ""), skipped: Boolean(skip), seconds }
           : item.kind === "write"
-            ? { code, text: text ?? "", skipped: Boolean(skip) }
-            : { code, spoken: false };
+            ? { code, text: text ?? "", skipped: Boolean(skip), seconds }
+            : { code, spoken: false, skipped: Boolean(skip), seconds };
 
     // Bỏ qua khác với trả lời sai. Câu bỏ qua không có điểm, và hàm chấm loại
     // nó khỏi phép tính thay vì coi là một câu làm hỏng.
@@ -127,12 +135,15 @@ export async function POST(request: Request) {
     if (isCorrect !== null) state.correct[code] = isCorrect;
   }
 
+  const next = nextItem(state, readingLevelSoFar(state));
+  // Đóng dấu thời điểm phát câu kế tiếp trước khi lưu, để chỉ ghi database một
+  // lần cho cả câu vừa trả lời lẫn câu sắp hiện.
+  if (next) markServed(state, next.code);
+
   await db
     .update(assessmentSessions)
     .set({ resumeState: state })
     .where(eq(assessmentSessions.id, sessionId));
-
-  const next = nextItem(state, readingLevelSoFar(state));
 
   return Response.json({
     saved: true,
@@ -148,7 +159,14 @@ export async function POST(request: Request) {
             why: item.why,
           }
         : null,
-    item: next ? publicItem(next, state.answered.length + 1, estimateTotal(state)) : null,
+    item: next
+      ? publicItem(
+          next,
+          state.answered.length + 1,
+          estimateTotal(state),
+          listensLeftFor(state, next.code, next.level),
+        )
+      : null,
     done: next === null,
   });
 }
