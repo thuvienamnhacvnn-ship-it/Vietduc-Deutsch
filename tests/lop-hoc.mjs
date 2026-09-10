@@ -1,10 +1,10 @@
 /**
  * Kiểm thử lớp học nói, ôn tập và gói học - chạy qua HTTP thật.
  *
- * Bản cài dùng để kiểm thử KHÔNG có engine giảng dạy và cũng chưa duyệt bài
- * nào, nên phần lớn phép kiểm ở đây là về chuyện hệ thống nói thật:
+ * Phần lớn phép kiểm ở đây là về chuyện hệ thống nói thật, và chúng được viết
+ * để chạy đúng dù bài đã duyệt hay chưa:
  *
- *   - chưa duyệt bài thì học viên không vào lớp được (chứ không phải vào rồi
+ *   - học viên KHÔNG BAO GIỜ nhận được bài chưa duyệt (chứ không phải vào rồi
  *     mới báo lỗi)
  *   - chưa có engine thì trả 503 kèm câu giải thích, KHÔNG bịa lời giảng
  *   - giá chưa duyệt thì không đặt mua được, dù giao diện có hiện nút
@@ -77,17 +77,34 @@ async function main() {
     method: "POST",
     body: JSON.stringify({ lesson: "A1-B01" }),
   });
-  // Bài mẫu được nạp ở trạng thái chờ duyệt, nên học viên KHÔNG thấy nó.
-  check(
-    "bài chưa duyệt thì học viên không mở được lớp",
-    start.status === 404,
-    `nhận ${start.status}`,
-  );
-  check(
-    "câu từ chối nói rõ là chưa có bài, không phải lỗi hệ thống",
-    typeof start.body?.error?.message === "string" && start.body.error.message.length > 5,
-    JSON.stringify(start.body),
-  );
+
+  /*
+   * Bất biến thật ở đây KHÔNG phải "bài luôn bị từ chối" - nó phụ thuộc vào
+   * việc người biên tập đã bấm duyệt hay chưa, tức là dữ liệu, không phải luật.
+   *
+   * Luật là: học viên KHÔNG BAO GIỜ nhận được một bài chưa duyệt. Bản trước của
+   * tệp này ghim cứng "phải trả 404", nên đúng ngày ai đó duyệt bài là bộ kiểm
+   * thử chuyển sang đỏ dù sản phẩm chạy đúng.
+   */
+  if (start.status === 200) {
+    check(
+      "bài học viên mở được LUÔN là bài đã duyệt",
+      start.body?.lesson?.published === true,
+      JSON.stringify(start.body?.lesson?.published),
+    );
+    check(
+      "mở lớp trả về câu Anna mở lời để người học đọc trước",
+      typeof start.body?.opener?.de === "string" && start.body.opener.de.length > 5,
+      JSON.stringify(start.body?.opener?.de ?? null),
+    );
+  } else {
+    check("bài chưa duyệt thì học viên không mở được lớp", start.status === 404, `nhận ${start.status}`);
+    check(
+      "câu từ chối nói rõ là chưa có bài, không phải lỗi hệ thống",
+      typeof start.body?.error?.message === "string" && start.body.error.message.length > 5,
+      JSON.stringify(start.body),
+    );
+  }
 
   const badLesson = await learner("/api/lop-hoc/bat-dau", {
     method: "POST",
