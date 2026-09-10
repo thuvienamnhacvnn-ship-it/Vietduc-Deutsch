@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth/guard";
 import { activeEntitlements, dueReviewCount, profileFor, skillStateFor } from "@/lib/queries";
 import { SKILL_LABEL_VI } from "@/lib/db/schema";
 import { ResendVerification } from "@/components/auth/ResendVerification";
-import { adapterStatus } from "@/lib/config";
+import { adapterStatus, config } from "@/lib/config";
 
 export const metadata: Metadata = { title: "Bảng học" };
 
@@ -42,7 +42,9 @@ export default async function LearnHome() {
         </p>
       </div>
 
-      {!user.emailVerified && (
+      {/* Đang tạm tắt xác minh email thì không nhắc: bảo người ta làm một việc
+          họ không làm được là cách nhanh nhất để họ mất tin vào phần còn lại. */}
+      {config.requireEmailVerification && !user.emailVerified && (
         <div className="alert alert--warning">
           <div>
             <p>

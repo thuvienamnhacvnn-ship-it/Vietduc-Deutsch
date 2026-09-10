@@ -15,6 +15,21 @@ export const config = {
   /** Múi giờ hiển thị mặc định; hồ sơ học viên ghi đè được. */
   defaultTimezone: process.env.LINGORA_DEFAULT_TZ ?? "Europe/Berlin",
   audioRetentionDays: Number(process.env.LINGORA_AUDIO_RETENTION_DAYS ?? 30),
+  /**
+   * Có bắt học viên xác minh email hay không.
+   *
+   * MẶC ĐỊNH LÀ CÓ. Đặt biến thành "0" để tạm tắt trong giai đoạn cho người
+   * dùng thử, khi chưa nối được máy chủ gửi thư - lúc đó gửi thư xác minh chỉ
+   * tạo ra một việc người học không làm được.
+   *
+   * Tắt cờ này KHÔNG đánh dấu tài khoản là đã xác minh: dữ liệu vẫn ghi đúng sự
+   * thật, chỉ là giao diện của học viên không nhắc nữa. Bật lại là mọi tài khoản
+   * chưa xác minh lại hiện nhắc, không mất mát gì.
+   *
+   * Nhớ rằng khi tắt thì "quên mật khẩu" cũng không dùng được, vì nó đi qua
+   * chính đường thư đó.
+   */
+  requireEmailVerification: process.env.LINGORA_YEU_CAU_XAC_MINH_EMAIL !== "0",
 } as const;
 
 /**

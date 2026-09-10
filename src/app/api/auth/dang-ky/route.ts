@@ -7,6 +7,7 @@ import { createSession, issueAuthToken } from "@/lib/auth/session";
 import { sendMail, verifyEmailMail } from "@/lib/adapters/mail";
 import { clientIp, hit, tooMany } from "@/lib/rate-limit";
 import { audit } from "@/lib/audit";
+import { config } from "@/lib/config";
 
 /** Phiên bản văn bản pháp lý mà người dùng đồng ý. Tăng khi văn bản đổi. */
 const LEGAL_VERSION = "0.1-draft";
@@ -86,16 +87,19 @@ export async function POST(request: Request) {
     { userId, kind: "marketing_contact", granted: marketingContact, documentVersion: LEGAL_VERSION, ip },
   ]);
 
-  const token = await issueAuthToken(userId, "verify_email");
-  const mail = await sendMail(verifyEmailMail(email, name, token));
+  // Tắt xác minh thì KHÔNG sinh token và KHÔNG gửi thư: một token nằm đó không
+  // ai dùng chỉ là một chìa khóa thừa nằm trong cơ sở dữ liệu.
+  const mail = config.requireEmailVerification
+    ? await sendMail(verifyEmailMail(email, name, await issueAuthToken(userId, "verify_email")))
+    : null;
 
   await createSession(userId);
   await audit({ actorUserId: userId, action: "auth.register", entity: "users", entityId: userId, ip });
 
   return Response.json({
     ok: true,
-    needsVerification: true,
+    needsVerification: config.requireEmailVerification,
     // Nói rõ thư đang được gửi bằng adapter mock, để không ai tưởng đã có email thật.
-    mailMode: mail.mode,
+    mailMode: mail?.mode ?? null,
   });
 }
