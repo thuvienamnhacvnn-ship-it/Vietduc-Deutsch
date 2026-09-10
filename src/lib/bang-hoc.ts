@@ -146,7 +146,19 @@ export async function learnerHome(userId: number): Promise<LearnerHome> {
   const chuaHoc = danhSach.filter((l) => l.state === "new");
   const dungMuc = level ? chuaHoc.find((l) => l.level === level) : undefined;
   const next = dangDo ?? dungMuc ?? chuaHoc[0] ?? danhSach[0] ?? null;
-  const after = next ? (danhSach.find((l) => l.code !== next.code && l.state !== "done") ?? null) : null;
+
+  /*
+   * "Sau đó" phải là buổi ĐỨNG SAU buổi tiếp theo trong lộ trình, không phải
+   * buổi chưa học đầu tiên trong danh sách. Lấy theo danh sách thì người đang ở
+   * B2 được gợi ý học tiếp bài A1 đầu tiên - đúng về mặt "chưa học", vô nghĩa
+   * về mặt lộ trình.
+   */
+  const xepLo = [...danhSach].sort(
+    (a, b) => ORDER.indexOf(a.level) - ORDER.indexOf(b.level) || a.code.localeCompare(b.code),
+  );
+  const viTri = next ? xepLo.findIndex((l) => l.code === next.code) : -1;
+  const after =
+    viTri >= 0 ? (xepLo.slice(viTri + 1).find((l) => l.state !== "done") ?? null) : null;
 
   const tz = profile.timezone || "Europe/Berlin";
   const days = new Set(spokenRows.map((r) => ngay(r.createdAt, tz)));
