@@ -762,3 +762,50 @@
 .test-rights ul li {
   list-style: disc;
 }
+
+/* ================================================ XOÁ LỊCH SỬ BÀI KIỂM TRA */
+
+/*
+ * Khối làm lại nằm TÁCH khỏi hai nút điều hướng ở trên: một thao tác xoá không
+ * nên đứng cùng hàng với những thao tác vô hại. Người ta bấm theo thói quen vị
+ * trí, không đọc lại nhãn mỗi lần.
+ */
+.ket-qua__lam-lai {
+  margin-top: var(--s-7);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+}
+
+.ket-qua__lam-lai p {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  max-width: 62ch;
+  margin-bottom: var(--s-3);
+}
+
+.reset-xac-nhan {
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--gold-deep);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--gold) 12%, var(--paper-sunken));
+  max-width: 46rem;
+}
+
+.reset-xac-nhan ul {
+  margin: var(--s-3) 0;
+  padding-left: var(--s-5);
+  display: grid;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.reset-xac-nhan li {
+  list-style: disc;
+}
+
+.reset-xac-nhan__row {
+  display: flex;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}

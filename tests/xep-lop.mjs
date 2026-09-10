@@ -295,6 +295,59 @@ async function main() {
     String(readD?.confidence),
   );
 
+  /* ------------------------------------ 2e. xoá lịch sử để làm lại từ đầu */
+  console.log("\nXoá lịch sử bài kiểm tra");
+  const lamLai = await newLearner("lam-lai");
+  const runE = await takeTest(lamLai, right, 6);
+  await finish(lamLai, runE.sessionId);
+
+  const truoc = await lamLai("/api/tien-do");
+  const daDo = (truoc.body?.skills ?? []).filter((s) => !s.unknown).length;
+  check("trước khi xoá đã có kỹ năng được đánh giá", daDo > 0, `${daDo} kỹ năng`);
+
+  const xoa = await lamLai("/api/xep-lop/lam-lai", { method: "POST", body: JSON.stringify({}) });
+  check("xoá lịch sử thành công", xoa.status === 200, `nhận ${xoa.status}`);
+  check(
+    "báo đúng số thứ đã xoá, không im lặng",
+    xoa.body?.sessions >= 1 && xoa.body?.responses >= 1,
+    JSON.stringify(xoa.body),
+  );
+
+  const sau = await lamLai("/api/tien-do");
+  check(
+    "sau khi xoá thì không còn kỹ năng nào được đánh giá",
+    (sau.body?.skills ?? []).every((s) => s.unknown),
+    JSON.stringify((sau.body?.skills ?? []).map((s) => s.level)),
+  );
+
+  const lai = await lamLai("/api/xep-lop/bat-dau", {
+    method: "POST",
+    body: JSON.stringify({ pledge: true }),
+  });
+  check("làm lại được ngay, và là một phiên mới", lai.status === 200 && lai.body.sessionId !== runE.sessionId, `${lai.status}`);
+
+  const khach = makeClient();
+  const trom = await khach("/api/xep-lop/lam-lai", {
+    method: "POST",
+    body: JSON.stringify({ userId: 1 }),
+  });
+  check(
+    "khách không xoá được lịch sử của người khác",
+    trom.status === 401 || trom.status === 403 || trom.status === 404,
+    `nhận ${trom.status}`,
+  );
+
+  const hocVienKhac = await newLearner("khong-phai-quan-tri");
+  const vuot = await hocVienKhac("/api/xep-lop/lam-lai", {
+    method: "POST",
+    body: JSON.stringify({ userId: 1 }),
+  });
+  check(
+    "học viên thường không xoá được lịch sử của người khác",
+    vuot.status === 403 || vuot.status === 404,
+    `nhận ${vuot.status}`,
+  );
+
   /* ------------------------------------- 2b. chấm câu điền, gõ không dấu Đức */
   console.log("\nCâu điền đáp án");
   const typer = await newLearner("go-tay");

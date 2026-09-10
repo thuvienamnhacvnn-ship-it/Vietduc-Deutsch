@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
 import { requireStaff } from "@/lib/auth/guard";
+import { ResetPlacement } from "@/components/ResetPlacement";
 import { getDb } from "@/lib/db";
 import { learnerProfiles, users } from "@/lib/db/schema";
 
@@ -62,6 +63,7 @@ export default async function AdminLearners() {
                 <th>Mục tiêu</th>
                 <th>Giờ/tuần</th>
                 <th>Đăng nhập gần nhất</th>
+                <th>Bài kiểm tra</th>
               </tr>
             </thead>
             <tbody>
@@ -82,7 +84,13 @@ export default async function AdminLearners() {
                   <td>
                     {row.lastLoginAt ? new Date(row.lastLoginAt).toLocaleString("vi-VN") : "chưa"}
                   </td>
-                </tr>
+                                  {/* Reset theo yêu cầu của học viên: đề lặp vì đã thi quá nhiều
+                      lần, hoặc lần thi trước hỏng giữa chừng. Thao tác ghi vào
+                      nhật ký kèm tên người bấm. */}
+                  <td>
+                    <ResetPlacement userId={row.id} label="Cho làm lại" compact />
+                  </td>
+</tr>
               ))}
             </tbody>
           </table>

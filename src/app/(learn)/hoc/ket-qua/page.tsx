@@ -9,6 +9,7 @@ import { CURRICULUM } from "@/content/curriculum";
 import { recommendCourse } from "@/content/khoa-hoc";
 import { DISCLAIMER, RESULT_VALID_DAYS, SCORING } from "@/content/quy-che-thi";
 import { PrintButton } from "@/components/PrintButton";
+import { ResetPlacement } from "@/components/ResetPlacement";
 
 export const metadata: Metadata = { title: "Kết quả kiểm tra" };
 
@@ -354,6 +355,25 @@ export default async function ResultPage() {
           <Link href="/hoc/xep-lop" className="btn btn--secondary">
             Làm lại bài kiểm tra
           </Link>
+        </div>
+
+        {/*
+          Hai đường làm lại, và chúng khác nhau:
+
+          "Làm lại bài kiểm tra" ở trên giữ nguyên lịch sử - lần thi mới nằm
+          cạnh lần cũ, và hệ thống tránh những câu đã gặp.
+
+          Nút dưới đây XOÁ lịch sử. Cần khi ai đó đã thi nhiều lần và đề bắt đầu
+          lặp, hoặc khi họ muốn bắt đầu lại sạch sẽ. Nó nằm tách xuống dưới,
+          không cùng hàng với hai nút kia, vì một thao tác xoá không nên đứng
+          cạnh những thao tác vô hại.
+        */}
+        <div className="ket-qua__lam-lai">
+          <p>
+            Đã thi nhiều lần và thấy câu hỏi lặp lại? Xoá lịch sử để đề rộng trở lại. Buổi học nói,
+            thẻ ôn tập và gói học của bạn không bị đụng tới.
+          </p>
+          <ResetPlacement label="Xoá lịch sử và làm lại từ đầu" compact />
         </div>
       </div>
     </>
