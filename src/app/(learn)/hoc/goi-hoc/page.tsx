@@ -63,7 +63,7 @@ export default async function PlansPage() {
       <h2 style={{ fontSize: "var(--fs-lg)", marginBottom: "var(--s-4)" }}>Các gói</h2>
       <div className="lesson-grid" style={{ marginBottom: "var(--s-8)" }}>
         {plans.map((plan) => (
-          <div key={plan.versionId} className="lesson-card" style={{ cursor: "default" }}>
+          <div key={plan.versionId} className="lesson-card lesson-card--tinh">
             <div className="lesson-card__top">
               <span className="badge badge--gold">{money(plan.priceCents, plan.currency)}</span>
               <span className="badge">{plan.billingPeriod}</span>
@@ -113,7 +113,7 @@ export default async function PlansPage() {
         <section className="card">
           <h2 style={{ fontSize: "var(--fs-lg)" }}>Đơn của bạn</h2>
           <div className="table-scroll">
-            <table className="data">
+            <table className="data data--stack">
               <thead>
                 <tr>
                   <th>Mã chuyển khoản</th>
@@ -126,13 +126,13 @@ export default async function PlansPage() {
               <tbody>
                 {orders.map((o) => (
                   <tr key={o.id}>
-                    <td>
+                    <td data-label="Mã chuyển khoản">
                       <strong>{o.code}</strong>
                     </td>
-                    <td>{o.planName}</td>
-                    <td>{money(o.amountCents, o.currency)}</td>
-                    <td>{STATUS_VI[o.status] ?? o.status}</td>
-                    <td>{new Date(o.createdAt).toLocaleDateString("vi-VN")}</td>
+                    <td data-label="Gói">{o.planName}</td>
+                    <td data-label="Số tiền">{money(o.amountCents, o.currency)}</td>
+                    <td data-label="Trạng thái">{STATUS_VI[o.status] ?? o.status}</td>
+                    <td data-label="Ngày đặt">{new Date(o.createdAt).toLocaleDateString("vi-VN")}</td>
                   </tr>
                 ))}
               </tbody>

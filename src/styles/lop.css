@@ -36,6 +36,21 @@
   box-shadow: var(--shadow-2);
 }
 
+/*
+ * Bản TĨNH: cùng hình dạng thẻ nhưng không bấm được (thẻ gói học, nơi nút mua
+ * nằm bên trong). Thẻ nhấc lên khi rê chuột mà bấm vào không đi đâu là một lời
+ * hứa hụt; trên cảm ứng còn tệ hơn - trạng thái rê chuột dính lại sau khi chạm.
+ */
+.lesson-card--tinh {
+  cursor: default;
+}
+
+.lesson-card--tinh:hover {
+  border-color: var(--line);
+  transform: none;
+  box-shadow: none;
+}
+
 .lesson-card__top {
   display: flex;
   flex-wrap: wrap;

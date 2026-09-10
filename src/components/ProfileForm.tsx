@@ -113,7 +113,7 @@ export function ProfileForm({
 
       <div className="card card--flat" style={{ marginBottom: "var(--s-7)" }}>
         <h2 style={{ fontSize: "var(--fs-md)" }}>Tài khoản</h2>
-        <p style={{ color: "var(--muted)", fontSize: "var(--fs-sm)" }}>
+        <p className="ho-so-ai">
           {name} · {email}
         </p>
 
@@ -248,7 +248,7 @@ export function ProfileForm({
         ))}
       </fieldset>
 
-      <button type="submit" className="btn btn--primary" disabled={busy}>
+      <button type="submit" className="btn btn--primary ho-so-luu" disabled={busy}>
         {busy && <span className="spinner" aria-hidden="true" />}
         {busy ? "Đang lưu…" : "Lưu hồ sơ"}
       </button>

@@ -314,7 +314,7 @@ export default async function ResultPage() {
       <section className="card" style={{ marginTop: "var(--s-8)" }}>
         <h2 style={{ fontSize: "var(--fs-lg)" }}>Cách chấm từng kỹ năng</h2>
         <div className="table-scroll">
-          <table className="data">
+          <table className="data data--stack">
             <thead>
               <tr>
                 <th>Kỹ năng</th>
@@ -325,9 +325,9 @@ export default async function ResultPage() {
             <tbody>
               {SCORING.map((row) => (
                 <tr key={row.skill}>
-                  <td>{SKILL_LABEL_VI[row.skill]}</td>
-                  <td style={{ whiteSpace: "normal" }}>{row.how}</td>
-                  <td style={{ whiteSpace: "normal" }}>{row.confidence}</td>
+                  <td data-label="Kỹ năng">{SKILL_LABEL_VI[row.skill]}</td>
+                  <td data-label="Cách chấm" style={{ whiteSpace: "normal" }}>{row.how}</td>
+                  <td data-label="Độ tin cậy" style={{ whiteSpace: "normal" }}>{row.confidence}</td>
                 </tr>
               ))}
             </tbody>
@@ -348,7 +348,7 @@ export default async function ResultPage() {
           <li>Bạn làm lại bài kiểm tra bất cứ lúc nào; kết quả mới sẽ được dùng thay cho kết quả cũ.</li>
           <li>Bài học của cấp độ này đang được biên soạn và duyệt trước khi mở.</li>
         </ul>
-        <div style={{ display: "flex", gap: "var(--s-3)", flexWrap: "wrap", marginTop: "var(--s-5)" }}>
+        <div className="hang-nut">
           <Link href="/hoc" className="btn btn--primary">
             Về bảng học
           </Link>

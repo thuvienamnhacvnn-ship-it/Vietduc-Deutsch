@@ -198,6 +198,27 @@ async function main() {
     check(`${path} mở được`, page.status === 200, `nhận ${page.status}`);
   }
 
+  /*
+   * Bảng học không được hứa suông.
+   *
+   * Bản trước của trang này in cứng "Làm bài xếp lớp (sắp có)" và "Chưa có bài
+   * học nào được xuất bản" - hai câu đúng lúc viết ra và sai ngay khi bài học
+   * được duyệt. Kiểm ở đây là kiểm cái bất biến: màn hình chính không bao giờ
+   * nói một tính năng đang chạy là "sắp có".
+   */
+  const bangHoc = await learner("/hoc");
+  const noiDung = typeof bangHoc.body === "string" ? bangHoc.body : "";
+  check(
+    "/hoc mở được, hoặc đẩy sang bài kiểm tra khi chưa đo trình độ",
+    bangHoc.status === 200 || bangHoc.status === 307,
+    `nhận ${bangHoc.status}`,
+  );
+  check(
+    "bảng học không gắn nhãn \"sắp có\" cho tính năng đang chạy",
+    !noiDung.includes("sắp có"),
+    "còn chữ 'sắp có' trong trang",
+  );
+
   console.log(`\n${passed} PASS, ${failed} FAIL`);
   process.exit(failed === 0 ? 0 : 1);
 }

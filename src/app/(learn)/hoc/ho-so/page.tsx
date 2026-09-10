@@ -21,7 +21,7 @@ export default async function ProfilePage() {
         </p>
       </div>
 
-      <div style={{ maxWidth: 680 }}>
+      <div className="kho-hep">
         <ProfileForm
           initial={{
             goal: profile.goal,

@@ -1,0 +1,705 @@
+/*
+ * KHU HỌC VIÊN - giao diện kiểu ứng dụng
+ *
+ * Trang công khai và khu học viên là hai thứ khác nhau, và cố ý trông khác
+ * nhau. Trang công khai để ĐỌC: chữ to, khoảng thở rộng, bố cục báo chí. Khu
+ * học viên để LÀM: một việc chính chiếm chỗ tốt nhất, mọi thứ còn lại là hàng
+ * bấm được cao 60px trong tầm ngón cái.
+ *
+ * Tệp này viết theo hướng điện thoại trước. Điện thoại là chỗ người ta thật sự
+ * học tiếng - trên tàu, trước giờ ngủ - còn màn hình rộng chỉ là bản nới ra của
+ * cùng bố cục đó.
+ */
+
+/* ------------------------------------------------------------------- lời chào */
+
+.hoc-chao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-bottom: var(--s-5);
+}
+
+.hoc-chao__hi {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.hoc-chao__h1 {
+  font-size: var(--fs-xl);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Huy hiệu trình độ: đủ nổi để đọc lướt, nhưng không tranh chỗ với thẻ học
+   tiếp. Nó là thông tin, không phải việc cần làm. */
+.hoc-chao__muc {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  min-width: 64px;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.1;
+  box-shadow: var(--shadow-1);
+}
+
+.hoc-chao__muc strong {
+  font-size: var(--fs-lg);
+  color: var(--brand);
+  letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------- thẻ học tiếp */
+
+/*
+ * Thẻ này là thứ duy nhất được phép to trên màn hình. Nó là câu trả lời cho
+ * "bây giờ tôi làm gì tiếp?", nên cả thẻ là một vùng bấm - không phải một thẻ
+ * có nút nhỏ ở góc.
+ */
+.tiep-tuc {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding: var(--s-5);
+  border-radius: var(--r-lg);
+  /*
+   * Dải màu trộn từ --brand-fill, KHÔNG dùng --brand-800/900. Hai biến đó là
+   * đỏ dành cho CHỮ: ở chủ đề tối chúng sáng lên để đọc được, nên lấy chúng
+   * làm điểm cuối của dải thì thẻ chuyển sang hồng nhạt đúng lúc trang tối đi.
+   * Trộn với đen/trắng thì hướng của dải giữ nguyên ở cả hai chủ đề.
+   */
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--brand-fill) 86%, #fff), transparent 60%),
+    linear-gradient(150deg, var(--brand-fill), color-mix(in srgb, var(--brand-fill) 58%, #000));
+  color: var(--on-brand-fill);
+  text-decoration: none;
+  box-shadow: var(--shadow-2);
+  transition:
+    transform var(--motion) var(--ease),
+    box-shadow var(--motion) var(--ease);
+}
+
+.tiep-tuc:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-3);
+}
+
+.tiep-tuc:active {
+  transform: translateY(0);
+}
+
+/* Hình nằm sau chữ và mờ đi: nó tạo chiều sâu, không được cạnh tranh với dòng
+   tiêu đề. Ở khung hẹp thì mờ thêm nữa để chữ luôn thắng. */
+.tiep-tuc__art {
+  position: absolute;
+  right: -18px;
+  top: 6px;
+  width: 190px;
+  height: auto;
+  opacity: 0.24;
+  pointer-events: none;
+}
+
+.tiep-tuc__nhan,
+.tiep-tuc__ten,
+.tiep-tuc__mo-ta,
+.tiep-tuc__nut {
+  position: relative;
+}
+
+.tiep-tuc__nhan {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+.tiep-tuc__cham {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.tiep-tuc__ten {
+  display: block;
+  margin-top: var(--s-2);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  /* Chừa chỗ cho hình ở góc phải, nếu không thì tiêu đề dài chạy đè lên nó. */
+  max-width: 20ch;
+}
+
+.tiep-tuc__mo-ta {
+  display: block;
+  margin-top: var(--s-3);
+  max-width: 34ch;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: color-mix(in srgb, var(--on-brand-fill) 82%, transparent);
+}
+
+.tiep-tuc__nut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-5);
+  padding: 10px var(--s-5);
+  border-radius: var(--r-pill);
+  background: var(--paper-raised);
+  color: var(--brand);
+  font-weight: 680;
+  font-size: var(--fs-sm);
+}
+
+.tiep-tuc__nut svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* -------------------------------------------------------------- hàng con số */
+
+/*
+ * Ba con số, hàng ngang, nhỏ. Chúng KHÔNG phải là thống kê để phân tích - chỉ
+ * là dấu vết công sức, đặt ngay dưới thẻ học tiếp để người vừa học xong nhìn
+ * thấy nó nhích lên.
+ */
+.so-lieu {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+
+.so-lieu__o {
+  display: grid;
+  gap: 2px;
+  padding: var(--s-4) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+
+.so-lieu__so {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+/* Phần "/12" nhỏ hơn và nhạt hơn: mắt đọc con số của mình trước, cái đích sau. */
+.so-lieu__tren {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.so-lieu__nhan {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------ tiêu đề khối */
+
+.muc-de {
+  margin: var(--s-8) 0 var(--s-3);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.muc-de--hang {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+
+.muc-de--hang h2 {
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+.muc-de--hang a {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ------------------------------------------------------------ hàng việc cần làm */
+
+.viec {
+  display: grid;
+  gap: var(--s-3);
+}
+
+/*
+ * Mỗi việc là một hàng cao 64px: icon - chữ - số đếm. Đây là hình dạng quen
+ * thuộc nhất của một danh sách việc trên điện thoại, và nó đọc được bằng mắt
+ * lướt trong một giây.
+ */
+.viec__hang {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: var(--s-4);
+  min-height: 64px;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+  transition:
+    border-color var(--motion) var(--ease),
+    transform var(--motion) var(--ease);
+}
+
+.viec__hang:hover {
+  border-color: var(--line-strong);
+  transform: translateX(2px);
+}
+
+.viec__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+  color: var(--muted);
+}
+
+.viec__icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+/* Ba màu, ba loại việc. Đủ để phân biệt khi lướt, không đủ để thành cầu vồng. */
+.viec__icon--on {
+  background: color-mix(in srgb, var(--gold) 22%, transparent);
+  color: var(--gold-deep);
+}
+
+.viec__icon--lop {
+  background: color-mix(in srgb, var(--skill-speaking) 16%, transparent);
+  color: var(--skill-speaking);
+}
+
+.viec__icon--do {
+  background: color-mix(in srgb, var(--skill-reading) 16%, transparent);
+  color: var(--skill-reading);
+}
+
+.viec__chu {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.viec__chu strong {
+  font-size: var(--fs-md);
+  font-weight: 640;
+  /* Tên buổi học dài không được đẩy vỡ hàng: cắt bằng ba chấm, tên đầy đủ vẫn
+     nằm trong trang buổi học. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Dòng phụ được xuống HAI dòng rồi mới cắt. Cắt ngay ở dòng đầu thì những câu
+ * như "Kỹ năng thiếu bằng chứng được ghi là chưa đánh giá" mất đúng nửa sau -
+ * phần mang nghĩa. Hai dòng vẫn giữ hàng ở khoảng 64-80px.
+ */
+.viec__chu span {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  line-height: var(--lh-snug);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.viec__dem {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding-inline: 8px;
+  border-radius: var(--r-pill);
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------- gói học */
+
+.the-goi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin-top: var(--s-8);
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+}
+
+.the-goi strong {
+  display: block;
+  font-size: var(--fs-md);
+}
+
+.the-goi p {
+  margin: 2px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  max-width: 46ch;
+}
+
+.hoc-cuoi {
+  margin-top: var(--s-6);
+  margin-bottom: 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* ============================================================ MÀN HÌNH RỘNG */
+
+/*
+ * Từ 720px trở lên không còn thanh dưới, và màn hình đủ rộng để hai cột. Bố cục
+ * vẫn là bố cục cũ nới ra - không đổi thứ tự ưu tiên, vì "làm gì tiếp" vẫn là
+ * câu hỏi quan trọng nhất trên mọi kích thước.
+ */
+@media (min-width: 720px) {
+  .hoc-chao {
+    margin-bottom: var(--s-6);
+  }
+
+  .hoc-chao__h1 {
+    font-size: var(--fs-2xl);
+  }
+
+  .tiep-tuc {
+    padding: var(--s-7) var(--s-8);
+  }
+
+  .tiep-tuc__art {
+    width: 260px;
+    right: 24px;
+    top: 14px;
+    opacity: 0.3;
+  }
+
+  .tiep-tuc__ten {
+    font-size: var(--fs-3xl);
+  }
+
+  .so-lieu {
+    gap: var(--s-4);
+  }
+
+  .so-lieu__so {
+    font-size: var(--fs-2xl);
+  }
+}
+
+/* ============================================ VỎ ỨNG DỤNG TRÊN ĐIỆN THOẠI */
+
+/*
+ * Chỉnh lại nhịp dọc của khu học viên trên màn hình hẹp.
+ *
+ * Nhịp mặc định là nhịp của trang đọc: 40px trên đỉnh, tiêu đề cỡ trang. Trên
+ * điện thoại nó đẩy việc cần làm xuống dưới mép màn hình, và người mở ứng dụng
+ * lên phải cuộn mới thấy thứ họ vào để làm. Ở đây rút ngắn phần đầu và để nội
+ * dung bắt đầu ngay.
+ *
+ * Chỉ động vào lề trên và cỡ chữ. Lề hai bên giữ nguyên var(--s-6) vì thẻ bài
+ * thi tràn mép dựa đúng vào con số đó (`margin-inline: calc(var(--s-6) * -1)`).
+ */
+@media (max-width: 719px) {
+  .app-main {
+    padding-top: var(--s-5);
+  }
+
+  .page-head {
+    margin-bottom: var(--s-6);
+  }
+
+  .page-head h1 {
+    font-size: var(--fs-xl);
+    line-height: var(--lh-snug);
+  }
+
+  .page-head p {
+    font-size: var(--fs-sm);
+  }
+
+  /* Thẻ trong khu học viên bớt độn: trên khung 390px, 24px lề trong mỗi bên
+     ngốn mất một phần tám chiều rộng. */
+  .card {
+    padding: var(--s-5);
+  }
+
+  /* Vạch nhỏ trên mục đang mở. Màu chữ đổi thôi thì ở kích thước 11px người ta
+     phải nhìn kỹ mới thấy; một vạch 16px thì thấy ngay bằng mắt lướt. */
+  .tabbar__item {
+    position: relative;
+  }
+
+  .tabbar__item[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--brand);
+  }
+
+  .tabbar__item[aria-current="page"] {
+    font-weight: 680;
+  }
+
+  .tabbar__item svg {
+    stroke-width: 1.8;
+  }
+}
+
+/* ================================================ VÁ NHỮNG CHỖ CHƯA VỪA TAY */
+
+/*
+ * MÃ CHUYỂN KHOẢN. Hai class này trước đây không có luật CSS nào - mã hiện ra
+ * như một dòng văn thường. Nó là thứ người ta phải chép lại KHÔNG ĐƯỢC SAI một
+ * ký tự vào nội dung chuyển khoản, nên nó phải là thứ nổi nhất trong khối:
+ * chữ đẳng chiều rộng, cỡ lớn, và bôi một cái là chọn trọn mã.
+ */
+.buy-done {
+  margin-top: var(--s-4);
+  padding: var(--s-5);
+  border-radius: var(--r-md);
+  background: var(--success-bg);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+}
+
+.buy-done p {
+  margin-bottom: var(--s-3);
+  font-size: var(--fs-sm);
+}
+
+.buy-done p:last-child {
+  margin-bottom: 0;
+}
+
+.buy-code {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  /* Mã dài không được đẩy vỡ thẻ trên màn hình hẹp. */
+  overflow-wrap: anywhere;
+  user-select: all;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-sm);
+  background: var(--paper-raised);
+  border: 1px dashed var(--line-strong);
+}
+
+/* Khối biểu mẫu hẹp lại cho dễ đọc: một dòng nhập dài hết màn hình rộng thì mắt
+   phải quét quá xa giữa nhãn và ô. */
+.kho-hep {
+  max-width: 42.5rem;
+}
+
+/* Hàng nút "bước tiếp theo" ở trang kết quả. Trên màn hình rộng nằm ngang,
+   trên điện thoại xếp dọc (luật ở khối max-width bên dưới). */
+.hang-nut {
+  display: flex;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  margin-top: var(--s-5);
+}
+
+/* Dòng "Tên · email" ở hồ sơ. Email dài là chuỗi không khoảng trắng. */
+.ho-so-ai {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+/* Số tài khoản, IBAN, email: chuỗi dài không có khoảng trắng. Không cho ngắt
+   thì chúng đẩy ngang cả lưới trên khung 390px. */
+.exam-record__grid dd,
+.ho-so-ai {
+  overflow-wrap: anywhere;
+}
+
+/* Ô chọn nhiều lựa chọn: hộp 20px không phải là vùng bấm. Cả hàng mới là. */
+.check {
+  min-height: 44px;
+  align-items: center;
+}
+
+@media (max-width: 719px) {
+  /*
+   * Nút nhỏ vẫn phải bấm được bằng ngón tay. 38px là cỡ của chuột, không phải
+   * cỡ của ngón cái - trên điện thoại nâng hết về 44px, ngưỡng dưới mà cả
+   * Apple lẫn Google đều lấy làm mức tối thiểu.
+   */
+  .btn--sm {
+    min-height: 44px;
+  }
+
+  /* Bảng rộng tràn ra sát mép để phần cuộn được rộng nhất có thể. Nằm trong
+     thẻ có lề trong thì vùng cuộn chỉ còn chưa tới 300px. */
+  .table-scroll {
+    margin-inline: calc(var(--s-5) * -1);
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  /* Tiêu đề trong lớp học và màn chuẩn bị: cỡ trang, đặt trên khung hẹp thì
+     ngốn hai dòng rưỡi trước khi tới nội dung. */
+  .lop__head h1,
+  .lop-chuan-bi h1 {
+    font-size: var(--fs-xl);
+    line-height: var(--lh-snug);
+  }
+
+  /* Thẻ khoá học gợi ý: bớt độn và cho phần đầu xuống dòng, nếu không thì tên
+     khoá chỉ còn chưa tới 180px bên cạnh mã cấp độ. */
+  .course-pick {
+    padding: var(--s-5);
+  }
+
+  .course-pick__head {
+    flex-wrap: wrap;
+  }
+
+  /* Nút lưu nằm cuối một biểu mẫu dài; trên điện thoại cho nó chiếm trọn chiều
+     ngang để ngón cái không phải nhắm. */
+  .ho-so-luu {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hàng nút cuối trang kết quả: xếp dọc, mỗi nút một hàng đầy chiều ngang. */
+  .hang-nut {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hang-nut .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ------------------------------------------------ bảng xếp chồng trên mobile */
+
+/*
+ * Một bảng năm cột trên khung 390px là một bảng phải kéo ngang mới đọc được, và
+ * người ta sẽ không kéo. Dưới 720px, `table.data.data--stack` bỏ hàng tiêu đề đi và
+ * biến MỖI DÒNG thành một thẻ nhỏ, tên cột đi kèm từng ô (`data-label`).
+ *
+ * Chỉ áp cho bảng đã gắn thêm class này - bảng nào thật sự cần so sánh theo cột
+ * thì vẫn cuộn ngang như cũ.
+ */
+@media (max-width: 719px) {
+  table.data.data--stack,
+  table.data.data--stack tbody,
+  table.data.data--stack tr,
+  table.data.data--stack td {
+    display: block;
+    width: auto;
+    min-width: 0;
+    white-space: normal;
+  }
+
+  table.data.data--stack {
+    min-width: 0;
+    /* `width: auto` ở luật chung phía trên làm bảng co lại theo nội dung; trả
+       lại 100% để nó lấp đầy thẻ, nếu không cột giá trị bị bóp hẹp vô cớ. */
+    width: 100%;
+  }
+
+  table.data.data--stack thead {
+    /* Ẩn khỏi mắt nhưng vẫn còn trong cây: bảng mất hàng tiêu đề thì trình đọc
+       màn hình không còn gọi tên được từng ô. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  table.data.data--stack tr {
+    padding: var(--s-4) var(--s-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  table.data.data--stack tr:last-child {
+    border-bottom: 0;
+  }
+
+  table.data.data--stack td {
+    display: grid;
+    grid-template-columns: minmax(80px, 28%) 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-1) 0;
+    border: 0;
+  }
+
+  table.data.data--stack td::before {
+    content: attr(data-label);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Bảng đã xếp chồng thì không còn gì để cuộn - trả lại viền và góc bo. */
+  .table-scroll:has(table.data.data--stack) {
+    margin-inline: 0;
+    border-radius: var(--r-md);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+}
