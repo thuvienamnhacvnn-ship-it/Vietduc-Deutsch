@@ -17,7 +17,7 @@
 import type { Level, Skill } from "@/lib/db/schema";
 
 /** Phiên bản quy chế. Mỗi bài thi ghi lại phiên bản đã áp dụng cho nó. */
-export const REGULATION_VERSION = "2.0";
+export const REGULATION_VERSION = "2.1";
 
 /** Kết quả xếp lớp có hiệu lực bao lâu trước khi nên kiểm tra lại. */
 export const RESULT_VALID_DAYS = 180;
@@ -52,6 +52,25 @@ export const SECTION_MINUTES: Record<Skill, number> = {
   speaking: 3,
 };
 
+/**
+ * Thời gian chuẩn bị trước khi vào phần Nghe và phần Nói, tính bằng giây.
+ *
+ * Kỳ thi thật KHÔNG bao giờ bật băng ngay khi thí sinh vừa lật trang: người ta
+ * được đọc câu hỏi trước, và với phần nói thì được nghĩ trước khi mở miệng.
+ * Không có bước này thì đề đo được tốc độ phản xạ với một giao diện lạ, chứ
+ * không đo được trình độ tiếng Đức.
+ *
+ * 15 giây cho Nghe là đủ đọc một câu hỏi và bốn phương án ngắn. 60 giây cho Nói
+ * là mức các kỳ thi chuẩn dùng cho một đề nói ngắn.
+ *
+ * Cả hai đều BỎ QUA ĐƯỢC: ai đọc xong sớm thì bấm vào luôn, không phải ngồi
+ * nhìn đồng hồ chạy hết.
+ */
+export const PREP_SECONDS = {
+  listening: 15,
+  speaking: 60,
+} as const;
+
 export type Section = {
   skill: Skill;
   title: string;
@@ -77,6 +96,7 @@ export const SECTIONS: Section[] = [
     title: "Nghe hiểu",
     what: "Hai khối câu và đoạn thoại tiếng Đức được đọc lên, kèm câu hỏi hiểu ý. Bắt đầu ở mức vừa với phần Đọc của bạn.",
     rules: [
+      `Bạn được ${PREP_SECONDS.listening} giây đọc câu hỏi trước khi đoạn nghe phát. Đọc xong sớm thì bấm phát luôn.`,
       `Mỗi đoạn được nghe tối đa ${LISTEN_LIMIT.A1} lần. Hệ thống đếm và hiện số lần còn lại.`,
       "Nghe chậm tính là một lần nghe.",
       "Thiết bị không phát được tiếng Đức thì bỏ qua; câu bỏ qua không bị tính là sai.",
@@ -96,6 +116,7 @@ export const SECTIONS: Section[] = [
     title: "Nói",
     what: "Một đề nói ngắn, ghi âm trực tiếp qua micro.",
     rules: [
+      `Bạn có ${PREP_SECONDS.speaking} giây chuẩn bị: đọc đề, nghĩ ý, rồi mới ghi âm. Sẵn sàng sớm thì bấm ghi ngay.`,
       "Không bắt buộc. Bỏ qua thì kỹ năng Nói được ghi là chưa đánh giá được.",
       "Bản ghi tối đa 90 giây, nghe lại và ghi lại được trước khi gửi.",
     ],
@@ -111,6 +132,7 @@ export const SECTIONS: Section[] = [
  * liệt kê nghĩa vụ thì đọc như một cái bẫy.
  */
 export const LEARNER_RIGHTS = [
+  "Phần Nghe và phần Nói đều có thời gian chuẩn bị: bạn đọc đề trước, không bị đẩy vào giữa câu hỏi.",
   "Bạn dừng bài bất cứ lúc nào. Phần đã làm vẫn được chấm và bạn vẫn nhận được khoá học phù hợp, kết quả chỉ ghi rõ là bài dừng sớm.",
   "Mỗi lần làm là một đề khác, rút từ ngân hàng câu hỏi và tránh những câu bạn đã gặp lần trước.",
   "Bạn làm lại bài bất cứ lúc nào; kết quả mới thay cho kết quả cũ.",

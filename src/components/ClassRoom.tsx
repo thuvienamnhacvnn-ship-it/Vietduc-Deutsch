@@ -49,9 +49,9 @@ export function ClassRoom({ code }: { code: string }) {
   const [data, setData] = useState<StartData | null>(null);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
-  const [state, setState] = useState<"loading" | "ready" | "listening" | "thinking" | "error">(
-    "loading",
-  );
+  const [state, setState] = useState<
+    "loading" | "chuan-bi" | "ready" | "listening" | "thinking" | "error"
+  >("loading");
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -96,9 +96,26 @@ export function ClassRoom({ code }: { code: string }) {
         vi: res.data.opener.vi,
       },
     ]);
-    setState("ready");
-    play(res.data.opener.audio);
+    /*
+     * Dừng ở màn chuẩn bị, chưa phát tiếng.
+     *
+     * Trước đây vào lớp là Anna nói ngay. Người học chưa kịp đọc xem buổi này
+     * nói về chuyện gì, chưa biết mục tiêu, chưa nhìn qua mấy cấu trúc sắp
+     * dùng - và câu tiếng Đức đầu tiên đã trôi qua tai. Buổi học nói mà bắt đầu
+     * bằng một câu nghe hụt thì mở đầu đã hỏng.
+     *
+     * Buổi đang học dở thì vào thẳng: người ta đã đọc phần này lần trước rồi.
+     */
+    const dangHocDo = res.data.history.length > 1;
+    setState(dangHocDo ? "ready" : "chuan-bi");
+    if (dangHocDo) play(res.data.opener.audio);
   }, [code, play]);
+
+  /** Bấm "Vào buổi học": bắt đầu thật, và đây mới là lúc Anna cất tiếng. */
+  function vaoLop() {
+    setState("ready");
+    play(data?.opener.audio ?? null);
+  }
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -248,6 +265,54 @@ export function ClassRoom({ code }: { code: string }) {
   }
 
   const llmOff = data.engines.llm !== "live";
+
+  if (state === "chuan-bi") {
+    return (
+      <div className="lop-chuan-bi">
+        <span className="badge badge--gold">{data.lesson.level}</span>
+        <h1>{data.lesson.title}</h1>
+        <p className="lop-chuan-bi__tinh-huong">{data.lesson.situationVi}</p>
+
+        <div className="lop-chuan-bi__khoi">
+          <h2>Hết buổi bạn làm được</h2>
+          <p>{data.lesson.goalVi}</p>
+        </div>
+
+        <div className="lop-chuan-bi__khoi">
+          <h2>Buổi này xoay quanh</h2>
+          <ul>
+            {data.lesson.focus.map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="lop-chuan-bi__khoi">
+          <h2>Anna sẽ mở lời thế nào</h2>
+          <p lang="de" className="lop-chuan-bi__de">
+            {data.opener.de}
+          </p>
+          <p className="lop-chuan-bi__vi">{data.opener.vi}</p>
+        </div>
+
+        {llmOff && (
+          <p className="note-quiet">
+            Phần chữa lỗi đang tắt trên bản cài này: bạn vẫn học được, chỉ là sau mỗi câu sẽ không
+            có ô sửa lỗi.
+          </p>
+        )}
+
+        <p className="lop-chuan-bi__nhac">
+          Đọc xong hãy bấm vào. Anna chỉ cất tiếng sau khi bạn sẵn sàng — không ai bị đẩy vào giữa
+          câu chuyện.
+        </p>
+
+        <button type="button" className="btn btn--primary btn--block" onClick={vaoLop}>
+          Tôi đã đọc xong, vào buổi học
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="lop">

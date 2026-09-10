@@ -8,6 +8,7 @@ import {
   HONESTY_PLEDGE,
   LEARNER_RIGHTS,
   LISTEN_LIMIT,
+  PREP_SECONDS,
   SECTIONS,
   SECTION_MINUTES,
 } from "@/content/quy-che-thi";
@@ -92,6 +93,13 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
   // Engine của trường đang đọc, hay giọng máy của trình duyệt. Quyết định câu
   // giải thích dưới hai nút nghe.
   const [voiceSource, setVoiceSource] = useState<"engine" | "trinh-duyet" | null>(null);
+  /**
+   * Số giây chuẩn bị còn lại, hoặc null khi câu này không cần chuẩn bị.
+   *
+   * Có bước này vì kỳ thi thật không bật băng lúc thí sinh vừa lật trang. Bỏ nó
+   * đi thì đề đo tốc độ phản xạ với một giao diện lạ, không đo tiếng Đức.
+   */
+  const [prepLeft, setPrepLeft] = useState<number | null>(null);
   const autoPlayedRef = useRef<string | null>(null);
 
   /* --------------------------------------------------------- giọng đọc */
@@ -219,16 +227,46 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
     if (hasOpenSession) void load(false);
   }, [load, hasOpenSession]);
 
-  // Lượt nghe đầu tiên phát tự động, đúng như trong phòng thi: đề được đọc lên
-  // một lần, người làm bài không phải đi tìm nút.
+  /*
+   * ĐỒNG HỒ CHUẨN BỊ.
+   *
+   * Câu Nghe: người học được đọc câu hỏi và bốn phương án trước, rồi đoạn nghe
+   * mới phát. Câu Nói: được đọc đề và nghĩ ý trước khi micro mở.
+   *
+   * Trước đây phần Nghe tự phát sau 400 mili giây - tức là bật băng ngay lúc
+   * người ta còn chưa kịp đọc xem câu hỏi hỏi gì. Nghe hụt một lần là mất một
+   * lượt trong hai lượt được nghe.
+   *
+   * Đồng hồ chỉ đặt MỘT lần cho mỗi câu; `autoPlayedRef` giữ mã câu đã đặt để
+   * việc vẽ lại màn hình không làm đồng hồ chạy lại từ đầu.
+   */
   useEffect(() => {
-    if (phase !== "question" || !item?.needsAudio) return;
+    if (phase !== "question" || !item) return;
     if (autoPlayedRef.current === item.code) return;
-    if ((item.listensLeft ?? 0) <= 0) return;
+
+    const giay =
+      item.needsAudio && (item.listensLeft ?? 0) > 0
+        ? PREP_SECONDS.listening
+        : item.kind === "speak"
+          ? PREP_SECONDS.speaking
+          : null;
+
     autoPlayedRef.current = item.code;
-    const timer = setTimeout(() => void playAudio(false), 400);
+    setPrepLeft(giay);
+  }, [item, phase]);
+
+  // Đếm lùi từng giây. Hết giờ: câu Nghe tự phát, câu Nói mở micro.
+  useEffect(() => {
+    if (prepLeft === null || prepLeft <= 0) return;
+    const timer = setTimeout(() => setPrepLeft((n) => (n === null ? null : n - 1)), 1000);
     return () => clearTimeout(timer);
-  }, [item, phase, playAudio]);
+  }, [prepLeft]);
+
+  useEffect(() => {
+    if (prepLeft !== 0 || !item?.needsAudio) return;
+    const timer = setTimeout(() => void playAudio(false), 200);
+    return () => clearTimeout(timer);
+  }, [prepLeft, item, playAudio]);
 
   /* ------------------------------------------------------------ gửi bài */
 
@@ -434,6 +472,8 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
    * thiếu giọng thì người có engine cũng không bấm được.
    */
   const noVoiceAtAll = voiceSource === "trinh-duyet" && !germanVoice;
+  /** Còn đang trong thời gian chuẩn bị của chính câu này. */
+  const dangChuanBi = prepLeft !== null && prepLeft > 0;
 
   return (
     <div className="test-card">
@@ -460,6 +500,34 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
         </blockquote>
       )}
 
+      {/*
+        Khối chuẩn bị. Nó nằm TRƯỚC phần nghe và trước đề nói, vì đó đúng là thứ
+        tự việc: đọc trước, rồi mới nghe hoặc nói.
+      */}
+      {dangChuanBi && (
+        <div className="test-prep" role="status" aria-live="polite">
+          <div>
+            <strong>
+              {item.needsAudio
+                ? "Đọc câu hỏi trước đã"
+                : "Đọc đề và nghĩ trước khi nói"}
+            </strong>
+            <p>
+              {item.needsAudio
+                ? "Đoạn nghe sẽ phát khi hết giờ chuẩn bị. Đọc xong sớm thì bấm phát luôn."
+                : "Micro mở khi hết giờ chuẩn bị. Sẵn sàng sớm thì bấm vào đây."}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn btn--secondary btn--sm"
+            onClick={() => setPrepLeft(0)}
+          >
+            {item.needsAudio ? `Phát ngay (${prepLeft}s)` : `Tôi sẵn sàng (${prepLeft}s)`}
+          </button>
+        </div>
+      )}
+
       {item.needsAudio && (
         <div className="test-audio">
           <div className="test-audio__buttons">
@@ -467,7 +535,7 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
               type="button"
               className="btn btn--solid btn--sm"
               onClick={() => void playAudio(false)}
-              disabled={noVoiceAtAll || playing || outOfListens || Boolean(feedback)}
+              disabled={noVoiceAtAll || dangChuanBi || playing || outOfListens || Boolean(feedback)}
             >
               {playing ? "Đang phát…" : "▶ Nghe"}
             </button>
@@ -475,7 +543,7 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
               type="button"
               className="btn btn--secondary btn--sm"
               onClick={() => void playAudio(true)}
-              disabled={noVoiceAtAll || playing || outOfListens || Boolean(feedback)}
+              disabled={noVoiceAtAll || dangChuanBi || playing || outOfListens || Boolean(feedback)}
             >
               Nghe chậm
             </button>
@@ -586,7 +654,13 @@ export function PlacementTest({ hasOpenSession }: { hasOpenSession: boolean }) {
         <div className="test-speak">
           <p>{item.hint}</p>
 
-          <SpeakingRecorder sessionId={sessionId} code={item.code} onSaved={() => undefined} />
+          {/* Máy ghi âm chỉ xuất hiện sau thời gian chuẩn bị: thấy nút ghi là
+              tay tự bấm, rồi mới nhận ra mình chưa nghĩ xong. */}
+          {dangChuanBi ? (
+            <p className="test-note">Đang trong thời gian chuẩn bị. Micro sẽ mở sau {prepLeft} giây.</p>
+          ) : (
+            <SpeakingRecorder sessionId={sessionId} code={item.code} onSaved={() => undefined} />
+          )}
 
           <p className="test-note" style={{ marginTop: "var(--s-5)" }}>
             Đoạn ghi âm được gửi thẳng lên máy chủ Việt Đức và không đi đâu khác. Hiện chưa có bộ

@@ -341,3 +341,121 @@
 .the-on__row .btn {
   min-height: 52px;
 }
+
+/* =========================================================== MÀN CHUẨN BỊ */
+
+/*
+ * Trước khi vào buổi học nói.
+ *
+ * Đây không phải màn hình chờ mà là một phần của việc học: đọc tình huống, biết
+ * mục tiêu, nhìn qua mấy cấu trúc sắp dùng, và thấy trước câu Anna sẽ mở lời.
+ * Người học bấm vào thì Anna mới cất tiếng — không ai bị đẩy vào giữa câu
+ * chuyện bằng một câu tiếng Đức nghe hụt.
+ */
+.lop-chuan-bi {
+  max-width: 40rem;
+  margin-inline: auto;
+  padding-bottom: calc(var(--s-8) + env(safe-area-inset-bottom, 0px));
+}
+
+.lop-chuan-bi h1 {
+  font-size: var(--fs-2xl);
+  margin: var(--s-3) 0 var(--s-2);
+}
+
+.lop-chuan-bi__tinh-huong {
+  color: var(--muted);
+  margin-bottom: var(--s-6);
+}
+
+.lop-chuan-bi__khoi {
+  margin-bottom: var(--s-5);
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+}
+
+.lop-chuan-bi__khoi h2 {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--s-3);
+}
+
+.lop-chuan-bi__khoi p {
+  margin: 0;
+}
+
+.lop-chuan-bi__khoi ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lop-chuan-bi__khoi li {
+  font-size: var(--fs-sm);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+}
+
+.lop-chuan-bi__de {
+  font-size: var(--fs-lg);
+  line-height: 1.45;
+}
+
+.lop-chuan-bi__vi {
+  margin-top: var(--s-2) !important;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.lop-chuan-bi__nhac {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin-bottom: var(--s-5);
+}
+
+/* ====================================================== CHUẨN BỊ TRONG BÀI THI */
+
+/*
+ * Khối chuẩn bị của câu Nghe và câu Nói.
+ *
+ * Đặt trên phần nghe và trên máy ghi âm, vì đó đúng thứ tự việc: đọc trước, rồi
+ * mới nghe hoặc nói. Nút bỏ qua nằm ngay bên phải để ai đọc xong sớm không phải
+ * ngồi nhìn đồng hồ.
+ */
+.test-prep {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-5);
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--gold) 14%, var(--paper-sunken));
+  border: 1px solid var(--gold-deep);
+}
+
+.test-prep strong {
+  display: block;
+  font-size: var(--fs-md);
+}
+
+.test-prep p {
+  margin: 2px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  max-width: 46ch;
+}
+
+.test-prep .btn {
+  flex: none;
+}
