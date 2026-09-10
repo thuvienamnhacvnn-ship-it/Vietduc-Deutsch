@@ -67,7 +67,7 @@ không được lưu trong tệp nào.
 | `npm run dat-quyen -- <email> admin` | đặt vai trò cho một tài khoản |
 | `npm run icon:app` | sinh icon cho bản cài về màn hình chính |
 | `node tests/smoke.mjs` | 38 kiểm tra nền tảng và phân quyền |
-| `node tests/google.mjs` | 24 kiểm tra luồng đăng nhập Google |
+| `node tests/google.mjs` | đăng nhập Google: 24 kiểm tra ở chế độ mô phỏng, 15 khi đã cắm khoá thật |
 | `node tests/xep-lop.mjs` | 53 kiểm tra bài kiểm tra xếp lớp |
 | `node tests/lop-hoc.mjs` | 15 kiểm tra lớp học, ôn tập và gói học |
 

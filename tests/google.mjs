@@ -90,6 +90,99 @@ async function signInWithGoogle(email, name) {
   return { client, callback, state, mockUrl };
 }
 
+/**
+ * Kiểm luồng Google khi đã cắm khóa THẬT.
+ *
+ * Không đăng nhập bằng tài khoản Google của ai cả - chỉ kiểm những gì server
+ * gửi đi và những gì server từ chối nhận. Đó đúng là phần dễ cấu hình sai:
+ * thiếu PKCE, quên state, hoặc callback nhận bừa một mã bất kỳ.
+ */
+async function kiemGoogleThat() {
+  console.log("Google THẬT (bản mô phỏng đã tắt)\n");
+
+  const client = makeClient();
+  const start = await client("/api/auth/google?tiep=/hoc");
+  check("chuyển hướng sang Google", start.status === 302, `nhận ${start.status}`);
+
+  const to = new URL(start.location ?? "https://x.invalid");
+  check("đích đến là accounts.google.com", to.host === "accounts.google.com", to.host);
+
+  const q = to.searchParams;
+  check("có client_id", Boolean(q.get("client_id")), q.get("client_id") ?? "");
+  check(
+    "redirect_uri trỏ đúng về ứng dụng này",
+    q.get("redirect_uri") === new URL("/api/auth/google/callback", BASE).toString(),
+    q.get("redirect_uri") ?? "",
+  );
+  check(
+    "chỉ xin tên và email, không xin gì thêm",
+    q.get("scope") === "openid email profile",
+    q.get("scope") ?? "",
+  );
+  check("có state chống CSRF", (q.get("state") ?? "").length >= 16, q.get("state") ?? "");
+  check("có nonce chống phát lại token", (q.get("nonce") ?? "").length >= 16, q.get("nonce") ?? "");
+  check(
+    "PKCE dùng S256, không phải plain",
+    q.get("code_challenge_method") === "S256" && (q.get("code_challenge") ?? "").length >= 40,
+    `${q.get("code_challenge_method")} / ${(q.get("code_challenge") ?? "").length} ký tự`,
+  );
+  check("state được cất vào cookie", client.jar.has("lingora_oauth"));
+
+  // Hai state khác nhau giữa hai lần bấm: dùng lại state cũ là mở đường phát lại.
+  const client2 = makeClient();
+  const start2 = await client2("/api/auth/google");
+  const state2 = new URL(start2.location ?? "https://x.invalid").searchParams.get("state");
+  check("mỗi lần bấm sinh state mới", state2 !== q.get("state"), `${q.get("state")} vs ${state2}`);
+
+  const evil = await client("/api/auth/google?tiep=https://vi-du-doc-hai.test/lay-cap");
+  const evilTo = new URL(evil.location ?? "https://x.invalid");
+  check(
+    "tham số tiep trỏ ra ngoài không kéo được người dùng đi",
+    evilTo.host === "accounts.google.com",
+    evilTo.host,
+  );
+
+  /* ---- ba đường callback giả, cả ba phải bị từ chối ---- */
+  const cb = async (query, jar) => {
+    const c = jar ?? makeClient();
+    const res = await c(`/api/auth/google/callback${query}`);
+    return { status: res.status, location: res.location ?? "", coPhien: c.jar.has("lingora_session") };
+  };
+
+  const khongCookie = await cb("?code=gia&state=gia");
+  check(
+    "callback không có cookie state bị từ chối",
+    khongCookie.status === 302 && khongCookie.location.includes("loi=") && !khongCookie.coPhien,
+    `${khongCookie.status} → ${khongCookie.location}`,
+  );
+
+  const client3 = makeClient();
+  await client3("/api/auth/google");
+  const saiState = await cb("?code=gia&state=khong-phai-state-that", client3);
+  check(
+    "callback sai state bị từ chối",
+    saiState.status === 302 && saiState.location.includes("google_sai_state") && !saiState.coPhien,
+    `${saiState.status} → ${saiState.location}`,
+  );
+
+  const client4 = makeClient();
+  const s4 = await client4("/api/auth/google");
+  const stateThat = new URL(s4.location ?? "https://x.invalid").searchParams.get("state");
+  const codeGia = await cb(`?code=ma-bia-ra&state=${encodeURIComponent(stateThat ?? "")}`, client4);
+  check(
+    "state đúng nhưng code bịa thì Google từ chối, không tạo phiên",
+    codeGia.status === 302 && codeGia.location.includes("loi=") && !codeGia.coPhien,
+    `${codeGia.status} → ${codeGia.location}`,
+  );
+
+  const moPhong = await client("/api/auth/google/mo-phong", { method: "POST", body: JSON.stringify({ email: "x@y.test" }) });
+  check(
+    "đường mô phỏng KHÔNG tồn tại khi đã có khóa thật",
+    moPhong.status === 404,
+    `nhận ${moPhong.status}`,
+  );
+}
+
 async function main() {
   console.log(`Kiểm thử đăng nhập Google trên ${BASE}\n`);
   const stamp = Date.now();
@@ -98,20 +191,24 @@ async function main() {
   console.log("Bắt đầu luồng");
   const opener = makeClient();
   /*
-   * Bộ này kiểm luồng ĐĂNG NHẬP GOOGLE MÔ PHỎNG, thứ chỉ tồn tại khi chưa có
-   * khóa Google thật. Cắm khóa thật vào là bản mô phỏng tắt - đó là điều đúng
-   * đắn, không phải hỏng - nên ở đây phải bỏ qua chứ không được báo đỏ.
+   * Có hai chế độ, và mỗi chế độ kiểm được những thứ khác nhau.
    *
-   * Không bỏ qua thì mỗi lần ai đó cấu hình Google xong sẽ thấy 24 phép kiểm
-   * chuyển sang thất bại và tưởng mình vừa làm hỏng thứ gì.
+   * Chưa cắm khóa Google: chạy được toàn bộ luồng bằng bản mô phỏng, kể cả
+   * phần tạo tài khoản và gán tài khoản có sẵn.
+   *
+   * Đã cắm khóa THẬT: bản mô phỏng tắt, nên không thể tự bấm qua màn hình
+   * Google. Nhưng những thứ QUAN TRỌNG NHẤT vẫn kiểm được mà không cần một
+   * người thật ngồi bấm - và chúng được kiểm ở `kiemGoogleThat()` bên dưới:
+   * PKCE, state, nonce, chặn chuyển hướng ra ngoài, và ba đường callback giả.
+   *
+   * Bản đầu tiên của tệp này chỉ in "BỎ QUA" rồi thoát. Như thế là bỏ trận
+   * đúng lúc trận đáng đá nhất: cấu hình thật mới là thứ dễ sai.
    */
   const suckhoe = await fetch(new URL("/api/suc-khoe", BASE)).then((r) => r.json());
   if (suckhoe?.adapters?.oauth_google === "live") {
-    console.log(
-      "BỎ QUA: máy này đang dùng khóa Google THẬT, nên bản mô phỏng đã tắt.\n" +
-        "Bộ kiểm thử này chỉ chạy khi chưa cấu hình GOOGLE_CLIENT_ID.\n",
-    );
-    process.exit(0);
+    await kiemGoogleThat();
+    console.log(`\n${passed} PASS, ${failed} FAIL`);
+    process.exit(failed === 0 ? 0 : 1);
   }
 
   const start = await opener("/api/auth/google?tiep=/hoc");

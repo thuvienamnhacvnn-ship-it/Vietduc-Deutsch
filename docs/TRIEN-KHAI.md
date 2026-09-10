@@ -97,9 +97,17 @@ node tests/xep-lop.mjs https://deutsch.57-129-45-199.sslip.io
 node tests/lop-hoc.mjs https://deutsch.57-129-45-199.sslip.io
 ```
 
-`tests/google.mjs` thì KHÔNG: nó kiểm luồng đăng nhập mô phỏng, mà bản mô phỏng
-cố ý bị tắt ở production. Chính điều đó đã được kiểm trên bản đang chạy - đường
-dẫn mô phỏng trả 404 và nút Google hiện "chưa kết nối" kèm lý do.
+`tests/google.mjs` chạy được ở CẢ HAI chế độ và tự nhận ra mình đang ở chế độ
+nào:
+
+- chưa có khoá Google: đi trọn luồng bằng bản mô phỏng (24 phép kiểm)
+- đã có khoá thật: kiểm phần cấu hình và phần từ chối (15 phép kiểm) - PKCE
+  S256, state, nonce, chặn chuyển hướng ra ngoài, ba đường callback giả đều
+  phải bị từ chối, và đường mô phỏng phải trả 404
+
+Không có phép kiểm nào bị bỏ khi cắm khoá thật. Bản đầu tiên của tệp đó chỉ in
+"BỎ QUA" rồi thoát - tức là bỏ trận đúng lúc trận đáng đá nhất, vì cấu hình
+thật mới là chỗ dễ sai.
 
 ## Đổi sang tên miền chính thức
 
