@@ -6,6 +6,7 @@ import {
   randomToken,
 } from "@/lib/adapters/oauth-google";
 import { clientIp, hit, tooMany } from "@/lib/rate-limit";
+import { config } from "@/lib/config";
 
 /**
  * Bước 1 của "Tiếp tục với Google": sinh state + nonce + PKCE, cất vào cookie
@@ -33,6 +34,22 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
+
+  /*
+   * Luồng phải BẮT ĐẦU trên đúng tên miền mà Google sẽ trả người dùng về.
+   *
+   * Cookie state ở dưới gắn theo tên miền đang mở. Người dùng mở trang bằng một
+   * tên miền (vd vietduc-lingua.com) trong khi redirect_uri khai với Google là
+   * tên miền khác (LINGORA_APP_URL) thì Google trả họ về chỗ không có cookie,
+   * và callback từ chối vì sai state - đúng lỗi "không đăng nhập Google được"
+   * đã gặp thật trên điện thoại. Chuyển họ sang tên miền của APP_URL trước.
+   */
+  const appHost = new URL(config.appUrl).host;
+  const requestHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (requestHost && requestHost !== appHost) {
+    return Response.redirect(`${config.appUrl}/api/auth/google${url.search}`, 302);
+  }
+
   const rawNext = url.searchParams.get("tiep");
   // Chỉ nhận đường dẫn nội bộ. Không có bước này, `tiep=https://...` biến
   // endpoint đăng nhập thành một open redirect.

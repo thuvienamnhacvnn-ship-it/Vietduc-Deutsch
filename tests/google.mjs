@@ -204,6 +204,30 @@ async function main() {
    * Bản đầu tiên của tệp này chỉ in "BỎ QUA" rồi thoát. Như thế là bỏ trận
    * đúng lúc trận đáng đá nhất: cấu hình thật mới là thứ dễ sai.
    */
+  /*
+   * Luồng phải bắt đầu trên đúng tên miền Google sẽ trả về. Mở từ tên miền
+   * khác thì cookie state nằm sai chỗ và callback từ chối - lỗi đã gặp thật
+   * khi vào bằng vietduc-lingua.com lúc APP_URL còn là sslip.io. Chạy được ở
+   * cả hai chế độ.
+   */
+  const lech = await fetch(new URL("/api/auth/google?tiep=/hoc", BASE), {
+    headers: { "x-forwarded-host": "ten-mien-khac.example" },
+    redirect: "manual",
+  });
+  const lechTo = lech.headers.get("location") ?? "";
+  check(
+    "mở từ tên miền khác: chuyển về tên miền của APP_URL trước khi đi Google",
+    lech.status === 302 &&
+      !lechTo.includes("ten-mien-khac.example") &&
+      new URL(lechTo, BASE).pathname === "/api/auth/google" &&
+      new URL(lechTo, BASE).searchParams.get("tiep") === "/hoc",
+    `nhận ${lech.status} → ${lechTo}`,
+  );
+  check(
+    "và KHÔNG đặt cookie state ở tên miền sai",
+    !(lech.headers.get("set-cookie") ?? "").includes("lingora_oauth"),
+  );
+
   const suckhoe = await fetch(new URL("/api/suc-khoe", BASE)).then((r) => r.json());
   if (suckhoe?.adapters?.oauth_google === "live") {
     await kiemGoogleThat();
