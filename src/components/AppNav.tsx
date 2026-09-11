@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { BrandLockup } from "./BrandLockup";
 import { ThemeToggle } from "./ThemeToggle";
+import { LangSwitch } from "./LangSwitch";
+import type { Locale } from "@/i18n/config";
 import { apiPost } from "@/lib/api-client";
 
 export type NavItem = { href: string; label: string; soon?: boolean };
@@ -32,11 +34,16 @@ export function AppNav({
   userName,
   role,
   homeHref,
+  locale,
+  untranslated,
 }: {
   items: NavItem[];
   userName: string;
   role: string;
   homeHref: string;
+  locale: Locale;
+  /** Dòng báo "trang này đang bằng tiếng Việt" của ngôn ngữ đang chọn; rỗng với tiếng Việt. */
+  untranslated: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -87,8 +94,10 @@ export function AppNav({
         </nav>
 
         <div className="app-nav__user">
-          <span className="app-nav__theme">
-            <ThemeToggle />
+          {/* Ngôn ngữ và ngày/đêm luôn ở góc phải, cả trên điện thoại. */}
+          <span className="app-nav__prefs">
+            <LangSwitch locale={locale} label="Ngôn ngữ" compact />
+            <ThemeToggle className="app-nav__theme-btn" />
           </span>
 
           <span className="app-nav__who">
@@ -117,6 +126,10 @@ export function AppNav({
           </button>
         </div>
       </div>
+
+      {locale !== "vi" && untranslated ? (
+        <p className="app-nav__untranslated">{untranslated}</p>
+      ) : null}
 
       <div id="app-nav-panel" className="app-nav__panel" hidden={!open}>
         <div className="app-nav__panel-inner">
@@ -159,10 +172,6 @@ export function AppNav({
             >
               {busy ? "Đang thoát…" : "Đăng xuất"}
             </button>
-            <span className="app-nav__panel-theme">
-              <span>Giao diện</span>
-              <ThemeToggle />
-            </span>
           </div>
         </div>
       </div>

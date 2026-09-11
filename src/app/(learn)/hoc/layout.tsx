@@ -1,6 +1,7 @@
 import { AppNav, type NavItem } from "@/components/AppNav";
 import { TabBar, type Tab } from "@/components/TabBar";
 import { requireUser } from "@/lib/auth/guard";
+import { getDict } from "@/i18n/server";
 
 const ITEMS: NavItem[] = [
   { href: "/hoc", label: "Bảng học" },
@@ -32,9 +33,12 @@ const ROLE_VI: Record<string, string> = {
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser("/hoc");
+  const { locale, t } = await getDict();
   return (
     <>
       <AppNav
+        locale={locale}
+        untranslated={t.chrome.untranslated}
         items={ITEMS}
         userName={user.name}
         role={ROLE_VI[user.role] ?? user.role}

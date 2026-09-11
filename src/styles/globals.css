@@ -1649,9 +1649,44 @@ table.data tr:last-child td {
   color: var(--muted);
 }
 
-.app-nav .app-nav__theme,
 .app-nav .app-nav__logout {
   display: none;
+}
+
+/* Ngôn ngữ + ngày/đêm: luôn hiện ở góc phải, kể cả trên điện thoại. */
+.app-nav__prefs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex: none;
+}
+
+.app-nav__theme-btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  color: var(--gold-ink);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.app-nav__theme-btn:hover {
+  border-color: var(--gold);
+}
+
+.app-nav__untranslated {
+  margin: 0;
+  max-width: none;
+  padding: var(--s-2) var(--s-6);
+  background: var(--paper-sunken);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  text-align: center;
 }
 
 .app-nav__burger {
@@ -1796,9 +1831,6 @@ table.data tr:last-child td {
   }
   .app-nav .app-nav__who {
     display: flex;
-  }
-  .app-nav .app-nav__theme {
-    display: inline-flex;
   }
   .app-nav .app-nav__logout {
     display: inline-flex;

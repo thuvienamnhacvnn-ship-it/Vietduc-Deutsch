@@ -17,14 +17,35 @@ import { LOCALES, LOCALE_COOKIE, LOCALE_NAMES, LOCALE_TAGS, type Locale } from "
  * `defaultValue` + `key` thay vì `value`: ô chọn có kiểm soát sẽ bật về giá trị
  * cũ trong lúc chờ server trả trang mới, trông như lựa chọn không ăn.
  */
-export function LangSwitch({ locale, label }: { locale: Locale; label: string }) {
+/** Mã ngắn cho biến thể gọn - chữ cái nhận ra được ngay dù không đọc tiếng đó. */
+const SHORT: Record<Locale, string> = { vi: "VI", en: "EN", ja: "日本", zh: "中文", ko: "한국" };
+
+export function LangSwitch({
+  locale,
+  label,
+  compact = false,
+}: {
+  locale: Locale;
+  label: string;
+  /** Chỉ hiện mã ngắn; ô chọn thật phủ trong suốt lên trên, bấm vẫn mở danh sách đầy đủ. */
+  compact?: boolean;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   return (
-    <label className="lang-switch" data-pending={pending || undefined}>
+    <label
+      className={compact ? "lang-switch lang-switch--compact" : "lang-switch"}
+      data-pending={pending || undefined}
+      title={label}
+    >
       <Globe />
       <span className="sr-only">{label}</span>
+      {compact && (
+        <span className="lang-switch__code" aria-hidden="true">
+          {SHORT[locale]}
+        </span>
+      )}
       <select
         key={locale}
         defaultValue={locale}

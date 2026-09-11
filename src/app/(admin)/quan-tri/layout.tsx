@@ -1,5 +1,6 @@
 import { AppNav, type NavItem } from "@/components/AppNav";
 import { requireStaff } from "@/lib/auth/guard";
+import { getDict } from "@/i18n/server";
 
 const ITEMS: NavItem[] = [
   { href: "/quan-tri", label: "Tổng quan" },
@@ -22,9 +23,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // requireStaff trả 404 cho người không có quyền, chứ không phải 403: khu quản
   // trị không nên tự xác nhận là nó tồn tại.
   const user = await requireStaff("/quan-tri");
+  const { locale, t } = await getDict();
   return (
     <>
       <AppNav
+        locale={locale}
+        untranslated={t.chrome.untranslated}
         items={ITEMS}
         userName={user.name}
         role={ROLE_VI[user.role] ?? user.role}

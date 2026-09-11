@@ -449,6 +449,33 @@
   background-repeat: no-repeat;
 }
 
+/* Biến thể gọn: chỉ hiện mã ngắn, ô chọn thật phủ trong suốt lên cả nút -
+   bấm vào đâu cũng mở danh sách đầy đủ của hệ điều hành. */
+.lang-switch--compact {
+  min-height: 42px;
+  padding: 0 12px 0 10px;
+  border-radius: 999px;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.lang-switch__code {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.lang-switch--compact select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+  background-image: none;
+}
+
 .lang-switch select:focus {
   outline: none;
 }
