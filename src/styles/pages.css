@@ -38,6 +38,18 @@
 
 .program-hero__h1 > span {
   display: block;
+  text-wrap: balance;
+}
+
+@media (max-width: 639px) {
+  /* Vừa "Bốn đích đến rõ ràng." trên một dòng 342px. */
+  .program-hero__h1 {
+    font-size: 1.95rem;
+    line-height: 1.12;
+  }
+  .program-hero__lede {
+    font-size: var(--fs-md);
+  }
 }
 
 

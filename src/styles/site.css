@@ -470,6 +470,7 @@
 }
 
 .home-h2 {
+  text-wrap: balance;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(1.875rem, 3.4vw, 2.75rem);
@@ -1396,4 +1397,165 @@
 
 .site main:has(.home-cta) + .site-footer .site-footer__office {
   border-top: 1px solid color-mix(in srgb, var(--on-band) 10%, transparent);
+}
+
+/* ============================================================ ĐIỆN THOẠI */
+
+/*
+ * Màn đầu trên điện thoại phải trả lời được ba câu trong một màn hình: đây là
+ * gì, nó khác gì, bấm vào đâu. Mọi khối dùng CÙNG một lề trái/phải của .wrap -
+ * không thẻ nào thò ra hay thụt vào so với dòng chữ phía trên nó.
+ */
+@media (max-width: 639px) {
+  .home-hero {
+    padding-block: var(--s-6) var(--s-9);
+  }
+
+  .home-eyebrow {
+    font-size: var(--fs-xs);
+    letter-spacing: 0.12em;
+    margin-bottom: var(--s-3);
+  }
+
+  /* Cỡ này vừa "Tự tin nói tiếng Đức." trên một dòng 342px - không còn chữ
+     "Đức." rơi lẻ xuống dòng riêng. */
+  .home-hero__h1 {
+    font-size: 2rem;
+    line-height: 1.12;
+    margin-bottom: var(--s-4);
+  }
+
+  .home-hero__lede {
+    font-size: var(--fs-md);
+    line-height: 1.55;
+    margin-bottom: var(--s-6);
+  }
+
+  /* Hai nút cùng bề ngang, cùng chiều cao - không nút dài nút ngắn. */
+  .home-hero__cta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+    margin-bottom: var(--s-7);
+  }
+
+  .home-hero__cta .btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: var(--fs-md);
+  }
+
+  /* Ba điểm mạnh thành một hàng ba ô: icon và tên. Phần giải thích ẩn đi -
+     trang còn nói lại từng điều ở phần dưới. */
+  .home-features {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-2);
+    padding-block: var(--s-4);
+    border-block: 1px solid var(--line);
+  }
+
+  .home-features li {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--s-2);
+  }
+
+  .home-features__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .home-features strong {
+    font-size: var(--fs-xs);
+    line-height: 1.3;
+  }
+
+  .home-features li > span:last-child > span {
+    display: none;
+  }
+
+  .home-hero__inner {
+    gap: var(--s-8);
+  }
+
+  .demo__wave {
+    width: 44px;
+  }
+
+  .demo__bubble {
+    gap: var(--s-3);
+    padding: 10px 14px;
+  }
+
+  .demo__fix {
+    margin-top: var(--s-4);
+    padding: var(--s-4) var(--s-5);
+  }
+
+  .demo__fix-line {
+    font-size: var(--fs-lg);
+  }
+
+  .home-section {
+    padding-block: var(--s-10);
+  }
+
+  .home-h2 {
+    font-size: 1.75rem;
+  }
+
+  .home-lede {
+    font-size: var(--fs-md);
+  }
+
+  .home-kicker {
+    display: none;
+  }
+
+  .home-path__head {
+    margin-bottom: var(--s-6);
+  }
+
+  /* Thẻ cấp độ cao theo nội dung, không giữ chiều cao tối thiểu của màn rộng
+     - chính nó để lại khoảng trống lớn trên dòng "Xem chi tiết". */
+  .home-level {
+    min-height: 0;
+    padding: var(--s-6) var(--s-5) var(--s-5);
+  }
+
+  .level-art {
+    width: 34%;
+    top: var(--s-4);
+  }
+
+  .home-level__code {
+    font-size: 2.25rem;
+  }
+
+  .home-level__body {
+    margin-bottom: var(--s-4);
+  }
+
+  .home-steps {
+    margin-top: var(--s-6);
+    gap: var(--s-5);
+  }
+
+  .home-card {
+    padding: var(--s-5);
+  }
+
+  .home-cta {
+    padding-block: var(--s-10) calc(var(--s-10) + 40px);
+  }
+
+  .home-cta::after {
+    height: 70px;
+    background-size: auto 70px;
+  }
+
+  .home-cta .btn {
+    width: 100%;
+  }
 }

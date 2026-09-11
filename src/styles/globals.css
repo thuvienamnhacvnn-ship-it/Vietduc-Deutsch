@@ -1038,78 +1038,114 @@ table.data tr:last-child td {
 /* ------------------------------------------------------------ trên điện thoại */
 
 /*
- * Ở màn hẹp ba dải thành một cột dài lệch trái: sơ đồ trang rơi xuống một hàng
- * dọc, hơn chục liên kết chạy suốt màn hình và các tiêu đề lạc giữa chúng.
+ * CHÂN TRANG TRÊN ĐIỆN THOẠI: gọn, và MỌI THỨ canh trái theo cùng một lề.
  *
- * Sơ đồ trang chuyển thành hai cột đều nhau, còn thứ gì là lời phát biểu chứ
- * không phải danh sách - khối văn phòng và dòng pháp lý - thì căn giữa, để mỗi
- * dải nằm cân giữa hai lề thay vì kéo lệch sang phải.
+ * Bản trước canh giữa khối văn phòng nhưng canh trái sơ đồ trang - hai trục
+ * trong một dải, nhìn như lệch. Địa chỉ dài canh giữa trong nửa cột thì thành
+ * một khối răng cưa. Giờ một trục duy nhất: lề trái của .wrap.
+ *
+ * Bản đồ nhúng bị bỏ trên điện thoại: nó cao 220px, nặng một iframe bên thứ
+ * ba, và ở màn hẹp người ta cần nút "Chỉ đường" mở ứng dụng bản đồ hơn là một
+ * tấm bản đồ nhỏ không kéo được. Nút đó ở lại.
  */
 @media (max-width: 719px) {
+  .site-footer {
+    margin-top: 0;
+  }
+
   .site-footer__office {
-    justify-items: center;
-    text-align: center;
-    padding-block: var(--s-8) var(--s-7);
+    gap: var(--s-4);
+    padding-block: var(--s-8) var(--s-5);
   }
 
   .site-footer__office-text {
-    justify-items: center;
+    gap: var(--s-3);
+  }
+
+  .site-footer__motto {
+    font-size: var(--fs-md);
   }
 
   .site-footer__legal-name {
-    max-width: 34ch;
+    font-size: var(--fs-xs);
   }
 
+  /* Liên hệ: mỗi mục một hàng - nhãn nhỏ bên trái, giá trị bên phải. */
   .site-footer__contact {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-4);
-    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+    width: 100%;
+    margin-top: var(--s-2);
   }
 
-  /*
-   * Email và website chiếm cả bề ngang.
-   *
-   * Nửa màn hình 390px còn khoảng 170px, mà "info@vietducgroup.com.vn" cần hơn
-   * thế. `overflow-wrap: anywhere` ở trên bèn cắt ngay giữa tên miền, ra thành
-   * "info@vietducgroup.co" xuống dòng "m.vn" - đọc như địa chỉ sai. Cho hai
-   * dòng này nguyên bề ngang thì chúng vừa đủ một dòng, không phải cắt.
-   */
-  .site-footer__contact > div:nth-child(n + 3) {
-    grid-column: 1 / -1;
+  .site-footer__contact > div {
+    display: grid;
+    grid-template-columns: 6.75rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--s-3);
   }
 
-  .site-footer__social {
-    justify-items: center;
-    text-align: center;
+  .site-footer__contact dt {
+    margin: 0;
+  }
+
+  .site-footer__contact dd {
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+
+  .footer-map {
+    min-height: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+
+  .footer-map__frame {
+    display: none;
+  }
+
+  .footer-map__directions {
+    position: static;
+    box-shadow: none;
   }
 
   .site-footer__cols {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-5) var(--s-4);
-    padding-block: var(--s-7);
-  }
-
-  /* Hai địa chỉ đầy đủ quá cao cho nửa cột: chúng để cột bên cạnh trống gần hết
-     một màn hình. Khối này lấy nguyên bề ngang. */
-  .site-footer__offices {
-    grid-column: 1 / -1;
-    padding-top: var(--s-4);
+    padding-block: var(--s-6);
     border-top: 1px solid color-mix(in srgb, var(--on-band) 12%, transparent);
   }
 
-  .site-footer__bottom-inner {
-    justify-content: center;
-    text-align: center;
+  .site-footer__cols ul {
     gap: var(--s-2);
   }
 
-  .site-footer__legal-links {
-    justify-content: center;
-    gap: var(--s-2) var(--s-4);
+  .site-footer__cols a {
+    font-size: var(--fs-sm);
+    padding-block: 4px;
   }
 
-  .site-footer__pending {
-    text-align: center;
+  /* Email đã có ở khối liên hệ ngay trên; lặp lại trong nửa cột thì bị cắt
+     giữa tên miền thành "…com.v / n". */
+  .site-footer__cols a[href^="mailto:"] {
+    display: none;
+  }
+
+  .site-footer__bottom-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-2);
+  }
+
+  .site-footer__copy {
+    font-size: var(--fs-xs);
+  }
+
+  .site-footer__legal-links {
+    justify-content: flex-start;
+    gap: var(--s-2) var(--s-4);
   }
 }
 
