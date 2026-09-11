@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   if (!googleAvailable()) {
     // Không im lặng chuyển hướng sang một trang lỗi mơ hồ: nói đúng lý do.
     return Response.redirect(
-      new URL("/dang-nhap?loi=google_chua_ket_noi", request.url).toString(),
+      new URL("/dang-nhap?loi=google_chua_ket_noi", config.appUrl).toString(),
       302,
     );
   }
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
   });
 
   return Response.redirect(
-    new URL(authorizationUrl({ state, nonce, codeChallenge: pkce.challenge }), request.url).toString(),
+    new URL(authorizationUrl({ state, nonce, codeChallenge: pkce.challenge }), config.appUrl).toString(),
     302,
   );
 }

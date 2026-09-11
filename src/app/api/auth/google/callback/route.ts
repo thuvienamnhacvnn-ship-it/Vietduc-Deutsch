@@ -7,6 +7,7 @@ import { createSession } from "@/lib/auth/session";
 import { clientIp, hit, tooMany } from "@/lib/rate-limit";
 import { audit } from "@/lib/audit";
 import { OAUTH_COOKIE } from "../route";
+import { config } from "@/lib/config";
 
 /** Phiên bản văn bản pháp lý mà người dùng đồng ý. Giữ khớp với luồng đăng ký. */
 const LEGAL_VERSION = "0.1-draft";
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
   jar.delete(OAUTH_COOKIE);
 
   const fail = (code: string) =>
-    Response.redirect(new URL(`/dang-nhap?loi=${code}`, request.url).toString(), 302);
+    Response.redirect(new URL(`/dang-nhap?loi=${code}`, config.appUrl).toString(), 302);
 
   // Người dùng bấm "Hủy" ở màn hình Google.
   if (url.searchParams.get("error")) return fail("google_bi_huy");
@@ -89,7 +90,7 @@ export async function GET(request: Request) {
       entityId: linked[0].userId,
       ip,
     });
-    return Response.redirect(new URL(saved.next, request.url).toString(), 302);
+    return Response.redirect(new URL(saved.next, config.appUrl).toString(), 302);
   }
 
   // 2. Chưa liên kết, nhưng email đã có tài khoản -> nối vào tài khoản đó.
@@ -124,7 +125,7 @@ export async function GET(request: Request) {
       after: { email: profile.email, mode: profile.mode },
       ip,
     });
-    return Response.redirect(new URL(saved.next, request.url).toString(), 302);
+    return Response.redirect(new URL(saved.next, config.appUrl).toString(), 302);
   }
 
   // 3. Người mới: tạo tài khoản không mật khẩu.
@@ -195,5 +196,5 @@ export async function GET(request: Request) {
 
   // Người MỚI đi thẳng vào bài kiểm tra trình độ, không qua bảng học rỗng.
   const firstStop = saved.next === "/hoc" ? "/hoc/xep-lop" : saved.next;
-  return Response.redirect(new URL(firstStop, request.url).toString(), 302);
+  return Response.redirect(new URL(firstStop, config.appUrl).toString(), 302);
 }

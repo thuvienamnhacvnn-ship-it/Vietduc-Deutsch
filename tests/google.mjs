@@ -228,6 +228,22 @@ async function main() {
     !(lech.headers.get("set-cookie") ?? "").includes("lingora_oauth"),
   );
 
+  /*
+   * Callback phải trả người dùng về ĐÚNG tên miền thật, không phải địa chỉ
+   * nội bộ mà Next nhìn thấy sau nginx. Bản cũ dựng chuyển hướng từ
+   * `request.url` và đẩy người dùng thật về https://localhost:3055 - lỗi đã gặp
+   * trên điện thoại. Kiểm tên miền, không chỉ kiểm đường dẫn.
+   */
+  const huy = await fetch(new URL("/api/auth/google/callback?error=access_denied", BASE), {
+    redirect: "manual",
+  });
+  const huyTo = huy.headers.get("location") ?? "";
+  check(
+    "callback chuyển về đúng tên miền của trang, không phải localhost",
+    huy.status === 302 && new URL(huyTo, BASE).host === new URL(BASE).host,
+    `nhận ${huy.status} → ${huyTo}`,
+  );
+
   const suckhoe = await fetch(new URL("/api/suc-khoe", BASE)).then((r) => r.json());
   if (suckhoe?.adapters?.oauth_google === "live") {
     await kiemGoogleThat();

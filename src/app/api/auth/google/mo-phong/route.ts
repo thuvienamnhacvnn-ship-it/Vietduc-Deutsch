@@ -1,4 +1,5 @@
 import { encodeMockCode, mockEnabled } from "@/lib/adapters/oauth-google";
+import { config } from "@/lib/config";
 
 /**
  * Đóng vai endpoint của Google, CHỈ ở môi trường phát triển.
@@ -19,11 +20,11 @@ export async function POST(request: Request) {
   const state = String(form.get("state") ?? "");
 
   if (!email.includes("@") || !state) {
-    return Response.redirect(new URL("/dang-nhap?loi=google_thieu_tham_so", request.url).toString(), 303);
+    return Response.redirect(new URL("/dang-nhap?loi=google_thieu_tham_so", config.appUrl).toString(), 303);
   }
 
   const code = encodeMockCode({ email, name });
-  const target = new URL("/api/auth/google/callback", request.url);
+  const target = new URL("/api/auth/google/callback", config.appUrl);
   target.searchParams.set("state", state);
   target.searchParams.set("code", code);
 
