@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { Logo } from "./Logo";
+import { BrandLockup } from "./BrandLockup";
 import { ThemeToggle } from "./ThemeToggle";
 import { apiPost } from "@/lib/api-client";
 
@@ -70,7 +70,7 @@ export function AppNav({
     >
       <div className="app-nav__inner">
         <Link href={homeHref} className="app-nav__brand" aria-label="Về trang chủ">
-          <Logo height={38} />
+          <BrandLockup height={42} />
         </Link>
 
         <nav className="app-nav__list" aria-label="Điều hướng">

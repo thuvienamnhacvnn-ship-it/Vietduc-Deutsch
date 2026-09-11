@@ -45,7 +45,10 @@ export type ThemeLabels = Record<Theme, string> & { hint: string };
 
 const ICON: Record<Theme, string> = { system: "◐", light: "☀", dark: "☾" };
 
-export function ThemeToggle({ labels }: { labels?: ThemeLabels } = {}) {
+export function ThemeToggle({
+  labels,
+  className = "btn btn--ghost btn--sm",
+}: { labels?: ThemeLabels; className?: string } = {}) {
   const label = labels ?? LABEL;
   const theme = useSyncExternalStore(subscribe, readTheme, () => "system" as Theme);
 
@@ -71,7 +74,7 @@ export function ThemeToggle({ labels }: { labels?: ThemeLabels } = {}) {
   return (
     <button
       type="button"
-      className="btn btn--ghost btn--sm"
+      className={className}
       onClick={() => apply(next)}
       title={label[theme]}
     >

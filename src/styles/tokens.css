@@ -1,87 +1,81 @@
 /*
- * VIỆT ĐỨC - design token
+ * VIỆT ĐỨC LINGUA - design token
  *
- * Màu lấy TRỰC TIẾP từ tệp logo (`npx tsx scripts/lay-mau-logo.ts`), không phải
- * ước lượng bằng mắt. Logo là ngọn lửa ghép từ cờ Việt Nam và cờ Đức:
+ * Bảng màu của bản thiết kế 11/09/2026 (E:WorksitwVDLigo): GIẤY KEM,
+ * XANH ĐẬM, VÀNG KIM. Áp cho toàn hệ thống - khu công khai, đăng nhập, khu học
+ * viên, quản trị - để mọi màn hình là một sản phẩm.
  *
- *   #CA2427  đỏ cờ Việt Nam - chiếm diện tích lớn nhất trong logo
- *   #0F0F0F  đen cờ Đức
- *   #C28E43  vàng kim của chữ VIET DUC
- *   #E0AC5A  vàng kim sáng hơn ở phần trên nét chữ
- *   #F9DA07  vàng ngôi sao
- *   #E37B26  cam của dải lửa
+ * Đỏ #CA2427 của logo KHÔNG còn là màu cấu trúc: nó ở lại trong chính logo và
+ * ở nút micro trong lớp (nút quan trọng nhất khi học nói). Nút chính, dải nền,
+ * thẻ nổi bật dùng xanh đậm; vàng kim là nét vẽ, viền, số thứ tự.
  *
- * ĐỎ LÀ MÀU CHÍNH, theo yêu cầu của chủ dự án. Nó làm cấu trúc: nút chính, dải
- * nền lớn, tiêu đề nhấn. Vàng kim là màu phụ - viền, huy hiệu, thanh tiến độ.
+ * TƯƠNG PHẢN (công thức WCAG 2.x, đã tính cho từng cặp):
+ *   ngày  --ink      #111B2E trên --paper #F8F3EA  15.6:1
+ *         --muted    #585F6E trên --paper           5.8:1
+ *         --gold-ink #7E5A1B trên --paper           5.6:1  chữ vàng nhỏ
+ *         trắng trên --brand-fill #14223D          15.8:1
+ *   đêm   --ink      #F1EBDF trên --paper #0B1322  15.6:1
+ *         --muted    #A7AFBF trên --paper           8.4:1
+ *         --gold-ink #E2BF80 trên --paper          10.6:1
+ *         --on-brand-fill #0B1322 trên #E2BC76     10.3:1
  *
- * TƯƠNG PHẢN đã đo (bằng scripts/lay-mau-logo.ts và công thức WCAG):
- *   --ink   #241A17 trên --paper  #FAF7F4  = 15.9:1  AAA
- *   --muted #6E5B54 trên --paper           =  6.0:1  AA
- *   --brand #CA2427 trên --paper           =  5.2:1  AA
- *   trắng trên --brand   #CA2427           =  5.5:1  AA   (nút chính)
- *   trắng trên --brand-800 #8E1A1D         =  9.1:1  AAA  (dải nền)
- *   --ink trên --gold    #C28E43           =  5.9:1  AA
- *   --on-star trên --star #F9DA07          = 11.8:1  AAA
+ * Vàng kim #C9A15E (ngày) chỉ cho nét vẽ và viền, KHÔNG cho chữ: trên giấy kem
+ * nó chỉ đạt 2.2:1. Chữ vàng luôn là --gold-ink.
  *
- * VÀNG KIM KHÔNG BAO GIỜ MANG CHỮ TRẮNG: trắng trên #C28E43 chỉ 2.9:1. Chữ trên
- * nền vàng luôn là --on-gold.
+ * Ở chủ đề đêm --brand-fill là VÀNG (nút vàng chữ xanh đậm). Vì vậy thẻ nổi
+ * bật và khung lớp học dùng --frame - xanh đậm ở cả hai chủ đề - chứ không dùng
+ * --brand-fill: chữ vàng nhạt trên nền vàng chỉ còn 1.2:1.
  *
- * HAI CHỦ ĐỀ. Bảng sáng khai báo trên :root. Bảng tối khai báo hai lần:
- *   [data-theme="dark"]                  - người đọc tự chọn tối
+ * HAI CHỦ ĐỀ. Bảng ngày khai báo trên :root. Bảng đêm khai báo hai lần:
+ *   [data-theme="dark"]                  - người đọc tự chọn đêm
  *   :root:not([data-theme]) @media dark  - người đọc chưa chọn, hệ thống tối
  * `data-theme` được ghi trước lần vẽ đầu bởi script inline trong app/layout.tsx.
- *
- * Ở chủ đề tối, đỏ #CA2427 chỉ đạt 3.4:1 trên nền tối nên KHÔNG dùng cho chữ;
- * bảng tối thay bằng #F07B78 (7.0:1).
  */
 
 :root {
   color-scheme: light;
 
-  /* ---- thương hiệu ----------------------------------------------------- */
-  /* Giấy hơi ấm, không phải trắng lạnh: đỏ và vàng kim đặt trên trắng xanh sẽ
-     trông như đèn báo lỗi. */
-  --paper: #faf7f4;
-  --paper-raised: #ffffff;
-  --paper-sunken: #f3ebe4;
+  /* ---- bảng màu: giấy kem, xanh đậm, vàng kim (xem đầu tệp) ---- */
+  --paper: #f8f3ea;
+  --paper-raised: #fffdf8;
+  --paper-sunken: #f2eadd;
+  --ink: #111b2e;
+  --muted: #585f6e;
+  --line: #e7ddcd;
+  --line-strong: #d3c4ac;
 
-  --brand: #ca2427;
-  --brand-600: #b01f22;
-  --brand-800: #8e1a1d;
-  --brand-900: #6e1416;
-
-  /*
-   * Đỏ dùng làm MẶT PHẲNG (nút chính, dải nhấn, bong bóng hội thoại), tách khỏi
-   * --brand vốn là đỏ dùng cho CHỮ.
-   *
-   * Hai vai trò này đi ngược chiều nhau khi đổi chủ đề: chữ đỏ phải sáng lên
-   * trên nền tối mới đọc được, còn mặt phẳng đỏ mà sáng lên thì thành màu hồng
-   * và mất hẳn chất thương hiệu. --brand-fill vì vậy giữ nguyên là đỏ ở cả hai
-   * chủ đề, chỉ chỉnh nhẹ độ sáng.
-   */
-  --brand-fill: #ca2427;
-  --brand-fill-hover: #b01f22;
+  --brand: #14223d;
+  --brand-600: #1e3157;
+  --brand-800: #0c1628;
+  --brand-900: #0a1220;
+  --brand-fill: #14223d;
+  --brand-fill-hover: #22375f;
   --on-brand-fill: #ffffff;
 
-  --gold: #c28e43;
-  --gold-light: #e0ac5a;
-  --gold-deep: #a27433;
-  --on-gold: #241a17;
+  --gold: #c9a15e;
+  --gold-light: #e5c68f;
+  --gold-deep: #a87d3b;
+  --gold-ink: #7e5a1b;
+  --on-gold: #14223d;
 
-  /* Vàng ngôi sao: điểm nhấn nhỏ và thanh tiến độ. Rực hơn vàng kim nên chỉ
-     dùng ở diện tích nhỏ. */
-  --star: #f9da07;
-  --on-star: #2a1d02;
+  --band: #101b31;
+  --on-band: #f4eee3;
+  --on-band-muted: #b8bfcc;
 
-  --ink: #241a17;
-  --muted: #6e5b54;
-  --line: #e9dfd7;
-  --line-strong: #d6c7bc;
+  --frame: #14223d;
+  --frame-line: rgba(255, 255, 255, 0.08);
+  --on-frame: #f4eee3;
+  --on-frame-muted: #b8bfcc;
 
-  /* Dải nền lớn (footer, khối nhấn). Đỏ sẫm để chữ trắng đạt AAA. */
-  --band: #8e1a1d;
-  --on-band: #fff3f0;
-  --on-band-muted: #e8b9b4;
+  --scene-sky-top: #f1e4cf;
+  --scene-sky-bottom: #fbf6ec;
+  --scene-orb: #f3d9a6;
+  --scene-far: #e9dcc5;
+  --scene-line: #bf9551;
+  --scene-fill: #f8f0e2;
+  --scene-win: transparent;
+  --scene-water-top: #efe3ce;
+  --scene-water-bottom: #f8f1e4;
 
   /* ---- ngữ nghĩa -------------------------------------------------------- */
   --success: #1f7a4d;
@@ -103,7 +97,8 @@
 
   /* ---- chữ -------------------------------------------------------------- */
   --font-sans: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --font-display: Georgia, "Times New Roman", serif;
+  --font-display: var(--font-playfair), "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-script: var(--font-caveat), "Segoe Script", "Bradley Hand", cursive;
   --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   --fs-xs: 0.8125rem;
@@ -147,9 +142,9 @@
 
   /* Bóng mang sắc nâu đỏ chứ không phải đen thuần: đen trên nền giấy ấm trông
      như vết bẩn xám. */
-  --shadow-1: 0 1px 2px rgba(58, 26, 20, 0.07), 0 1px 3px rgba(58, 26, 20, 0.05);
-  --shadow-2: 0 4px 12px rgba(58, 26, 20, 0.08), 0 2px 4px rgba(58, 26, 20, 0.05);
-  --shadow-3: 0 18px 40px rgba(58, 26, 20, 0.14), 0 4px 12px rgba(58, 26, 20, 0.07);
+  --shadow-1: 0 1px 2px rgba(20, 34, 61, 0.06), 0 1px 3px rgba(20, 34, 61, 0.05);
+  --shadow-2: 0 6px 16px rgba(20, 34, 61, 0.08), 0 2px 4px rgba(20, 34, 61, 0.05);
+  --shadow-3: 0 24px 50px rgba(20, 34, 61, 0.16), 0 6px 14px rgba(20, 34, 61, 0.08);
 
   /* ---- chuyển động ------------------------------------------------------ */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -158,44 +153,43 @@
   --motion-slow: 420ms;
 }
 
-/* Bảng tối, khai báo một lần rồi áp từ hai nơi. */
+/* Bảng ĐÊM, khai báo một lần rồi áp từ hai nơi. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     color-scheme: dark;
-
-    --paper: #17100f;
-    --paper-raised: #1f1614;
-    --paper-sunken: #120c0b;
-
-    /* Đỏ phải sáng lên mới đọc được trên nền tối; #CA2427 chỉ đạt 3.4:1. */
-    --brand: #f07b78;
-    --brand-600: #e8615e;
-    --brand-800: #f79b98;
-    --brand-900: #fbbdbb;
-
-    /* Vẫn là đỏ thật, không phải hồng. Trắng trên #C0292C đạt 6.0:1. */
-    --brand-fill: #c0292c;
-    --brand-fill-hover: #d43438;
-    --on-brand-fill: #ffffff;
-
-    --gold: #e6b76a;
-    --gold-light: #f0cd93;
-    --gold-deep: #c99a4e;
-    --on-gold: #241a17;
-
-    --star: #f9da07;
-    --on-star: #2a1d02;
-
-    --ink: #f2e9e4;
-    --muted: #b49f97;
-    --line: #33241f;
-    --line-strong: #4a352e;
-
-    /* Dải nền TỐI HƠN trang ở chủ đề tối, để nó vẫn đọc ra là một dải riêng. */
-    --band: #0f0a09;
-    --on-band: #f2e9e4;
-    --on-band-muted: #b49f97;
-
+    --paper: #0b1322;
+    --paper-raised: #121c30;
+    --paper-sunken: #08101c;
+    --ink: #f1ebdf;
+    --muted: #a7afbf;
+    --line: #212e47;
+    --line-strong: #34445f;
+    --brand: #e6c68a;
+    --brand-600: #edd29e;
+    --brand-800: #f2dcb2;
+    --brand-900: #f6e6c8;
+    --brand-fill: #e2bc76;
+    --brand-fill-hover: #edca8c;
+    --on-brand-fill: #0b1322;
+    --gold: #d8b06a;
+    --gold-light: #ebcf9c;
+    --gold-deep: #b68e4a;
+    --gold-ink: #e2bf80;
+    --on-gold: #0b1322;
+    --band: #060b15;
+    --on-band: #efe9dd;
+    --on-band-muted: #9ea7b8;
+    --frame: #18243e;
+    --frame-line: rgba(226, 188, 118, 0.14);
+    --scene-sky-top: #0c1629;
+    --scene-sky-bottom: #1c2b4a;
+    --scene-orb: #efe2c2;
+    --scene-far: #15213a;
+    --scene-line: #c9a160;
+    --scene-fill: #111c33;
+    --scene-win: #f2c46d;
+    --scene-water-top: #14213b;
+    --scene-water-bottom: #0a1323;
     --success: #62c78f;
     --success-bg: #12291f;
     --warning: #e0b054;
@@ -205,51 +199,51 @@
     --info: #7fc3e0;
     --info-bg: #10262f;
     --focus: #6fc4e6;
-
     --skill-listening: #6fc4e6;
     --skill-reading: #93a9e8;
     --skill-writing: #c69fe0;
     --skill-speaking: #62c78f;
-
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
-    --shadow-3: 0 18px 40px rgba(0, 0, 0, 0.55);
+    --shadow-2: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --shadow-3: 0 24px 50px rgba(0, 0, 0, 0.55);
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-
-  --paper: #17100f;
-  --paper-raised: #1f1614;
-  --paper-sunken: #120c0b;
-
-  --brand: #f07b78;
-  --brand-600: #e8615e;
-  --brand-800: #f79b98;
-  --brand-900: #fbbdbb;
-
-  --brand-fill: #c0292c;
-  --brand-fill-hover: #d43438;
-  --on-brand-fill: #ffffff;
-
-  --gold: #e6b76a;
-  --gold-light: #f0cd93;
-  --gold-deep: #c99a4e;
-  --on-gold: #241a17;
-
-  --star: #f9da07;
-  --on-star: #2a1d02;
-
-  --ink: #f2e9e4;
-  --muted: #b49f97;
-  --line: #33241f;
-  --line-strong: #4a352e;
-
-  --band: #0f0a09;
-  --on-band: #f2e9e4;
-  --on-band-muted: #b49f97;
-
+  --paper: #0b1322;
+  --paper-raised: #121c30;
+  --paper-sunken: #08101c;
+  --ink: #f1ebdf;
+  --muted: #a7afbf;
+  --line: #212e47;
+  --line-strong: #34445f;
+  --brand: #e6c68a;
+  --brand-600: #edd29e;
+  --brand-800: #f2dcb2;
+  --brand-900: #f6e6c8;
+  --brand-fill: #e2bc76;
+  --brand-fill-hover: #edca8c;
+  --on-brand-fill: #0b1322;
+  --gold: #d8b06a;
+  --gold-light: #ebcf9c;
+  --gold-deep: #b68e4a;
+  --gold-ink: #e2bf80;
+  --on-gold: #0b1322;
+  --band: #060b15;
+  --on-band: #efe9dd;
+  --on-band-muted: #9ea7b8;
+  --frame: #18243e;
+  --frame-line: rgba(226, 188, 118, 0.14);
+  --scene-sky-top: #0c1629;
+  --scene-sky-bottom: #1c2b4a;
+  --scene-orb: #efe2c2;
+  --scene-far: #15213a;
+  --scene-line: #c9a160;
+  --scene-fill: #111c33;
+  --scene-win: #f2c46d;
+  --scene-water-top: #14213b;
+  --scene-water-bottom: #0a1323;
   --success: #62c78f;
   --success-bg: #12291f;
   --warning: #e0b054;
@@ -259,15 +253,13 @@
   --info: #7fc3e0;
   --info-bg: #10262f;
   --focus: #6fc4e6;
-
   --skill-listening: #6fc4e6;
   --skill-reading: #93a9e8;
   --skill-writing: #c69fe0;
   --skill-speaking: #62c78f;
-
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-3: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --shadow-2: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 24px 50px rgba(0, 0, 0, 0.55);
 }
 
 /*

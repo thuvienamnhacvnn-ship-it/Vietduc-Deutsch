@@ -42,7 +42,7 @@ export const FAQ = [
   },
   {
     q: "Học xong có chứng chỉ không?",
-    a: "Không. Lingora dạy và theo dõi tiến bộ nội bộ. Hoàn thành một cấp độ ở đây không đồng nghĩa với chứng chỉ CEFR được công nhận - chứng chỉ đó do các tổ chức khảo thí cấp và phải thi riêng.",
+    a: "Không. Việt Đức Lingua dạy và theo dõi tiến bộ nội bộ. Hoàn thành một cấp độ ở đây không đồng nghĩa với chứng chỉ CEFR được công nhận - chứng chỉ đó do các tổ chức khảo thí cấp và phải thi riêng.",
   },
   {
     q: "Bao lâu thì tôi đạt B2?",

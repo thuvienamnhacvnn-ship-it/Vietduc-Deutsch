@@ -3,6 +3,8 @@
 @import "./lop.css";
 @import "./app.css";
 @import "./site.css";
+@import "./auth.css";
+@import "./pages.css";
 
 /* ------------------------------------------------------------------ nền tảng */
 
@@ -37,6 +39,16 @@ h4 {
   line-height: var(--lh-tight);
   letter-spacing: -0.015em;
   font-weight: 640;
+}
+
+/* Tiêu đề lớn dùng chữ có chân của bản thiết kế ở MỌI khu - công khai, học
+   viên, quản trị - để cả hệ thống đọc ra là một sản phẩm. h3 trở xuống giữ
+   chữ không chân cho dễ đọc ở cỡ nhỏ. */
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 h1 {
@@ -190,10 +202,10 @@ video {
 
 .eyebrow {
   font-size: var(--fs-sm);
-  font-weight: 620;
-  letter-spacing: 0.09em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--gold-ink);
   margin-bottom: var(--s-3);
 }
 
@@ -302,7 +314,7 @@ video {
   gap: var(--s-2);
   padding: var(--s-3) var(--s-6);
   min-height: 46px;
-  border-radius: var(--r-pill);
+  border-radius: 14px;
   border: 1px solid transparent;
   font: inherit;
   font-size: var(--fs-md);
@@ -403,6 +415,36 @@ video {
   width: 100%;
 }
 
+/* Cỡ lớn, viền, vàng: ba biến thể của bản thiết kế. Đứng SAU .btn để thắng
+   padding và chiều cao mặc định. */
+.btn--lg {
+  min-height: 56px;
+  padding: var(--s-3) var(--s-7);
+  font-size: var(--fs-lg);
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+
+.btn--outline:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.btn--gold {
+  background: var(--gold-light);
+  color: var(--on-gold);
+  border-color: var(--gold-light);
+}
+
+.btn--gold:hover:not(:disabled) {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+
 /* Vòng quay chờ dùng chung cho mọi nút ở trạng thái loading. */
 .spinner {
   width: 16px;
@@ -442,9 +484,9 @@ video {
   color: var(--ink);
   background: var(--paper-raised);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm);
+  border-radius: 12px;
   padding: var(--s-3) var(--s-4);
-  min-height: 46px;
+  min-height: 52px;
   width: 100%;
   transition:
     border-color var(--motion-fast) var(--ease),
@@ -460,7 +502,59 @@ video {
 .field input:hover,
 .field select:hover,
 .field textarea:hover {
-  border-color: var(--brand);
+  border-color: var(--gold);
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: none;
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 30%, transparent);
+}
+
+/* Khung chứa icon + ô nhập + nút ẩn/hiện mật khẩu. Icon nằm TRONG ô bằng
+   padding, không đè lên chữ người dùng gõ. */
+.field__box {
+  position: relative;
+  display: block;
+}
+
+.field__icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.field__box[data-icon] input {
+  padding-left: 50px;
+}
+
+.field__box[data-reveal] input {
+  padding-right: 52px;
+}
+
+.field__reveal {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.field__reveal:hover {
+  background: var(--paper-sunken);
 }
 
 .field input:disabled,
@@ -1403,193 +1497,7 @@ table.data tr:last-child td {
   margin-bottom: 0;
 }
 
-/* ================================================================== KHU AUTH */
-
-.auth-shell {
-  display: grid;
-  grid-template-columns: 1fr;
-  min-height: 100dvh;
-}
-
-/*
- * Cột trái của khu auth.
- *
- * `justify-content: space-between` với hai khối nội dung tạo ra đúng cái lỗ
- * trống giữa màn hình mà bản trước mắc phải. Giờ là một lưới bốn hàng, trong đó
- * hàng chứa hình được phép co lại - hình nhường chỗ trước, chữ không bao giờ bị
- * ép.
- */
-.auth-shell__aside {
-  display: none;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
-  gap: var(--s-7);
-  padding: var(--s-9) var(--s-8);
-  background:
-    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--gold) 26%, transparent), transparent 60%),
-    radial-gradient(90% 70% at 100% 100%, color-mix(in srgb, var(--brand-fill) 40%, transparent), transparent 65%),
-    var(--band);
-  overflow: hidden;
-}
-
-.auth-shell__brand {
-  display: grid;
-  gap: var(--s-4);
-  justify-items: start;
-}
-
-.auth-shell__headline {
-  font-size: var(--fs-2xl);
-  line-height: 1.2;
-  max-width: 16ch;
-  margin: 0;
-}
-
-.auth-shell__lede {
-  max-width: 42ch;
-  margin: 0;
-}
-
-/* Hình hội thoại: căn giữa và có trần chiều cao. Không có trần thì ở màn hình
-   cao 1400px nó phình to như một tấm áp phích và đẩy ba dòng điểm mạnh xuống
-   dưới tầm nhìn. */
-.auth-shell__art {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-}
-
-.auth-shell__art > * {
-  width: 100%;
-  max-width: 360px;
-}
-
-/*
- * Bỏ chú thích dưới hình khi hình nằm trong cột trái.
- *
- * Đặt max-height lên cả khối hình là sai: khối đó gồm cả một dòng chú thích, và
- * chú thích bị đẩy tràn ra ngoài rồi ĐÈ LÊN dòng "Bốn kỹ năng đo riêng". Ở cột
- * trái, câu ngay trên hình đã nói đúng điều chú thích định nói, nên bỏ hẳn nó
- * gọn hơn là ép chiều cao.
- */
-.auth-shell__art .hero-art__note {
-  display: none;
-}
-
-.auth-shell__points {
-  display: grid;
-  gap: var(--s-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.auth-shell__points li {
-  display: grid;
-  gap: 2px;
-  padding-left: var(--s-4);
-  border-left: 2px solid var(--gold);
-}
-
-.auth-shell__points strong {
-  font-size: var(--fs-sm);
-  color: var(--on-band);
-}
-
-.auth-shell__points span {
-  font-size: var(--fs-sm);
-  line-height: 1.5;
-  color: var(--on-band-muted);
-}
-
-.auth-shell__note {
-  font-size: var(--fs-sm);
-  color: var(--on-band-muted);
-  margin: 0;
-}
-
-/* Màn hình thấp: bỏ hình đi trước, chữ ở lại. Ngưỡng 900px chứ không phải 780:
-   laptop 1280x800 là cỡ máy phổ biến nhất của học viên, và ở đó hình làm cột
-   trái cao 1096px trong khung 800px - tức là kéo dài cả trang. */
-@media (max-height: 900px) {
-  .auth-shell__art {
-    display: none;
-  }
-}
-
-.auth-shell__main {
-  display: flex;
-  flex-direction: column;
-  padding: var(--s-5) var(--s-6) var(--s-10);
-}
-
-.auth-shell__bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s-4);
-  margin-bottom: var(--s-8);
-}
-
-/* Logo trên thanh của khu auth: chỉ ở màn hẹp, vì màn rộng đã có logo trong
-   dải đỏ bên trái. Hai logo cùng lúc là thừa. */
-.auth-shell__logo {
-  display: flex;
-  align-items: center;
-  margin-right: auto;
-}
-
-.auth-shell__back {
-  font-size: var(--fs-sm);
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.auth-shell__back:hover {
-  color: var(--brand);
-}
-
-.auth-shell__card {
-  width: 100%;
-  max-width: 460px;
-  margin-inline: auto;
-}
-
-.auth-shell__card h1 {
-  font-size: var(--fs-2xl);
-  margin-bottom: var(--s-3);
-}
-
-.auth-shell__foot {
-  margin-top: var(--s-6);
-  font-size: var(--fs-sm);
-  color: var(--muted);
-}
-
-@media (min-width: 900px) {
-  .auth-shell {
-    grid-template-columns: 0.9fr 1.1fr;
-  }
-  /* Màn rộng đã có logo trong dải đỏ bên trái; hai logo cùng lúc là thừa. */
-  .auth-shell__logo {
-    display: none;
-  }
-  .auth-shell__back {
-    margin-right: auto;
-  }
-  .auth-shell__aside {
-    display: grid;
-    /* Dính và cao đúng một màn hình: cột TRÁI không bao giờ được kéo dài trang.
-       Thứ được phép cuộn ở đây là biểu mẫu bên phải. */
-    position: sticky;
-    top: 0;
-    height: 100dvh;
-  }
-  .auth-shell__main {
-    justify-content: center;
-    padding: var(--s-9) var(--s-10);
-  }
-}
+/* Khu đăng nhập: xem auth.css. */
 
 /* ========================================================= KHU HỌC / QUẢN TRỊ */
 

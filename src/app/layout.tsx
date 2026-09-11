@@ -1,8 +1,34 @@
 import type { Metadata, Viewport } from "next";
+import { Caveat, Playfair_Display } from "next/font/google";
 import "@/styles/globals.css";
 import { brand } from "@/lib/brand";
 import { config } from "@/lib/config";
 import { getDict } from "@/i18n/server";
+
+/*
+ * Hai font của bản thiết kế, nạp cho toàn hệ thống.
+ *
+ * Playfair Display có bộ ký tự tiếng Việt - tiêu đề có đủ dấu, không rơi về
+ * font dự phòng giữa chừng. Tiếng Nhật, Trung, Hàn không có trong font này và
+ * cũng không nạp thêm: mỗi bộ chữ CJK nặng vài MB, nên các thứ tiếng đó dùng
+ * font có sẵn của hệ điều hành (xem site.css, `:lang()`).
+ *
+ * Caveat chỉ viết những dòng tiếng Đức viết tay trang trí - không bao giờ mang
+ * nội dung cần đọc để hiểu trang.
+ */
+const display = Playfair_Display({
+  subsets: ["latin", "latin-ext", "vietnamese"],
+  weight: ["600", "700"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const script = Caveat({
+  subsets: ["latin", "latin-ext"],
+  weight: ["500"],
+  variable: "--font-caveat",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   // Cần cho việc dựng URL tuyệt đối của ảnh Open Graph. Đọc từ cấu hình để bản
@@ -41,8 +67,8 @@ export const viewport: Viewport = {
   // các thanh dính đã tự trừ safe-area trong CSS.
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAF7F4" },
-    { media: "(prefers-color-scheme: dark)", color: "#17100F" },
+    { media: "(prefers-color-scheme: light)", color: "#F8F3EA" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1322" },
   ],
 };
 
@@ -64,7 +90,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // ngữ đã chọn vì nó là thứ đầu tiên người dùng bàn phím gặp.
   const { t } = await getDict();
   return (
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" className={`${display.variable} ${script.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

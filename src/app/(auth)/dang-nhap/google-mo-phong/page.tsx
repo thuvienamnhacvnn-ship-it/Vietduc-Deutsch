@@ -35,7 +35,7 @@ export default async function GoogleMockPage({
       </div>
 
       <h1>Chọn tài khoản (mô phỏng)</h1>
-      <p className="lede" style={{ fontSize: "var(--fs-md)", marginBottom: "var(--s-7)" }}>
+      <p className="auth-card__sub">
         Nhập địa chỉ Gmail bạn muốn đóng vai. Nhập lại cùng địa chỉ ở lần sau sẽ vào đúng tài khoản
         đó, giống hệt hành vi thật.
       </p>

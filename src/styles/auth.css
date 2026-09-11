@@ -1,0 +1,434 @@
+/* ============================================================ TRANH NÉT */
+
+/*
+ * Tranh Berlin tách từ bản thiết kế (scripts/tach-tranh.ts). Tệp PNG chỉ mang
+ * độ đục của nét vẽ; màu do CSS tô bằng `background-color`, nên cùng một tranh
+ * là vàng nâu trên giấy kem ở chủ đề ngày và vàng sáng trên nền đêm.
+ */
+.art-mask {
+  display: block;
+  width: 100%;
+  background-color: var(--art-ink, var(--gold-deep));
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center bottom;
+  mask-position: center bottom;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .art-mask {
+    --art-ink: var(--gold);
+  }
+}
+:root[data-theme="dark"] .art-mask {
+  --art-ink: var(--gold);
+}
+
+.art-mask--toan-canh {
+  aspect-ratio: 840 / 318;
+  -webkit-mask-image: url("/art/berlin-toan-canh.png");
+  mask-image: url("/art/berlin-toan-canh.png");
+}
+
+.art-mask--cong {
+  aspect-ratio: 858 / 263;
+  -webkit-mask-image: url("/art/cong-brandenburg.png");
+  mask-image: url("/art/cong-brandenburg.png");
+}
+
+.art-mask--dai {
+  aspect-ratio: 800 / 205;
+  -webkit-mask-image: url("/art/berlin-dai.png");
+  mask-image: url("/art/berlin-dai.png");
+}
+
+/* ============================================================ KHU ĐĂNG NHẬP */
+
+.auth {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  padding-inline: var(--s-6);
+}
+
+@media (min-width: 768px) {
+  .auth {
+    padding-inline: var(--s-9);
+  }
+}
+
+.auth__bar,
+.auth__body,
+.auth__foot {
+  width: 100%;
+  max-width: 1400px;
+  margin-inline: auto;
+}
+
+.auth__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-block: var(--s-5);
+}
+
+.auth__brand {
+  text-decoration: none;
+  display: flex;
+}
+
+@media (max-width: 600px) {
+  .auth__brand .brand-lockup {
+    --lockup-h: 40px !important;
+  }
+}
+
+.auth__bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+}
+
+.auth__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth__back:hover {
+  color: var(--gold-ink);
+}
+
+/* Nút ngày/đêm tròn, nền kem đậm như bản thiết kế. */
+.auth__theme {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 0;
+  background: color-mix(in srgb, var(--gold) 16%, var(--paper));
+  color: var(--gold-ink);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.auth__theme:hover {
+  background: color-mix(in srgb, var(--gold) 26%, var(--paper));
+}
+
+.auth__back--bar {
+  display: none !important;
+}
+
+.auth__body {
+  flex: 1;
+  display: grid;
+  /* minmax(0, 1fr): không có nó, cột tự nở theo độ rộng lớn nhất của nội dung
+     (560px) và biểu mẫu tràn khỏi màn 390px. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-9);
+  align-items: start;
+  padding-bottom: var(--s-8);
+}
+
+.auth-intro {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .auth__back--bar {
+    display: inline-flex !important;
+  }
+  .auth__back--main {
+    display: none !important;
+  }
+  .auth__body {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--s-10);
+    align-items: center;
+  }
+  .auth-intro {
+    display: block;
+  }
+}
+
+/* ---- cột trái ---- */
+
+.auth-intro__h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3rem, 5.2vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--s-5);
+  max-width: 9.5em;
+  text-wrap: balance;
+}
+
+.auth-intro__lede {
+  font-size: var(--fs-xl);
+  color: var(--ink);
+  margin: 0 0 var(--s-4);
+  max-width: 34em;
+}
+
+.auth-intro__art {
+  position: relative;
+  padding-bottom: var(--s-9);
+}
+
+.auth-intro__anna {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  max-width: 420px;
+  padding: var(--s-5) var(--s-7) var(--s-5) var(--s-5);
+  border-radius: 22px;
+  background: var(--frame);
+  color: var(--on-frame);
+  border: 1px solid var(--frame-line);
+  box-shadow: var(--shadow-3);
+}
+
+.auth-intro__anna .demo__avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 1.75rem;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold-light) 60%, transparent);
+}
+
+.auth-intro__anna p {
+  margin: 0;
+}
+
+.auth-intro__who {
+  font-size: var(--fs-sm);
+  color: var(--on-frame-muted);
+}
+
+.auth-intro__who strong {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.auth-intro__anna .auth-intro__de {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  margin-block: 2px;
+}
+
+.auth-intro__vi {
+  font-size: var(--fs-sm);
+  color: var(--on-frame-muted);
+}
+
+.auth-intro__points {
+  list-style: none;
+  margin: var(--s-8) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.auth-intro__points li {
+  display: flex;
+  gap: var(--s-4);
+  align-items: flex-start;
+  padding-inline: var(--s-5);
+  border-left: 1px solid var(--line-strong);
+}
+
+.auth-intro__points li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.auth-intro__icon {
+  color: var(--gold-deep);
+  flex: none;
+}
+
+.auth-intro__points strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  margin-bottom: 2px;
+}
+
+.auth-intro__points li span span {
+  display: block;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ---- thẻ biểu mẫu ---- */
+
+.auth__main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  justify-self: center;
+}
+
+.auth__back--main {
+  margin-bottom: var(--s-6);
+}
+
+.auth__card h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 9vw, 3.25rem);
+  line-height: 1.08;
+  margin: 0 0 var(--s-3);
+}
+
+.auth-card__sub {
+  font-size: var(--fs-lg);
+  color: var(--muted);
+  margin: 0 0 var(--s-7);
+}
+
+@media (min-width: 1024px) {
+  .auth__card {
+    padding: var(--s-10) var(--s-9) var(--s-8);
+    border-radius: 28px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-2);
+  }
+  .auth__card > h1,
+  .auth__card > .auth-card__sub {
+    text-align: center;
+    margin-inline: auto;
+  }
+}
+
+.auth__card .oauth-btn {
+  min-height: 58px;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--paper-raised);
+  gap: var(--s-4);
+}
+
+.auth__card .oauth-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: var(--paper-raised);
+}
+
+.auth__card .oauth-btn svg {
+  width: 26px;
+  height: 26px;
+}
+
+.auth__card .oauth-block__terms {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.auth__card .oauth-block__or {
+  font-size: var(--fs-md);
+  margin-block: var(--s-7) var(--s-6);
+}
+
+.auth__card a:not(.btn) {
+  color: var(--gold-ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--gold-ink) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+.auth__card .field label {
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.auth-form__forgot {
+  margin: calc(var(--s-3) * -1) 0 var(--s-6);
+  text-align: right;
+  max-width: none;
+}
+
+.auth-card__switch {
+  margin: var(--s-6) 0 0;
+  text-align: center;
+  max-width: none;
+  color: var(--ink);
+}
+
+.auth-note {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin: var(--s-6) 0 0;
+  max-width: none;
+  padding: var(--s-4) var(--s-5);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--gold) 13%, var(--paper));
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+.auth-note svg {
+  flex: none;
+  color: var(--gold-deep);
+}
+
+/* Dải tranh Berlin dưới biểu mẫu - chỉ ở màn hẹp, như bản mobile. */
+.auth__skyline {
+  margin-top: var(--s-9);
+  max-width: 560px;
+}
+
+@media (min-width: 1024px) {
+  .auth__skyline {
+    display: none;
+  }
+}
+
+.auth__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3) var(--s-6);
+  padding-block: var(--s-5) var(--s-6);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.auth__foot p {
+  margin: 0;
+}
+
+.auth__foot nav {
+  display: flex;
+  gap: var(--s-4);
+}
+
+.auth__foot a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.auth__foot a:hover {
+  color: var(--gold-ink);
+}

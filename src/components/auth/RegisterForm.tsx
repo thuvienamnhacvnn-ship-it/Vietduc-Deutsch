@@ -51,6 +51,7 @@ export function RegisterForm({ next }: { next: string }) {
       <Field
         label="Tên của bạn"
         name="name"
+        icon="user"
         value={name}
         onChange={setName}
         required
@@ -62,6 +63,8 @@ export function RegisterForm({ next }: { next: string }) {
       <Field
         label="Email"
         name="email"
+        icon="mail"
+        placeholder="tenban@email.com"
         type="email"
         value={email}
         onChange={setEmail}
@@ -73,6 +76,7 @@ export function RegisterForm({ next }: { next: string }) {
       <Field
         label="Mật khẩu"
         name="password"
+        icon="lock"
         type="password"
         value={password}
         onChange={setPassword}
@@ -102,12 +106,12 @@ export function RegisterForm({ next }: { next: string }) {
           onChange={(e) => setMarketingContact(e.target.checked)}
         />
         <span>
-          Lingora được liên hệ riêng với tôi về lộ trình học. Không bắt buộc, bỏ chọn lúc nào cũng
+          Việt Đức được liên hệ riêng với tôi về lộ trình học. Không bắt buộc, bỏ chọn lúc nào cũng
           được.
         </span>
       </label>
 
-      <button type="submit" className="btn btn--primary btn--block" disabled={busy}>
+      <button type="submit" className="btn btn--primary btn--block btn--lg" disabled={busy}>
         {busy && <span className="spinner" aria-hidden="true" />}
         {busy ? "Đang tạo tài khoản…" : "Tạo tài khoản"}
       </button>

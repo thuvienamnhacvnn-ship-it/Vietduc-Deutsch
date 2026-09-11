@@ -5,7 +5,7 @@ import { adapterMode } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Học phí",
-  description: "Các gói học Lingora, chu kỳ thanh toán và điều kiện.",
+  description: "Các gói học Việt Đức Lingua, chu kỳ thanh toán và điều kiện.",
 };
 
 export default async function PricingPage() {

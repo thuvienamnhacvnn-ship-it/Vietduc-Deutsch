@@ -12,7 +12,7 @@ export default async function ResetPage({
   return (
     <>
       <h1>Đặt mật khẩu mới</h1>
-      <p className="lede" style={{ fontSize: "var(--fs-md)", marginBottom: "var(--s-7)" }}>
+      <p className="auth-card__sub">
         Sau khi đổi, mọi thiết bị đang đăng nhập sẽ bị đăng xuất.
       </p>
       <ResetForm token={token ?? ""} />

@@ -1,188 +1,12 @@
 /*
- * KHU CÔNG KHAI - bản thiết kế "giấy kem, xanh đậm, vàng kim".
- *
- * Bảng màu này CHỈ áp trong `.site` (layout của khu công khai). Khu học viên và
- * cổng quản trị giữ bảng đỏ của tokens.css. Logo vẫn là logo đỏ - vàng - đen;
- * đỏ lùi về làm màu của logo, xanh đậm làm cấu trúc, vàng kim làm nét trang trí.
- *
- * TƯƠNG PHẢN (công thức WCAG 2.x, đã tính cho từng cặp):
- *   ngày  --ink      #111B2E trên --paper #F8F3EA  15.6:1
- *         --muted    #585F6E trên --paper           5.8:1
- *         --gold-ink #7E5A1B trên --paper           5.6:1  chữ vàng nhỏ
- *         trắng trên --brand-fill #14223D          15.8:1
- *   đêm   --ink      #F1EBDF trên --paper #0B1322  15.6:1
- *         --muted    #A7AFBF trên --paper           8.4:1
- *         --gold-ink #E2BF80 trên --paper          10.6:1
- *         --on-brand-fill #0B1322 trên #E2BC76     10.3:1
- *
- * Vàng kim #C9A15E (ngày) chỉ dùng cho nét vẽ và viền, KHÔNG cho chữ: trên giấy
- * kem nó chỉ đạt 2.2:1. Chữ vàng luôn là --gold-ink.
- *
- * Thẻ A1 và khung lớp học dùng --frame (xanh đậm ở CẢ HAI chủ đề), không dùng
- * --brand-fill: ở chủ đề đêm --brand-fill là vàng, và chữ vàng nhạt trên nền
- * vàng chỉ còn 1.2:1 - đo ra mới thấy.
+ * KHU CÔNG KHAI - bố cục của bản thiết kế: header, trang chủ, cụm nhận diện.
+ * Bảng màu nằm ở tokens.css (dùng chung toàn hệ thống).
  */
 
 .site {
-  --paper: #f8f3ea;
-  --paper-raised: #fffdf8;
-  --paper-sunken: #f2eadd;
-  --ink: #111b2e;
-  --muted: #585f6e;
-  --line: #e7ddcd;
-  --line-strong: #d3c4ac;
-
-  --brand: #14223d;
-  --brand-600: #1e3157;
-  --brand-800: #0c1628;
-  --brand-900: #0a1220;
-  --brand-fill: #14223d;
-  --brand-fill-hover: #22375f;
-  --on-brand-fill: #ffffff;
-
-  --gold: #c9a15e;
-  --gold-light: #e5c68f;
-  --gold-deep: #a87d3b;
-  --gold-ink: #7e5a1b;
-  --on-gold: #14223d;
-
-  --band: #101b31;
-  --on-band: #f4eee3;
-  --on-band-muted: #b8bfcc;
-
-  --frame: #14223d;
-  --frame-line: rgba(255, 255, 255, 0.08);
-  --on-frame: #f4eee3;
-  --on-frame-muted: #b8bfcc;
-
-  --scene-sky-top: #f1e4cf;
-  --scene-sky-bottom: #fbf6ec;
-  --scene-orb: #f3d9a6;
-  --scene-far: #e9dcc5;
-  --scene-line: #bf9551;
-  --scene-fill: #f8f0e2;
-  --scene-win: transparent;
-  --scene-water-top: #efe3ce;
-  --scene-water-bottom: #f8f1e4;
-
-  --font-display: var(--font-playfair), "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-script: var(--font-caveat), "Segoe Script", "Bradley Hand", cursive;
-
-  --shadow-1: 0 1px 2px rgba(20, 34, 61, 0.06), 0 1px 3px rgba(20, 34, 61, 0.05);
-  --shadow-2: 0 6px 16px rgba(20, 34, 61, 0.08), 0 2px 4px rgba(20, 34, 61, 0.05);
-  --shadow-3: 0 24px 50px rgba(20, 34, 61, 0.16), 0 6px 14px rgba(20, 34, 61, 0.08);
-
   background: var(--paper);
   color: var(--ink);
   min-height: 100vh;
-}
-
-/* Bảng đêm, khai báo hai lần như tokens.css: người đọc tự chọn, hoặc chưa chọn
-   mà hệ thống đang tối. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .site {
-    --paper: #0b1322;
-    --paper-raised: #121c30;
-    --paper-sunken: #08101c;
-    --ink: #f1ebdf;
-    --muted: #a7afbf;
-    --line: #212e47;
-    --line-strong: #34445f;
-
-    --brand: #e6c68a;
-    --brand-600: #edd29e;
-    --brand-800: #f2dcb2;
-    --brand-900: #f6e6c8;
-    --brand-fill: #e2bc76;
-    --brand-fill-hover: #edca8c;
-    --on-brand-fill: #0b1322;
-
-    --gold: #d8b06a;
-    --gold-light: #ebcf9c;
-    --gold-deep: #b68e4a;
-    --gold-ink: #e2bf80;
-    --on-gold: #0b1322;
-
-    --band: #060b15;
-    --on-band: #efe9dd;
-    --on-band-muted: #9ea7b8;
-
-    --frame: #18243e;
-    --frame-line: rgba(226, 188, 118, 0.14);
-
-    --scene-sky-top: #0c1629;
-    --scene-sky-bottom: #1c2b4a;
-    --scene-orb: #efe2c2;
-    --scene-far: #15213a;
-    --scene-line: #c9a160;
-    --scene-fill: #111c33;
-    --scene-win: #f2c46d;
-    --scene-water-top: #14213b;
-    --scene-water-bottom: #0a1323;
-
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-2: 0 6px 16px rgba(0, 0, 0, 0.45);
-    --shadow-3: 0 24px 50px rgba(0, 0, 0, 0.55);
-  }
-}
-
-:root[data-theme="dark"] .site {
-  --paper: #0b1322;
-  --paper-raised: #121c30;
-  --paper-sunken: #08101c;
-  --ink: #f1ebdf;
-  --muted: #a7afbf;
-  --line: #212e47;
-  --line-strong: #34445f;
-
-  --brand: #e6c68a;
-  --brand-600: #edd29e;
-  --brand-800: #f2dcb2;
-  --brand-900: #f6e6c8;
-  --brand-fill: #e2bc76;
-  --brand-fill-hover: #edca8c;
-  --on-brand-fill: #0b1322;
-
-  --gold: #d8b06a;
-  --gold-light: #ebcf9c;
-  --gold-deep: #b68e4a;
-  --gold-ink: #e2bf80;
-  --on-gold: #0b1322;
-
-  --band: #060b15;
-  --on-band: #efe9dd;
-  --on-band-muted: #9ea7b8;
-
-  --frame: #18243e;
-  --frame-line: rgba(226, 188, 118, 0.14);
-
-  --scene-sky-top: #0c1629;
-  --scene-sky-bottom: #1c2b4a;
-  --scene-orb: #efe2c2;
-  --scene-far: #15213a;
-  --scene-line: #c9a160;
-  --scene-fill: #111c33;
-  --scene-win: #f2c46d;
-  --scene-water-top: #14213b;
-  --scene-water-bottom: #0a1323;
-
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 6px 16px rgba(0, 0, 0, 0.45);
-  --shadow-3: 0 24px 50px rgba(0, 0, 0, 0.55);
-}
-
-/* Nền của chính <body> - thấy được khi kéo quá đầu/cuối trang. Không đặt thì
-   lộ màu giấy đỏ-nâu của tokens.css ở chủ đề đêm. */
-body:has(> .site) {
-  background: #f8f3ea;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) body:has(> .site) {
-    background: #0b1322;
-  }
-}
-:root[data-theme="dark"] body:has(> .site) {
-  background: #0b1322;
 }
 
 /*
@@ -191,60 +15,27 @@ body:has(> .site) {
  * Android. Playfair vẫn đứng đầu danh sách để chữ Latin và số trong câu (A1,
  * B2, tên Anna) giữ đúng nét của bản thiết kế.
  */
-.site :lang(ja) {
+:lang(ja) {
   --font-display: var(--font-playfair), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho",
     "Noto Serif JP", serif;
   --font-sans: "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Noto Sans JP", system-ui, sans-serif;
 }
-.site :lang(zh) {
+:lang(zh) {
   --font-display: var(--font-playfair), "Songti SC", "STSong", "Noto Serif SC", "SimSun", serif;
   --font-sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
 }
-.site :lang(ko) {
+:lang(ko) {
   --font-display: var(--font-playfair), "AppleMyungjo", "Noto Serif KR", "Batang", serif;
   --font-sans: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
 }
-.site :lang(ja),
-.site :lang(zh),
-.site :lang(ko) {
+:lang(ja),
+:lang(zh),
+:lang(ko) {
   font-family: var(--font-sans);
   /* Chữ CJK không có khoảng trắng giữa từ; ngắt dòng theo cụm từ thay vì giữa
      một từ ghép (trình duyệt chưa hỗ trợ thì bỏ qua). */
   word-break: auto-phrase;
   line-break: strict;
-}
-
-/* ------------------------------------------------------------------ nút */
-
-.site .btn {
-  border-radius: 14px;
-}
-
-.site .btn--lg {
-  min-height: 56px;
-  padding: var(--s-3) var(--s-7);
-  font-size: var(--fs-lg);
-}
-
-.site .btn--outline {
-  background: transparent;
-  color: var(--ink);
-  border: 1.5px solid var(--ink);
-}
-
-.site .btn--outline:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--ink) 6%, transparent);
-}
-
-.site .btn--gold {
-  background: var(--gold-light);
-  color: var(--on-gold);
-  border-color: var(--gold-light);
-}
-
-.site .btn--gold:hover:not(:disabled) {
-  background: var(--gold);
-  border-color: var(--gold);
 }
 
 /* --------------------------------------------------------- cụm nhận diện */
@@ -311,6 +102,7 @@ body:has(> .site) {
 }
 
 @media (max-width: 600px) {
+  .app-nav .brand-lockup,
   .site-header .brand-lockup {
     --lockup-h: 36px !important;
   }

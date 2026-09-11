@@ -4,7 +4,7 @@ import { AGENTS, AI_DISCLOSURE, MEMORY_NOTE } from "@/content/agents";
 export const metadata: Metadata = {
   title: "Đội ngũ giảng dạy",
   description:
-    "Bảy vai trò của Lingora: ai dạy gì, không được làm gì, và đọc được dữ liệu nào của bạn.",
+    "Bảy vai trò của Việt Đức Lingua: ai dạy gì, không được làm gì, và đọc được dữ liệu nào của bạn.",
 };
 
 export default function AgentsPage() {

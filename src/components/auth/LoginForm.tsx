@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Field } from "@/components/Field";
@@ -46,6 +47,8 @@ export function LoginForm({ next }: { next: string }) {
         onChange={setEmail}
         required
         autoComplete="email"
+        icon="mail"
+        placeholder="tenban@email.com"
       />
 
       <Field
@@ -56,11 +59,22 @@ export function LoginForm({ next }: { next: string }) {
         onChange={setPassword}
         required
         autoComplete="current-password"
+        icon="lock"
+        placeholder="Nhập mật khẩu"
       />
 
-      <button type="submit" className="btn btn--primary btn--block" disabled={busy}>
+      <p className="auth-form__forgot">
+        <Link href="/quen-mat-khau">Quên mật khẩu?</Link>
+      </p>
+
+      <button type="submit" className="btn btn--primary btn--block btn--lg" disabled={busy}>
         {busy && <span className="spinner" aria-hidden="true" />}
         {busy ? "Đang đăng nhập…" : "Đăng nhập"}
+        {!busy && (
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
       </button>
     </form>
   );

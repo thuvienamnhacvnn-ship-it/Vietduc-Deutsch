@@ -15,7 +15,7 @@ export function HeroArt() {
         aria-labelledby="hero-art-title hero-art-desc"
         width="100%"
       >
-        <title id="hero-art-title">Một lượt hội thoại trong lớp học Lingora</title>
+        <title id="hero-art-title">Một lượt hội thoại trong lớp học Việt Đức Lingua</title>
         <desc id="hero-art-desc">
           Cô Anna hỏi &quot;Wo wohnst du?&quot;, học viên trả lời &quot;Ich wohne in Berlin&quot;,
           kèm gợi ý ngữ pháp và thanh trạng thái micro.

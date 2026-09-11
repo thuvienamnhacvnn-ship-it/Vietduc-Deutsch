@@ -51,14 +51,33 @@ export function GoogleButton({ next = "/hoc" }: { next?: string }) {
 
       <p className="oauth-block__terms">
         Tiếp tục với Google nghĩa là bạn đồng ý với <Link href="/dieu-khoan">Điều khoản sử dụng</Link>{" "}
-        và <Link href="/rieng-tu">chính sách riêng tư</Link>. Chúng tôi chỉ nhận tên và địa chỉ email
-        của bạn, không đọc Gmail và không truy cập gì khác.
+        và <Link href="/rieng-tu">Chính sách riêng tư</Link>.
       </p>
 
       <div className="oauth-block__or">
-        <span>hoặc dùng email và mật khẩu</span>
+        <span>hoặc dùng email</span>
       </div>
     </div>
+  );
+}
+
+/**
+ * Ghi chú quyền riêng tư của đăng nhập Google, đặt ở cuối thẻ biểu mẫu. Nói
+ * đúng phạm vi đã xin của Google (`openid email profile`): tên và email, không
+ * đọc Gmail, không gì khác.
+ */
+export function GooglePrivacyNote() {
+  if (!googleAvailable()) return null;
+  return (
+    <p className="auth-note">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <g fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
+          <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5M12 14.5v2" />
+        </g>
+      </svg>
+      Chỉ dùng tên và email khi đăng nhập Google - không đọc Gmail, không truy cập gì khác.
+    </p>
   );
 }
 

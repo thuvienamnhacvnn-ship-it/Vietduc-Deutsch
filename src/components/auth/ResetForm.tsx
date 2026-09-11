@@ -57,6 +57,7 @@ export function ResetForm({ token }: { token: string }) {
       <Field
         label="Mật khẩu mới"
         name="password"
+        icon="lock"
         type="password"
         value={password}
         onChange={setPassword}
@@ -65,7 +66,7 @@ export function ResetForm({ token }: { token: string }) {
         hint="Ít nhất 10 ký tự."
         error={error?.fields?.password}
       />
-      <button type="submit" className="btn btn--primary btn--block" disabled={busy}>
+      <button type="submit" className="btn btn--primary btn--block btn--lg" disabled={busy}>
         {busy && <span className="spinner" aria-hidden="true" />}
         {busy ? "Đang lưu…" : "Đặt mật khẩu mới"}
       </button>

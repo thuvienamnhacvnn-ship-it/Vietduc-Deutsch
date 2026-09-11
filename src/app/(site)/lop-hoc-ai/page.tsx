@@ -7,7 +7,7 @@ import { AI_DISCLOSURE } from "@/content/agents";
 export const metadata: Metadata = {
   title: "Lớp học hoạt động thế nào",
   description:
-    "Một buổi học Lingora: Anna dẫn bài, bảng giảng chạy theo nội dung, bạn nói bằng micro hoặc gõ chữ.",
+    "Một buổi học Việt Đức Lingua: Anna dẫn bài, bảng giảng chạy theo nội dung, bạn nói bằng micro hoặc gõ chữ.",
 };
 
 const IN_CLASS = [

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { GoogleButton } from "@/components/auth/GoogleButton";
+import { GoogleButton, GooglePrivacyNote } from "@/components/auth/GoogleButton";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { getSessionUser } from "@/lib/auth/session";
 
@@ -38,9 +38,7 @@ export default async function LoginPage({
   return (
     <>
       <h1>Đăng nhập</h1>
-      <p className="lede" style={{ fontSize: "var(--fs-md)", marginBottom: "var(--s-7)" }}>
-        Tiếp tục từ đúng chỗ bạn đang dở.
-      </p>
+      <p className="auth-card__sub">Tiếp tục từ đúng chỗ bạn đang dở.</p>
 
       {loi && (
         <div className="alert alert--error" role="alert">
@@ -52,11 +50,11 @@ export default async function LoginPage({
 
       <LoginForm next={next} />
 
-      <p className="auth-shell__foot">
-        <Link href="/quen-mat-khau">Quên mật khẩu?</Link>
-        {" · "}
+      <p className="auth-card__switch">
         Chưa có tài khoản? <Link href="/dang-ky">Tạo tài khoản</Link>
       </p>
+
+      <GooglePrivacyNote />
     </>
   );
 }

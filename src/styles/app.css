@@ -72,15 +72,15 @@
   padding: var(--s-5);
   border-radius: var(--r-lg);
   /*
-   * Dải màu trộn từ --brand-fill, KHÔNG dùng --brand-800/900. Hai biến đó là
-   * đỏ dành cho CHỮ: ở chủ đề tối chúng sáng lên để đọc được, nên lấy chúng
-   * làm điểm cuối của dải thì thẻ chuyển sang hồng nhạt đúng lúc trang tối đi.
-   * Trộn với đen/trắng thì hướng của dải giữ nguyên ở cả hai chủ đề.
+   * Nền --frame (xanh đậm ở CẢ HAI chủ đề), không phải --brand-fill: ở chủ đề
+   * đêm --brand-fill là vàng, và nhãn vàng nhạt của thẻ trên nền vàng thì biến
+   * mất. Ánh vàng ở góc là màu nhấn của bản thiết kế.
    */
   background:
-    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--brand-fill) 86%, #fff), transparent 60%),
-    linear-gradient(150deg, var(--brand-fill), color-mix(in srgb, var(--brand-fill) 58%, #000));
-  color: var(--on-brand-fill);
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--gold) 30%, var(--frame)), transparent 60%),
+    linear-gradient(150deg, var(--frame), color-mix(in srgb, var(--frame) 72%, #000));
+  color: var(--on-frame);
+  border: 1px solid var(--frame-line);
   text-decoration: none;
   box-shadow: var(--shadow-2);
   transition:
@@ -152,7 +152,7 @@
   max-width: 34ch;
   font-size: var(--fs-sm);
   line-height: var(--lh-snug);
-  color: color-mix(in srgb, var(--on-brand-fill) 82%, transparent);
+  color: var(--on-frame-muted);
 }
 
 .tiep-tuc__nut {
@@ -161,9 +161,9 @@
   gap: var(--s-2);
   margin-top: var(--s-5);
   padding: 10px var(--s-5);
-  border-radius: var(--r-pill);
-  background: var(--paper-raised);
-  color: var(--brand);
+  border-radius: 12px;
+  background: var(--gold-light);
+  color: #14223d;
   font-weight: 680;
   font-size: var(--fs-sm);
 }

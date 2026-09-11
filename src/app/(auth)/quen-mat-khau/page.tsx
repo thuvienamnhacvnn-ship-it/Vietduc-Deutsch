@@ -8,13 +8,13 @@ export default function ForgotPage() {
   return (
     <>
       <h1>Quên mật khẩu</h1>
-      <p className="lede" style={{ fontSize: "var(--fs-md)", marginBottom: "var(--s-7)" }}>
+      <p className="auth-card__sub">
         Nhập email của bạn. Nếu email đó có tài khoản, chúng tôi gửi một liên kết đặt lại mật khẩu.
       </p>
 
       <ForgotForm />
 
-      <p className="auth-shell__foot">
+      <p className="auth-card__switch">
         Nhớ ra rồi? <Link href="/dang-nhap">Đăng nhập</Link>
       </p>
     </>

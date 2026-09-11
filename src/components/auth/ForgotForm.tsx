@@ -35,13 +35,15 @@ export function ForgotForm() {
       <Field
         label="Email"
         name="email"
+        icon="mail"
+        placeholder="tenban@email.com"
         type="email"
         value={email}
         onChange={setEmail}
         required
         autoComplete="email"
       />
-      <button type="submit" className="btn btn--primary btn--block" disabled={busy}>
+      <button type="submit" className="btn btn--primary btn--block btn--lg" disabled={busy}>
         {busy && <span className="spinner" aria-hidden="true" />}
         {busy ? "Đang gửi…" : "Gửi liên kết đặt lại"}
       </button>

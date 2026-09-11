@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { GoogleButton } from "@/components/auth/GoogleButton";
+import { GoogleButton, GooglePrivacyNote } from "@/components/auth/GoogleButton";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { getSessionUser } from "@/lib/auth/session";
 
@@ -22,7 +22,7 @@ export default async function RegisterPage({
   return (
     <>
       <h1>Tạo tài khoản</h1>
-      <p className="lede" style={{ fontSize: "var(--fs-md)", marginBottom: "var(--s-7)" }}>
+      <p className="auth-card__sub">
         Miễn phí. Sau khi tạo tài khoản bạn làm bài kiểm tra bốn kỹ năng để hệ thống biết bắt đầu từ
         đâu.
       </p>
@@ -31,9 +31,11 @@ export default async function RegisterPage({
 
       <RegisterForm next={next} />
 
-      <p className="auth-shell__foot">
+      <p className="auth-card__switch">
         Đã có tài khoản? <Link href="/dang-nhap">Đăng nhập</Link>
       </p>
+
+      <GooglePrivacyNote />
     </>
   );
 }

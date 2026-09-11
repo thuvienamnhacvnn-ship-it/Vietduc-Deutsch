@@ -1,0 +1,465 @@
+/*
+ * Các trang con của khu công khai, cùng ngôn ngữ với trang chủ: tiêu đề chữ có
+ * chân lớn, nhãn vàng viết hoa, tranh nét Berlin, thẻ giấy bo tròn 20px.
+ */
+
+.site .wrap {
+  max-width: 1400px;
+}
+
+/* ============================================================ CHƯƠNG TRÌNH */
+
+.program-hero {
+  padding-block: var(--s-8) var(--s-5);
+  overflow: hidden;
+}
+
+.program-hero__inner {
+  display: grid;
+  gap: var(--s-6);
+  align-items: end;
+}
+
+@media (min-width: 1080px) {
+  .program-hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-6);
+  }
+}
+
+.program-hero__h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 4.1vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--s-5);
+}
+
+.program-hero__h1 > span {
+  display: block;
+}
+
+
+.program-hero__lede {
+  font-size: var(--fs-xl);
+  max-width: 30em;
+  margin: 0;
+}
+
+.program-hero__art {
+  justify-self: end;
+  max-width: 820px;
+  margin-bottom: calc(var(--s-5) * -1);
+}
+
+@media (max-width: 1079px) {
+  .program-hero__art {
+    max-width: 640px;
+  }
+}
+
+/* ---- bốn thẻ cấp độ ---- */
+
+.program-body {
+  padding-block: var(--s-5) var(--s-9);
+}
+
+.program-tabs {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .program-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.program-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-5) var(--s-6);
+  min-height: 108px;
+  border-radius: 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--paper-raised);
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--ease),
+    box-shadow var(--motion-fast) var(--ease);
+}
+
+.program-tab:hover {
+  border-color: var(--gold);
+}
+
+.program-tab[aria-selected="true"] {
+  background: var(--frame);
+  color: var(--on-frame);
+  border-color: var(--frame);
+  box-shadow: var(--shadow-2);
+}
+
+.program-tab__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.program-tab__code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+/* Đêm: khung xanh đậm gần màu trang - viền vàng để thẻ đang chọn nổi lên. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .program-tab[aria-selected="true"] {
+    border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  }
+}
+:root[data-theme="dark"] .program-tab[aria-selected="true"] {
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+}
+
+.program-tab[aria-selected="true"] .program-tab__code {
+  color: var(--gold-light);
+}
+
+.program-tab__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  line-height: 1.25;
+}
+
+.program-tab__hours {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.program-tab[aria-selected="true"] .program-tab__hours {
+  color: var(--on-frame-muted);
+}
+
+.program-tab__icon {
+  flex: none;
+  color: var(--gold-deep);
+}
+
+.program-tab[aria-selected="true"] .program-tab__icon {
+  color: var(--gold-light);
+}
+
+@media (max-width: 560px) {
+  .program-tab {
+    padding: var(--s-4);
+    min-height: 0;
+  }
+  .program-tab__icon svg {
+    width: 30px;
+    height: 30px;
+  }
+  .program-tab__code {
+    font-size: 1.75rem;
+  }
+  .program-tab__title {
+    font-size: var(--fs-md);
+  }
+}
+
+.program-note {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: var(--s-3) 0 var(--s-6);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* ---- bảng chi tiết ---- */
+
+.program-panel {
+  padding: var(--s-8);
+  border-radius: 22px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .program-panel {
+    padding: var(--s-6) var(--s-5);
+  }
+}
+
+.program-panel__h {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  line-height: 1.15;
+  margin: 0 0 var(--s-2);
+}
+
+.program-panel__sub {
+  font-size: var(--fs-lg);
+  color: var(--muted);
+  max-width: 80ch;
+  margin: 0 0 var(--s-7);
+}
+
+.program-cols {
+  display: grid;
+  gap: var(--s-7);
+}
+
+@media (min-width: 960px) {
+  .program-cols {
+    grid-template-columns: 1fr 1fr 1.1fr;
+    gap: 0;
+  }
+  .program-col {
+    padding-inline: var(--s-7);
+    border-left: 1px solid var(--line-strong);
+  }
+  .program-col:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .program-col--can {
+    border-left: 0;
+  }
+}
+
+.program-col h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-xl);
+  color: var(--gold-ink);
+  margin: 0 0 var(--s-5);
+}
+
+.program-col h3 svg {
+  color: var(--gold-deep);
+}
+
+.program-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: muc;
+  display: grid;
+  gap: var(--s-3);
+}
+
+.program-list li {
+  counter-increment: muc;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-4);
+  line-height: 1.5;
+}
+
+.program-list li::before {
+  content: counter(muc);
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--gold) 18%, var(--paper));
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.program-col--can {
+  padding: var(--s-6) !important;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--gold) 12%, var(--paper));
+}
+
+.program-can {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-4);
+}
+
+.program-can li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-4);
+  line-height: 1.45;
+}
+
+.program-can li > span {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--frame);
+  color: var(--gold-light);
+}
+
+.program-building {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin: var(--s-7) 0 0;
+  max-width: none;
+  padding: var(--s-3) var(--s-5);
+  border-radius: 10px;
+  background: var(--paper-sunken);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* ---- dải kêu gọi ---- */
+
+.program-cta-wrap {
+  padding-bottom: var(--s-10);
+}
+
+.program-cta {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: var(--s-5);
+  align-items: center;
+  padding: var(--s-7) var(--s-6);
+  border-radius: 22px;
+  background: var(--frame);
+  color: var(--on-frame);
+}
+
+@media (min-width: 900px) {
+  .program-cta {
+    grid-template-columns: 200px 1fr auto 210px;
+    gap: var(--s-7);
+    padding: var(--s-6) var(--s-8);
+  }
+}
+
+.program-cta__art {
+  color: var(--gold-light);
+  display: none;
+}
+
+.program-cta__art svg {
+  position: static;
+  width: 100%;
+  max-width: none;
+}
+
+@media (min-width: 900px) {
+  .program-cta__art {
+    display: block;
+  }
+}
+
+.program-cta__text h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.625rem, 2.6vw, 2.25rem);
+  margin: 0 0 var(--s-2);
+  color: var(--on-frame);
+}
+
+.program-cta__text p {
+  margin: 0;
+  color: var(--on-frame-muted);
+}
+
+.program-cta__script {
+  display: none;
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  color: var(--gold-light);
+  transform: rotate(-8deg);
+}
+
+@media (min-width: 1180px) {
+  .program-cta__script {
+    display: block;
+  }
+}
+
+/* ============================================================ TRANG CON */
+
+/*
+ * Các trang con (Lớp học, Đội ngũ, Học phí, Quy chế…) mở đầu bằng cùng một
+ * khuôn: nhãn, tiêu đề, đoạn dẫn trong .section đầu tiên. Khuôn đó được đồng
+ * bộ ở đây thay vì sửa từng trang: tiêu đề lớn chữ có chân, và dải tranh Berlin
+ * ở góc phải.
+ *
+ * Trang chỉ có MỘT section (Câu hỏi, Điều khoản, Riêng tư) thì section đó là
+ * cả trang - tranh ở đáy nó sẽ nằm lẫn vào nội dung, nên không vẽ.
+ */
+.site main > .section:first-child {
+  position: relative;
+  overflow: hidden;
+}
+
+.site main > .section:first-child h1 {
+  font-size: clamp(2.375rem, 4.4vw, 4rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  max-width: 16em;
+  text-wrap: balance;
+}
+
+.site main > .section:first-child > .wrap > .lede {
+  font-size: var(--fs-xl);
+  color: var(--ink);
+}
+
+@media (min-width: 1100px) {
+  .site main > .section:first-child:not(:only-child) {
+    padding-bottom: var(--s-11);
+  }
+
+  .site main > .section:first-child:not(:only-child)::after {
+    content: "";
+    position: absolute;
+    right: max(var(--s-8), calc((100vw - 1400px) / 2));
+    bottom: var(--s-3);
+    width: min(38vw, 560px);
+    aspect-ratio: 800 / 205;
+    background-color: var(--art-ink, var(--gold-deep));
+    -webkit-mask: url("/art/berlin-dai.png") no-repeat center bottom / contain;
+    mask: url("/art/berlin-dai.png") no-repeat center bottom / contain;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
+  /* Chữ của phần mở đầu chừa chỗ cho tranh. */
+  .site main > .section:first-child:not(:only-child) > .wrap > * {
+    max-width: min(58%, 68ch);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .site main > .section:first-child::after {
+    --art-ink: var(--gold);
+  }
+}
+:root[data-theme="dark"] .site main > .section:first-child::after {
+  --art-ink: var(--gold);
+}
