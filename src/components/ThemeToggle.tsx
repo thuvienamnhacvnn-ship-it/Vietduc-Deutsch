@@ -40,9 +40,13 @@ const LABEL: Record<Theme, string> = {
   dark: "Giao diện: tối",
 };
 
+/** Nhãn đã dịch, truyền từ khu công khai; khu học viên dùng nhãn tiếng Việt ở trên. */
+export type ThemeLabels = Record<Theme, string> & { hint: string };
+
 const ICON: Record<Theme, string> = { system: "◐", light: "☀", dark: "☾" };
 
-export function ThemeToggle() {
+export function ThemeToggle({ labels }: { labels?: ThemeLabels } = {}) {
+  const label = labels ?? LABEL;
   const theme = useSyncExternalStore(subscribe, readTheme, () => "system" as Theme);
 
   function apply(next: Theme) {
@@ -69,10 +73,12 @@ export function ThemeToggle() {
       type="button"
       className="btn btn--ghost btn--sm"
       onClick={() => apply(next)}
-      title={LABEL[theme]}
+      title={label[theme]}
     >
       <span aria-hidden="true">{ICON[theme]}</span>
-      <span className="sr-only">{LABEL[theme]}. Bấm để đổi.</span>
+      <span className="sr-only">
+        {label[theme]}. {labels?.hint ?? "Bấm để đổi."}
+      </span>
     </button>
   );
 }

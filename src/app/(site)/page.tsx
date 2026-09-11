@@ -1,173 +1,144 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { brand } from "@/lib/brand";
-import { CURRICULUM, TEACHING_CYCLE } from "@/content/curriculum";
-import { AGENTS } from "@/content/agents";
-import { FAQ, HONESTY, JOURNEY } from "@/content/site";
-import { HeroArt } from "@/components/HeroArt";
-import { PlanCards } from "@/components/PlanCards";
-import { listPublicPlans } from "@/lib/queries";
+import { getDict } from "@/i18n/server";
+import { LOCALE_TAGS } from "@/i18n/config";
+import { ClassroomDemo } from "@/components/home/ClassroomDemo";
+import { LevelArt } from "@/components/home/LevelArt";
+import { IconArrow, IconBars, IconBook, IconMic, IconPlay } from "@/components/home/Icons";
 
+const LEVELS = ["A1", "A2", "B1", "B2"] as const;
+const FEATURE_ICONS = [IconBars, IconMic, IconBook];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getDict();
+  return {
+    title: { absolute: t.meta.title },
+    description: t.meta.description,
+    openGraph: { title: t.meta.title, description: t.meta.description },
+  };
+}
+
+/**
+ * Trang chủ theo bản thiết kế "giấy kem - xanh đậm - vàng kim".
+ *
+ * Toàn bộ chữ lấy từ từ điển của ngôn ngữ đang chọn (src/i18n/dict). Câu tiếng
+ * Đức và dòng viết tay tiếng Đức giữ nguyên ở mọi bản, có `lang="de"`.
+ */
 export default async function HomePage() {
-  const plans = await listPublicPlans();
+  const { locale, t } = await getDict();
 
   return (
-    <>
+    <div className="home" lang={LOCALE_TAGS[locale]}>
       {/* ------------------------------------------------------------ HERO */}
-      <section className="hero">
-        <div className="wrap hero__inner">
-          <div className="hero__text">
-            <p className="eyebrow">Tiếng Đức A1–B2 cho người Việt</p>
-            <h1 className="hero__h1">{brand.headline.vi}</h1>
-            <p className="lede">
-              {brand.promise.vi} Giải thích bằng tiếng Việt, luyện bằng tiếng Đức, và lộ trình dựng
-              từ kết quả thật của bạn chứ không phải một khoá học chung cho tất cả mọi người.
-            </p>
-            <div className="hero__cta">
-              <Link href="/dang-ky" className="btn btn--primary">
-                Kiểm tra trình độ
+      <section className="home-hero">
+        <div className="wrap home-hero__inner">
+          <div className="home-hero__text">
+            <p className="home-eyebrow">{t.hero.eyebrow}</p>
+            <h1 className="home-hero__h1">
+              <span>{t.hero.h1[0]}</span> <span>{t.hero.h1[1]}</span>
+            </h1>
+            <p className="home-hero__lede">{t.hero.lede}</p>
+
+            <div className="home-hero__cta">
+              <Link href="/dang-ky" className="btn btn--primary btn--lg">
+                {t.hero.ctaTest}
+                <IconArrow />
               </Link>
-              <Link href="/lop-hoc-ai" className="btn btn--secondary">
-                Trải nghiệm lớp học
+              <Link href="/lop-hoc-ai" className="btn btn--outline btn--lg">
+                <IconPlay size={18} />
+                {t.hero.ctaClass}
               </Link>
             </div>
-            <p className="hero__fine">
-              Miễn phí tạo tài khoản. Chưa thu tiền cho tới khi hệ thống thanh toán được chủ dự án
-              kích hoạt.
+
+            <ul className="home-features">
+              {t.hero.features.map((f, i) => {
+                const Icon = FEATURE_ICONS[i];
+                return (
+                  <li key={f.title}>
+                    <span className="home-features__icon" aria-hidden="true">
+                      <Icon size={20} />
+                    </span>
+                    <span>
+                      <strong>{f.title}</strong>
+                      <span>{f.body}</span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <p className="home-hero__script" lang="de" aria-hidden="true">
+              <span>Mehr als eine Sprache.</span>
+              <span>Eine größere Zukunft.</span>
             </p>
           </div>
-          <HeroArt />
+
+          <ClassroomDemo t={t.demo} />
         </div>
       </section>
 
-      {/* -------------------------------------------------------- HÀNH TRÌNH */}
-      <section className="section" id="hanh-trinh">
+      {/* -------------------------------------------------------- LỘ TRÌNH */}
+      <section className="home-section home-path" id="lo-trinh">
         <div className="wrap">
-          <p className="eyebrow">Hành trình học</p>
-          <h2>Năm bước, không bước nào là hình thức</h2>
-          <p className="lede">
-            Từ lúc bạn chưa có tài khoản đến lúc bạn ôn lại đúng những từ hay quên.
-          </p>
-
-          <ol className="journey">
-            {JOURNEY.map((step) => (
-              <li key={step.n} className="journey__item">
-                <span className="journey__n">{step.n}</span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* -------------------------------------------------------- CHƯƠNG TRÌNH */}
-      <section className="section band" id="chuong-trinh">
-        <div className="wrap">
-          <p className="eyebrow">Chương trình</p>
-          <h2>Từ A1 đến B2, mỗi cấp có đích đến rõ ràng</h2>
-          <p className="lede">
-            Khung mục tiêu tham chiếu CEFR, viết lại bằng những việc bạn làm được trong đời sống ở
-            Đức.
-          </p>
-
-          <div className="grid grid-4" style={{ marginTop: "var(--s-9)" }}>
-            {CURRICULUM.map((lvl) => (
-              <article key={lvl.level} className="card level-card">
-                <span className="badge badge--gold">{lvl.level}</span>
-                <h3 style={{ marginTop: "var(--s-4)" }}>{lvl.headline}</h3>
-                <ul className="tick">
-                  {lvl.canDo.slice(0, 3).map((c) => (
-                    <li key={c}>{c}</li>
-                  ))}
-                </ul>
-                <p className="level-card__hours">{lvl.typicalHours}</p>
-              </article>
-            ))}
+          <div className="home-path__head">
+            <div>
+              <h2 className="home-h2">{t.path.h2}</h2>
+              <p className="home-lede">{t.path.lede}</p>
+            </div>
+            <p className="home-kicker">{t.path.kicker}</p>
           </div>
 
-          <p style={{ marginTop: "var(--s-8)" }}>
-            <Link href="/chuong-trinh" className="btn btn--secondary">
-              Xem chi tiết từng cấp độ
-            </Link>
-          </p>
+          <div className="home-levels">
+            {LEVELS.map((lvl, i) => {
+              const L = t.path.levels[lvl];
+              return (
+                <article key={lvl} className="home-level" data-first={i === 0 || undefined}>
+                  <LevelArt level={lvl} />
+                  <div className="home-level__top">
+                    <span className="home-level__code">{lvl}</span>
+                    {i === 0 && <span className="home-level__badge">{t.path.startHere}</span>}
+                  </div>
+                  <h3 className="home-level__title">{L.title}</h3>
+                  <p className="home-level__body">{L.body}</p>
+                  <Link href={`/chuong-trinh#${lvl.toLowerCase()}`} className="home-level__more">
+                    {t.path.more}
+                    <IconArrow size={18} />
+                    <span className="sr-only"> — {lvl}</span>
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* ------------------------------------------------------ LỚP HỌC AI */}
-      <section className="section" id="lop-hoc">
+      {/* ------------------------------------------------------- HÀNH TRÌNH */}
+      <section className="home-section home-journey">
         <div className="wrap">
-          <p className="eyebrow">Trong một buổi học</p>
-          <h2>Một buổi học đi qua tám bước</h2>
-          <p className="lede">
-            Không phải một ô chat. Có người dẫn bài, có bảng giảng chạy theo nội dung đang dạy, có
-            lượt nói của bạn và có phần sửa lỗi tập trung.
-          </p>
-
-          <ol className="cycle">
-            {TEACHING_CYCLE.map((s, i) => (
-              <li key={s.step} className="cycle__item">
-                <span className="cycle__n" aria-hidden="true">
-                  {i + 1}
+          <p className="home-eyebrow">{t.journey.eyebrow}</p>
+          <h2 className="home-h2">{t.journey.h2}</h2>
+          <ol className="home-steps">
+            {t.journey.steps.map((s, i) => (
+              <li key={s.title}>
+                <span className="home-steps__n" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3>{s.step}</h3>
-                <p>{s.detail}</p>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* -------------------------------------------------------- GIÁO VIÊN AI */}
-      <section className="section" id="doi-ngu" style={{ background: "var(--paper-sunken)" }}>
+      {/* -------------------------------------------------------- NÓI THẲNG */}
+      <section className="home-section home-honest">
         <div className="wrap">
-          <p className="eyebrow">Đội ngũ</p>
-          <h2>Những người sẽ dạy bạn</h2>
-          <p className="lede">
-            Mỗi người một việc, một cách dạy. Chúng tôi ghi luôn cả những việc từng người{" "}
-            <strong>không</strong> được làm — đó mới là điều đáng biết khi bạn giao việc học của
-            mình cho ai đó.
-          </p>
-
-          <div className="grid grid-3" style={{ marginTop: "var(--s-9)" }}>
-            {AGENTS.slice(0, 6).map((a) => (
-              <article key={a.key} className="card card--hover">
-                <h3>{a.name ? `${a.name} — ${a.title}` : a.title}</h3>
-                <p className="persona">{a.persona}</p>
-                <p>{a.does}</p>
-                <p className="limits">
-                  <strong>Không làm:</strong> {a.limits}
-                </p>
-              </article>
-            ))}
-          </div>
-
-          <p style={{ marginTop: "var(--s-8)" }}>
-            <Link href="/giao-vien-ai" className="btn btn--secondary">
-              Xem cả đội ngũ
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------------------ GÓI HỌC */}
-      <section className="section" id="hoc-phi">
-        <div className="wrap">
-          <p className="eyebrow">Gói học</p>
-          <h2>Học phí</h2>
-          <PlanCards plans={plans} />
-        </div>
-      </section>
-
-      {/* ------------------------------------------------------- NÓI THẲNG */}
-      <section className="section band">
-        <div className="wrap">
-          <p className="eyebrow">Nói thẳng</p>
-          <h2>Ba điều chúng tôi không làm</h2>
-          <div className="grid grid-3" style={{ marginTop: "var(--s-8)" }}>
-            {HONESTY.map((h) => (
-              <div key={h.title} className="card">
+          <p className="home-eyebrow">{t.honest.eyebrow}</p>
+          <h2 className="home-h2">{t.honest.h2}</h2>
+          <div className="home-honest__grid">
+            {t.honest.items.map((h) => (
+              <div key={h.title} className="home-card">
                 <h3>{h.title}</h3>
                 <p>{h.body}</p>
               </div>
@@ -176,13 +147,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---------------------------------------------------------------- FAQ */}
-      <section className="section" id="cau-hoi">
-        <div className="wrap">
-          <p className="eyebrow">Câu hỏi thường gặp</p>
-          <h2>Những điều người học hỏi trước tiên</h2>
+      {/* -------------------------------------------------------------- FAQ */}
+      <section className="home-section" id="cau-hoi">
+        <div className="wrap home-faq">
+          <div>
+            <p className="home-eyebrow">{t.faq.eyebrow}</p>
+            <h2 className="home-h2">{t.faq.h2}</h2>
+          </div>
           <div className="faq">
-            {FAQ.map((item) => (
+            {t.faq.items.map((item) => (
               <details key={item.q} className="faq__item">
                 <summary>{item.q}</summary>
                 <p>{item.a}</p>
@@ -192,21 +165,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* --------------------------------------------------------------- CTA */}
-      <section className="section cta-final">
-        <div className="wrap" style={{ textAlign: "center" }}>
-          <h2>Bắt đầu bằng một bài kiểm tra thật</h2>
-          <p className="lede" style={{ marginInline: "auto" }}>
-            Bốn kỹ năng được kiểm riêng. Kết quả nói rõ bạn đang ở đâu và phần nào chưa đủ dữ liệu
-            để kết luận.
-          </p>
-          <p style={{ marginTop: "var(--s-6)" }}>
-            <Link href="/dang-ky" className="btn btn--primary">
-              Tạo tài khoản và kiểm tra
+      {/* -------------------------------------------------------------- CTA */}
+      <section className="home-cta">
+        <div className="wrap home-cta__inner">
+          <h2 className="home-h2">{t.cta.h2}</h2>
+          <p className="home-lede">{t.cta.lede}</p>
+          <p>
+            <Link href="/dang-ky" className="btn btn--gold btn--lg">
+              {t.cta.button}
+              <IconArrow />
             </Link>
           </p>
+          <p className="home-cta__fine">{t.cta.fine}</p>
         </div>
       </section>
-    </>
+    </div>
   );
 }

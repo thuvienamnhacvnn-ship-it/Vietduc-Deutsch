@@ -25,6 +25,7 @@ export default function ProgramPage() {
       {CURRICULUM.map((lvl, i) => (
         <section
           key={lvl.level}
+          id={lvl.level.toLowerCase()}
           className="section"
           style={{ background: i % 2 === 1 ? "var(--paper-sunken)" : undefined }}
         >

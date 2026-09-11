@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 import { brand } from "@/lib/brand";
 import { config } from "@/lib/config";
+import { getDict } from "@/i18n/server";
 
 export const metadata: Metadata = {
   // Cần cho việc dựng URL tuyệt đối của ảnh Open Graph. Đọc từ cấu hình để bản
@@ -57,7 +58,11 @@ try {
 } catch (e) {}
 `;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // `lang` của <html> để tiếng Việt: chỉ khu công khai có bản dịch, và các vùng
+  // đã dịch tự khai `lang` riêng. Riêng liên kết "bỏ qua điều hướng" theo ngôn
+  // ngữ đã chọn vì nó là thứ đầu tiên người dùng bàn phím gặp.
+  const { t } = await getDict();
   return (
     <html lang="vi" suppressHydrationWarning>
       <head>
@@ -65,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <a className="skip-link" href="#noi-dung">
-          Bỏ qua điều hướng, tới nội dung chính
+          {t.chrome.skip}
         </a>
         {children}
       </body>

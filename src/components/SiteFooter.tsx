@@ -2,6 +2,8 @@ import Link from "next/link";
 import { brand, telHref } from "@/lib/brand";
 import { Logo } from "./Logo";
 import { FooterMap } from "./FooterMap";
+import { LOCALE_TAGS, type Locale } from "@/i18n/config";
+import { fill, type Dict } from "@/i18n/dict";
 
 /**
  * Chân trang, ba dải đều nhau - lấy nguyên cấu trúc của chân trang
@@ -14,7 +16,7 @@ import { FooterMap } from "./FooterMap";
  * Icon mạng xã hội chỉ render khi brand.social có URL thật - yêu cầu A-08.
  * Danh sách rỗng thì cả khối biến mất, không có icon dẫn tới "#".
  */
-export function SiteFooter() {
+export function SiteFooter({ locale, t }: { locale: Locale; t: Dict["footer"] }) {
   const tel = telHref(brand.phoneE164 || brand.phone);
   /*
    * Cột "Văn phòng" bỏ trụ sở ra: địa chỉ trụ sở đã nằm ngay trên, cạnh bản đồ.
@@ -24,28 +26,30 @@ export function SiteFooter() {
   const otherOffices = brand.offices.filter((o) => o.address !== brand.headquarters);
   const legal = brand.legalEntity;
   const missing = [
-    !legal.register && "mã số doanh nghiệp",
-    !legal.vatId && "mã số thuế",
-    !legal.responsible && "người chịu trách nhiệm nội dung",
+    !legal.register && t.missing.register,
+    !legal.vatId && t.missing.vatId,
+    !legal.responsible && t.missing.responsible,
   ].filter(Boolean) as string[];
+  // Tiếng Nhật và tiếng Trung liệt kê bằng dấu "、", không phải dấu phẩy.
+  const listSep = locale === "ja" || locale === "zh" ? "、" : ", ";
 
   return (
-    <footer className="band site-footer">
+    <footer className="band site-footer" lang={LOCALE_TAGS[locale]}>
       {/* ------------------------------------------------------- văn phòng */}
       <div className="wrap site-footer__office">
         <div className="site-footer__office-text">
           <Logo variant="plate" height={44} />
-          <p className="site-footer__motto">{brand.motto}</p>
+          <p className="site-footer__motto">{t.motto}</p>
           <p className="site-footer__legal-name">{legal.company}</p>
 
           <dl className="site-footer__contact">
             <div>
-              <dt>Trụ sở</dt>
+              <dt>{t.hq}</dt>
               <dd>{brand.headquarters}</dd>
             </div>
             {tel ? (
               <div>
-                <dt>Điện thoại</dt>
+                <dt>{t.phone}</dt>
                 <dd>
                   <a href={tel}>{brand.phone}</a>
                 </dd>
@@ -53,7 +57,7 @@ export function SiteFooter() {
             ) : null}
             {brand.email ? (
               <div>
-                <dt>Email</dt>
+                <dt>{t.email}</dt>
                 <dd>
                   <a href={`mailto:${brand.email}`}>{brand.email}</a>
                 </dd>
@@ -61,7 +65,7 @@ export function SiteFooter() {
             ) : null}
             {brand.website ? (
               <div>
-                <dt>Website</dt>
+                <dt>{t.website}</dt>
                 <dd>
                   <a href={brand.website} target="_blank" rel="noopener noreferrer">
                     {brand.website.replace(/^https?:\/\//, "")}
@@ -73,7 +77,7 @@ export function SiteFooter() {
 
           {brand.social.length > 0 ? (
             <div className="site-footer__social">
-              <h2 className="site-footer__h">Kênh của chúng tôi</h2>
+              <h2 className="site-footer__h">{t.social}</h2>
               <div className="site-footer__social-links">
                 {brand.social.map((s) => (
                   <a key={s.href} href={s.href} rel="noreferrer noopener" target="_blank">
@@ -89,57 +93,57 @@ export function SiteFooter() {
           address={brand.headquarters}
           bbox={brand.map.bbox}
           marker={brand.map.marker}
-          title={`Bản đồ vị trí trụ sở ${brand.fullName}`}
-          directionsLabel="Chỉ đường"
+          title={fill(t.mapTitle, { name: brand.fullName })}
+          directionsLabel={t.directions}
         />
       </div>
 
       {/* --------------------------------------------------- sơ đồ trang */}
       <div className="wrap site-footer__cols">
-        <nav aria-label="Học">
-          <h2 className="site-footer__h">Học</h2>
+        <nav aria-label={t.learn}>
+          <h2 className="site-footer__h">{t.learn}</h2>
           <ul>
             <li>
-              <Link href="/chuong-trinh">Chương trình A1–B2</Link>
+              <Link href="/chuong-trinh">{t.links.program}</Link>
             </li>
             <li>
-              <Link href="/lop-hoc-ai">Lớp học</Link>
+              <Link href="/lop-hoc-ai">{t.links.classroom}</Link>
             </li>
             <li>
-              <Link href="/giao-vien-ai">Đội ngũ giảng dạy</Link>
+              <Link href="/giao-vien-ai">{t.links.team}</Link>
             </li>
             <li>
-              <Link href="/hoc-phi">Học phí</Link>
+              <Link href="/hoc-phi">{t.links.pricing}</Link>
             </li>
           </ul>
         </nav>
 
-        <nav aria-label="Tài khoản">
-          <h2 className="site-footer__h">Tài khoản</h2>
+        <nav aria-label={t.account}>
+          <h2 className="site-footer__h">{t.account}</h2>
           <ul>
             <li>
-              <Link href="/dang-ky">Tạo tài khoản</Link>
+              <Link href="/dang-ky">{t.links.signup}</Link>
             </li>
             <li>
-              <Link href="/dang-nhap">Đăng nhập</Link>
+              <Link href="/dang-nhap">{t.links.signin}</Link>
             </li>
             <li>
-              <Link href="/cau-hoi">Câu hỏi thường gặp</Link>
+              <Link href="/cau-hoi">{t.links.faq}</Link>
             </li>
             <li>
-              <Link href="/quy-che-thi">Quy chế kiểm tra xếp lớp</Link>
+              <Link href="/quy-che-thi">{t.links.placementRules}</Link>
             </li>
           </ul>
         </nav>
 
-        <nav aria-label="Pháp lý">
-          <h2 className="site-footer__h">Pháp lý</h2>
+        <nav aria-label={t.legal}>
+          <h2 className="site-footer__h">{t.legal}</h2>
           <ul>
             <li>
-              <Link href="/dieu-khoan">Điều khoản sử dụng</Link>
+              <Link href="/dieu-khoan">{t.links.terms}</Link>
             </li>
             <li>
-              <Link href="/rieng-tu">Quyền riêng tư</Link>
+              <Link href="/rieng-tu">{t.links.privacy}</Link>
             </li>
             <li>
               <a href={`mailto:${brand.email}`}>{brand.email}</a>
@@ -152,7 +156,7 @@ export function SiteFooter() {
             có ô nào. */}
         {otherOffices.length > 0 && (
           <div className="site-footer__offices">
-            <h2 className="site-footer__h">Văn phòng</h2>
+            <h2 className="site-footer__h">{t.offices}</h2>
             <ul>
               {otherOffices.map((office) => (
                 <li key={office.city}>
@@ -169,18 +173,18 @@ export function SiteFooter() {
       <div className="site-footer__bottom">
         <div className="wrap site-footer__bottom-inner">
           <p className="site-footer__copy">
-            © {new Date().getFullYear()} {brand.fullName}. Bản quyền thuộc về {brand.fullName}. Nội
-            dung học do AI hỗ trợ biên soạn và có người duyệt trước khi xuất bản.
+            © {new Date().getFullYear()} {brand.fullName}. {fill(t.rights, { name: brand.fullName })}{" "}
+            {t.aiNote}
           </p>
           <ul className="site-footer__legal-links">
             <li>
-              <Link href="/rieng-tu">Quyền riêng tư</Link>
+              <Link href="/rieng-tu">{t.links.privacy}</Link>
             </li>
             <li>
-              <Link href="/dieu-khoan">Điều khoản sử dụng</Link>
+              <Link href="/dieu-khoan">{t.links.terms}</Link>
             </li>
             <li>
-              <Link href="/quy-che-thi">Quy chế kiểm tra</Link>
+              <Link href="/quy-che-thi">{t.links.placementShort}</Link>
             </li>
           </ul>
         </div>
@@ -188,8 +192,7 @@ export function SiteFooter() {
         {missing.length > 0 && (
           <div className="wrap">
             <p className="site-footer__pending">
-              Chưa có {missing.join(", ")}. Những mục này bắt buộc phải có trước khi trang được công
-              khai và mở bán.
+              {fill(t.missing.sentence, { list: missing.join(listSep) })}
             </p>
           </div>
         )}

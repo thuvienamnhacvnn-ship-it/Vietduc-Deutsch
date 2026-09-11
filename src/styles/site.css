@@ -1,0 +1,1607 @@
+/*
+ * KHU CÔNG KHAI - bản thiết kế "giấy kem, xanh đậm, vàng kim".
+ *
+ * Bảng màu này CHỈ áp trong `.site` (layout của khu công khai). Khu học viên và
+ * cổng quản trị giữ bảng đỏ của tokens.css. Logo vẫn là logo đỏ - vàng - đen;
+ * đỏ lùi về làm màu của logo, xanh đậm làm cấu trúc, vàng kim làm nét trang trí.
+ *
+ * TƯƠNG PHẢN (công thức WCAG 2.x, đã tính cho từng cặp):
+ *   ngày  --ink      #111B2E trên --paper #F8F3EA  15.6:1
+ *         --muted    #585F6E trên --paper           5.8:1
+ *         --gold-ink #7E5A1B trên --paper           5.6:1  chữ vàng nhỏ
+ *         trắng trên --brand-fill #14223D          15.8:1
+ *   đêm   --ink      #F1EBDF trên --paper #0B1322  15.6:1
+ *         --muted    #A7AFBF trên --paper           8.4:1
+ *         --gold-ink #E2BF80 trên --paper          10.6:1
+ *         --on-brand-fill #0B1322 trên #E2BC76     10.3:1
+ *
+ * Vàng kim #C9A15E (ngày) chỉ dùng cho nét vẽ và viền, KHÔNG cho chữ: trên giấy
+ * kem nó chỉ đạt 2.2:1. Chữ vàng luôn là --gold-ink.
+ *
+ * Thẻ A1 và khung lớp học dùng --frame (xanh đậm ở CẢ HAI chủ đề), không dùng
+ * --brand-fill: ở chủ đề đêm --brand-fill là vàng, và chữ vàng nhạt trên nền
+ * vàng chỉ còn 1.2:1 - đo ra mới thấy.
+ */
+
+.site {
+  --paper: #f8f3ea;
+  --paper-raised: #fffdf8;
+  --paper-sunken: #f2eadd;
+  --ink: #111b2e;
+  --muted: #585f6e;
+  --line: #e7ddcd;
+  --line-strong: #d3c4ac;
+
+  --brand: #14223d;
+  --brand-600: #1e3157;
+  --brand-800: #0c1628;
+  --brand-900: #0a1220;
+  --brand-fill: #14223d;
+  --brand-fill-hover: #22375f;
+  --on-brand-fill: #ffffff;
+
+  --gold: #c9a15e;
+  --gold-light: #e5c68f;
+  --gold-deep: #a87d3b;
+  --gold-ink: #7e5a1b;
+  --on-gold: #14223d;
+
+  --band: #101b31;
+  --on-band: #f4eee3;
+  --on-band-muted: #b8bfcc;
+
+  --frame: #14223d;
+  --frame-line: rgba(255, 255, 255, 0.08);
+  --on-frame: #f4eee3;
+  --on-frame-muted: #b8bfcc;
+
+  --scene-sky-top: #f1e4cf;
+  --scene-sky-bottom: #fbf6ec;
+  --scene-orb: #f3d9a6;
+  --scene-far: #e9dcc5;
+  --scene-line: #bf9551;
+  --scene-fill: #f8f0e2;
+  --scene-win: transparent;
+  --scene-water-top: #efe3ce;
+  --scene-water-bottom: #f8f1e4;
+
+  --font-display: var(--font-playfair), "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-script: var(--font-caveat), "Segoe Script", "Bradley Hand", cursive;
+
+  --shadow-1: 0 1px 2px rgba(20, 34, 61, 0.06), 0 1px 3px rgba(20, 34, 61, 0.05);
+  --shadow-2: 0 6px 16px rgba(20, 34, 61, 0.08), 0 2px 4px rgba(20, 34, 61, 0.05);
+  --shadow-3: 0 24px 50px rgba(20, 34, 61, 0.16), 0 6px 14px rgba(20, 34, 61, 0.08);
+
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* Bảng đêm, khai báo hai lần như tokens.css: người đọc tự chọn, hoặc chưa chọn
+   mà hệ thống đang tối. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .site {
+    --paper: #0b1322;
+    --paper-raised: #121c30;
+    --paper-sunken: #08101c;
+    --ink: #f1ebdf;
+    --muted: #a7afbf;
+    --line: #212e47;
+    --line-strong: #34445f;
+
+    --brand: #e6c68a;
+    --brand-600: #edd29e;
+    --brand-800: #f2dcb2;
+    --brand-900: #f6e6c8;
+    --brand-fill: #e2bc76;
+    --brand-fill-hover: #edca8c;
+    --on-brand-fill: #0b1322;
+
+    --gold: #d8b06a;
+    --gold-light: #ebcf9c;
+    --gold-deep: #b68e4a;
+    --gold-ink: #e2bf80;
+    --on-gold: #0b1322;
+
+    --band: #060b15;
+    --on-band: #efe9dd;
+    --on-band-muted: #9ea7b8;
+
+    --frame: #18243e;
+    --frame-line: rgba(226, 188, 118, 0.14);
+
+    --scene-sky-top: #0c1629;
+    --scene-sky-bottom: #1c2b4a;
+    --scene-orb: #efe2c2;
+    --scene-far: #15213a;
+    --scene-line: #c9a160;
+    --scene-fill: #111c33;
+    --scene-win: #f2c46d;
+    --scene-water-top: #14213b;
+    --scene-water-bottom: #0a1323;
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --shadow-3: 0 24px 50px rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root[data-theme="dark"] .site {
+  --paper: #0b1322;
+  --paper-raised: #121c30;
+  --paper-sunken: #08101c;
+  --ink: #f1ebdf;
+  --muted: #a7afbf;
+  --line: #212e47;
+  --line-strong: #34445f;
+
+  --brand: #e6c68a;
+  --brand-600: #edd29e;
+  --brand-800: #f2dcb2;
+  --brand-900: #f6e6c8;
+  --brand-fill: #e2bc76;
+  --brand-fill-hover: #edca8c;
+  --on-brand-fill: #0b1322;
+
+  --gold: #d8b06a;
+  --gold-light: #ebcf9c;
+  --gold-deep: #b68e4a;
+  --gold-ink: #e2bf80;
+  --on-gold: #0b1322;
+
+  --band: #060b15;
+  --on-band: #efe9dd;
+  --on-band-muted: #9ea7b8;
+
+  --frame: #18243e;
+  --frame-line: rgba(226, 188, 118, 0.14);
+
+  --scene-sky-top: #0c1629;
+  --scene-sky-bottom: #1c2b4a;
+  --scene-orb: #efe2c2;
+  --scene-far: #15213a;
+  --scene-line: #c9a160;
+  --scene-fill: #111c33;
+  --scene-win: #f2c46d;
+  --scene-water-top: #14213b;
+  --scene-water-bottom: #0a1323;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 24px 50px rgba(0, 0, 0, 0.55);
+}
+
+/* Nền của chính <body> - thấy được khi kéo quá đầu/cuối trang. Không đặt thì
+   lộ màu giấy đỏ-nâu của tokens.css ở chủ đề đêm. */
+body:has(> .site) {
+  background: #f8f3ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) body:has(> .site) {
+    background: #0b1322;
+  }
+}
+:root[data-theme="dark"] body:has(> .site) {
+  background: #0b1322;
+}
+
+/*
+ * Chữ CJK: Playfair không có chữ Nhật, Trung, Hàn, và nạp một bộ chữ CJK là vài
+ * MB. Mỗi thứ tiếng dùng font có sẵn của hệ điều hành, xếp theo Mac - Windows -
+ * Android. Playfair vẫn đứng đầu danh sách để chữ Latin và số trong câu (A1,
+ * B2, tên Anna) giữ đúng nét của bản thiết kế.
+ */
+.site :lang(ja) {
+  --font-display: var(--font-playfair), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho",
+    "Noto Serif JP", serif;
+  --font-sans: "Hiragino Sans", "Yu Gothic UI", "Meiryo", "Noto Sans JP", system-ui, sans-serif;
+}
+.site :lang(zh) {
+  --font-display: var(--font-playfair), "Songti SC", "STSong", "Noto Serif SC", "SimSun", serif;
+  --font-sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+}
+.site :lang(ko) {
+  --font-display: var(--font-playfair), "AppleMyungjo", "Noto Serif KR", "Batang", serif;
+  --font-sans: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+}
+.site :lang(ja),
+.site :lang(zh),
+.site :lang(ko) {
+  font-family: var(--font-sans);
+  /* Chữ CJK không có khoảng trắng giữa từ; ngắt dòng theo cụm từ thay vì giữa
+     một từ ghép (trình duyệt chưa hỗ trợ thì bỏ qua). */
+  word-break: auto-phrase;
+  line-break: strict;
+}
+
+/* ------------------------------------------------------------------ nút */
+
+.site .btn {
+  border-radius: 14px;
+}
+
+.site .btn--lg {
+  min-height: 56px;
+  padding: var(--s-3) var(--s-7);
+  font-size: var(--fs-lg);
+}
+
+.site .btn--outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+
+.site .btn--outline:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.site .btn--gold {
+  background: var(--gold-light);
+  color: var(--on-gold);
+  border-color: var(--gold-light);
+}
+
+.site .btn--gold:hover:not(:disabled) {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+/* --------------------------------------------------------- cụm nhận diện */
+
+.brand-lockup {
+  --lockup-h: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--lockup-h) * 0.18);
+  line-height: 1;
+}
+
+.brand-lockup__flame {
+  display: block;
+  width: calc(var(--lockup-h) * 0.92);
+  height: var(--lockup-h);
+  overflow: hidden;
+  flex: none;
+}
+
+.brand-lockup__flame img {
+  height: var(--lockup-h);
+  width: auto;
+  max-width: none;
+  display: block;
+}
+
+.brand-lockup__text {
+  display: grid;
+  justify-items: center;
+  gap: calc(var(--lockup-h) * 0.1);
+}
+
+.brand-lockup__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: calc(var(--lockup-h) * 0.5);
+  letter-spacing: 0.01em;
+  /* Vàng kim có chuyển sắc như chữ trong logo gốc. Đây là chữ của logo, không
+     phải chữ để đọc: đường dẫn bọc ngoài đã có nhãn đầy đủ. */
+  background: linear-gradient(180deg, #e0ac5a 0%, #b88338 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  white-space: nowrap;
+}
+
+.brand-lockup__sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(var(--lockup-h) * 0.2);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: var(--gold-deep);
+}
+
+.brand-lockup__sub::before,
+.brand-lockup__sub::after {
+  content: "";
+  width: calc(var(--lockup-h) * 0.4);
+  height: 1px;
+  background: currentColor;
+}
+
+@media (max-width: 600px) {
+  .site-header .brand-lockup {
+    --lockup-h: 36px !important;
+  }
+}
+
+/* ============================================================ HEADER */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--motion) var(--ease),
+    border-color var(--motion) var(--ease),
+    box-shadow var(--motion) var(--ease);
+}
+
+.site-header[data-scrolled] {
+  background: color-mix(in srgb, var(--paper) 95%, transparent);
+  border-bottom-color: var(--line);
+  box-shadow: var(--shadow-1);
+}
+
+.site-header[data-open] {
+  background: var(--paper);
+  border-bottom-color: var(--line);
+}
+
+.site-header .wrap,
+.home .wrap,
+.site-footer .wrap {
+  max-width: 1400px;
+}
+
+.site-header__inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s-4);
+  min-height: 76px;
+}
+
+.site-header__brand {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.site-header__nav {
+  display: none;
+  justify-self: center;
+  gap: var(--s-7);
+}
+
+.site-header__link {
+  position: relative;
+  padding-block: var(--s-2);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--fs-md);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Vạch vàng dưới mục đang mở và mục đang rê chuột - nhẹ như bản thiết kế,
+   không phải viên thuốc tô màu. */
+.site-header__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--motion) var(--ease);
+}
+
+.site-header__link:hover {
+  color: var(--ink);
+}
+
+.site-header__link:hover::after,
+.site-header__link[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+.site-header__actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.site-header .site-header__signin,
+.site-header .site-header__theme,
+.site-header .site-header__lang,
+.site-header .site-header__motto {
+  display: none;
+}
+
+.site-header__signin {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--s-2) var(--s-3);
+  white-space: nowrap;
+}
+
+.site-header__signin:hover {
+  color: var(--gold-ink);
+}
+
+.site-header__cta {
+  white-space: nowrap;
+}
+
+/* Khẩu hiệu đứng sau vạch ba màu cờ Đức, như bản thiết kế. Chỉ hiện ở màn rộng. */
+.site-header__motto {
+  margin: 0 0 0 var(--s-3);
+  padding-left: var(--s-4);
+  position: relative;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.625rem;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.site-header__motto span {
+  white-space: nowrap;
+}
+
+.site-header__motto::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #111 0 33.3%, #dd0000 33.3% 66.6%, #ffce00 66.6%);
+}
+
+.site-header__burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.site-header__burger:hover {
+  border-color: var(--gold);
+}
+
+.burger__lines line {
+  transform-origin: 10px 10px;
+  transition:
+    transform var(--motion) var(--ease),
+    opacity var(--motion-fast) var(--ease);
+}
+.burger__lines[data-open] line:nth-child(1) {
+  transform: translateY(4px) rotate(45deg);
+}
+.burger__lines[data-open] line:nth-child(2) {
+  opacity: 0;
+}
+.burger__lines[data-open] line:nth-child(3) {
+  transform: translateY(-4px) rotate(-45deg);
+}
+
+.site-header__mobile {
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  padding-block: var(--s-3) var(--s-6);
+  box-shadow: var(--shadow-2);
+  max-height: calc(100dvh - 76px);
+  overflow-y: auto;
+}
+
+.site-header__mobile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--fs-lg);
+  font-weight: 560;
+  padding: var(--s-4) var(--s-3);
+  border-radius: 12px;
+}
+
+.site-header__mobile-link span {
+  color: var(--muted);
+  font-size: var(--fs-xl);
+  line-height: 1;
+}
+
+.site-header__mobile-link:hover {
+  background: var(--paper-sunken);
+}
+
+.site-header__mobile-link[aria-current="page"] {
+  background: var(--brand-fill);
+  color: var(--on-brand-fill);
+}
+
+.site-header__mobile-link[aria-current="page"] span {
+  color: var(--on-brand-fill);
+}
+
+.site-header__mobile-foot {
+  display: grid;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line);
+}
+
+.site-header__mobile-prefs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.site-header__mobile-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* Dải báo "trang này đang bằng tiếng Việt" cho người đã chọn tiếng khác. */
+.site-header__untranslated {
+  margin: 0;
+  max-width: none;
+  padding-block: var(--s-2);
+  background: var(--paper-sunken);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .site-header .site-header__nav,
+  .site-header .site-header__lang {
+    display: flex;
+  }
+  .site-header .site-header__signin,
+  .site-header .site-header__theme {
+    display: inline-flex;
+  }
+  .site-header .site-header__burger,
+  .site-header .site-header__mobile {
+    display: none;
+  }
+}
+
+/* Menu bốn mục + ngôn ngữ + giao diện + hai nút chật ở 1024-1180px: rút khoảng
+   cách menu lại thay vì để thanh tràn. */
+@media (min-width: 1024px) and (max-width: 1180px) {
+  .site-header__nav {
+    gap: var(--s-5);
+  }
+}
+
+@media (min-width: 1440px) {
+  .site-header .site-header__motto {
+    display: flex;
+  }
+}
+
+@media (max-width: 420px) {
+  /* Ở 390px: logo + nút "Bắt đầu học" + nút menu. Nút chính bỏ mũi tên cho vừa. */
+  .site-header__cta svg {
+    display: none;
+  }
+  .site-header__cta {
+    padding-inline: var(--s-3);
+  }
+}
+
+/* --------------------------------------------------------- chọn ngôn ngữ */
+
+.lang-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper-raised);
+  padding-left: 10px;
+  min-height: 44px;
+}
+
+.lang-switch:hover,
+.lang-switch:focus-within {
+  border-color: var(--gold);
+}
+
+.lang-switch[data-pending] {
+  opacity: 0.6;
+}
+
+.lang-switch select {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: 0 28px 0 2px;
+  min-height: 42px;
+  cursor: pointer;
+  /* Mũi tên tự vẽ vì đã bỏ giao diện gốc của ô chọn. */
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 52%,
+    calc(100% - 9px) 52%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.lang-switch select:focus {
+  outline: none;
+}
+
+.lang-switch:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ============================================================ TRANG CHỦ */
+
+.home-eyebrow {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  margin: 0 0 var(--s-4);
+}
+
+.home-h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--s-3);
+}
+
+.home-lede {
+  font-size: var(--fs-lg);
+  color: var(--muted);
+  margin: 0;
+}
+
+.home-section {
+  padding-block: var(--s-12);
+}
+
+@media (min-width: 900px) {
+  .home-section {
+    padding-block: var(--s-14);
+  }
+}
+
+/* ---------------------------------------------------------------- hero */
+
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--s-8) var(--s-12);
+}
+
+/* Tháp truyền hình vẽ mờ phía sau khối chữ, như nét phác trong bản thiết kế. */
+.home-hero::before {
+  content: "";
+  position: absolute;
+  left: 41%;
+  top: 300px;
+  width: 80px;
+  height: 330px;
+  opacity: 0.22;
+  pointer-events: none;
+  background: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 300' fill='none' stroke='%23C9A15E' stroke-width='1.3'%3E%3Cpath d='M26 300 29 90h2l3 210'/%3E%3Ccircle cx='30' cy='74' r='14'/%3E%3Cpath d='M16 72h28M17 78h26M30 60V4M27 22h6M28 38h4'/%3E%3Ccircle cx='30' cy='108' r='3'/%3E%3Cpath d='M10 300h40M4 296h52'/%3E%3C/svg%3E");
+}
+
+.home-hero__inner {
+  position: relative;
+  display: grid;
+  gap: var(--s-10);
+  align-items: center;
+}
+
+@media (min-width: 1080px) {
+  .home-hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
+    gap: var(--s-8);
+  }
+}
+
+.home-hero__h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 3.9vw, 4rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--s-6);
+}
+
+.home-hero__h1 > span {
+  display: block;
+}
+
+/* Tiêu đề CJK: không có chữ hoa, không cần siết khoảng chữ; cỡ nhỏ lại một nấc
+   vì mỗi chữ Hán vuông và đặc hơn chữ Latin. */
+.home-hero__h1:lang(ja),
+.home-hero__h1:lang(zh),
+.home-hero__h1:lang(ko),
+.home:lang(ja) .home-hero__h1,
+.home:lang(zh) .home-hero__h1,
+.home:lang(ko) .home-hero__h1 {
+  font-size: clamp(2.125rem, 3.3vw, 3.25rem);
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.home-hero__lede {
+  font-size: clamp(1.125rem, 1.6vw, 1.3125rem);
+  color: var(--muted);
+  max-width: 34em;
+  margin: 0 0 var(--s-8);
+}
+
+.home-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  margin-bottom: var(--s-9);
+}
+
+.home-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-5);
+}
+
+@media (min-width: 640px) {
+  .home-features {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-4);
+  }
+}
+
+.home-features li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.home-features__icon {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  color: var(--gold-ink);
+}
+
+.home-features strong {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.home-features li > span:last-child > span {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.home-hero__script {
+  margin: var(--s-9) 0 0;
+  font-family: var(--font-script);
+  font-size: 1.75rem;
+  line-height: 1.15;
+  color: var(--gold-ink);
+  display: grid;
+  gap: 0;
+  transform: rotate(-4deg);
+  transform-origin: left;
+}
+
+.home-hero__script span:last-child {
+  padding-left: 2.2em;
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.home-hero__script span:last-child::after {
+  content: "";
+  flex: 0 1 160px;
+  height: 1px;
+  background: var(--gold);
+}
+
+@media (max-width: 1079px) {
+  .home-hero::before,
+  .home-hero__script {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------- minh hoạ lớp học */
+
+.demo {
+  position: relative;
+  margin: 0;
+  padding-right: 0;
+}
+
+@media (min-width: 1280px) {
+  .demo {
+    padding-right: 72px;
+  }
+}
+
+.demo__frame {
+  background: var(--frame);
+  border-radius: 30px;
+  padding: 14px 14px 0;
+  box-shadow: var(--shadow-3);
+  border: 1px solid var(--frame-line);
+}
+
+.demo__screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  aspect-ratio: 16 / 10.4;
+  min-height: 320px;
+  isolation: isolate;
+}
+
+.demo__scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.scene-orb {
+  fill: var(--scene-orb);
+}
+.scene-far path {
+  fill: var(--scene-far);
+}
+.scene-line {
+  fill: none;
+  stroke: var(--scene-line);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.scene-fill {
+  fill: var(--scene-fill);
+}
+.scene-win rect {
+  fill: var(--scene-win);
+}
+.scene-wave {
+  opacity: 0.55;
+}
+
+.demo__chip {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px 10px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--frame) 88%, transparent);
+  color: var(--on-frame);
+  border: 1px solid var(--frame-line);
+  backdrop-filter: blur(6px);
+  line-height: 1.3;
+}
+
+.demo__chip strong {
+  display: block;
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.demo__avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #e5c68f, #b88338);
+  color: #14223d;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.125rem;
+  flex: none;
+}
+
+.demo__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  color: var(--on-frame-muted);
+}
+
+.demo__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3ecf7a;
+  box-shadow: 0 0 0 3px rgba(62, 207, 122, 0.25);
+}
+
+/* Anna là một giọng nói: một vòng tròn đang nghe, ba vòng sóng lan ra. */
+.demo__voice {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+}
+
+.demo__voice i {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #f0d7a6, #c1903f);
+  color: #14223d;
+  font-style: normal;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.75rem;
+  box-shadow: 0 10px 30px rgba(20, 34, 61, 0.25);
+}
+
+.demo__voice span {
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--scene-line);
+  opacity: 0;
+  animation: demo-ripple 2.6s var(--ease) infinite;
+}
+
+.demo__voice span:nth-child(2) {
+  animation-delay: 0.85s;
+}
+.demo__voice span:nth-child(3) {
+  animation-delay: 1.7s;
+}
+
+@keyframes demo-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+/* Giảm chuyển động: sóng đứng yên, hiện một vòng mờ thay vì biến mất hẳn. */
+@media (prefers-reduced-motion: reduce) {
+  .demo__voice span:first-child {
+    opacity: 0.5;
+    transform: scale(1.5);
+  }
+}
+
+.demo__turns {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.demo__bubble {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: 12px 18px;
+  border-radius: 16px;
+  max-width: min(100%, 420px);
+  line-height: 1.3;
+  box-shadow: var(--shadow-2);
+}
+
+.demo__bubble svg {
+  flex: none;
+}
+
+.demo__bubble--anna {
+  background: color-mix(in srgb, var(--frame) 92%, transparent);
+  color: var(--on-frame);
+  /* Ở chủ đề đêm bong bóng cùng tông với bầu trời; viền mảnh giữ nó tách ra. */
+  border: 1px solid var(--frame-line);
+}
+
+.demo__bubble--me {
+  margin-left: clamp(12px, 5%, 40px);
+  background: #fffdf8;
+  color: #111b2e;
+}
+
+.demo__de {
+  font-size: var(--fs-lg);
+  font-weight: 500;
+}
+
+.demo__tr {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--on-frame-muted);
+}
+
+/* Chữ sai được gạch dưới lượn sóng, như trình soát lỗi - người học nhận ra ngay
+   chữ nào đang được nói tới. */
+.demo__err {
+  text-decoration: underline wavy #d33a3d;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+.demo__wave {
+  width: 72px;
+  height: 18px;
+  fill: #b88338;
+}
+
+.demo__bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  padding: 12px 8px 14px;
+  color: var(--on-frame);
+}
+
+.demo__ctl {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: var(--fs-xs);
+  color: var(--on-frame-muted);
+}
+
+.demo__ctl svg {
+  color: var(--on-frame);
+}
+
+.demo__mic {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-top: -32px;
+  border-radius: 50%;
+  background: #ca2427;
+  color: #fff;
+  box-shadow:
+    0 0 0 5px var(--frame),
+    0 8px 20px rgba(202, 36, 39, 0.4);
+}
+
+.demo__mic svg {
+  color: #fff;
+}
+
+.demo__fix {
+  margin-top: var(--s-5);
+  padding: var(--s-5);
+  border-radius: 20px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-2);
+}
+
+@media (min-width: 1080px) {
+  .demo__fix {
+    position: absolute;
+    top: -24px;
+    right: 0;
+    width: 250px;
+    margin: 0;
+  }
+}
+
+.demo__fix-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-3);
+  font-weight: 600;
+}
+
+.demo__fix-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  color: var(--success);
+  flex: none;
+}
+
+.demo__fix-line {
+  margin: 0 0 var(--s-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  line-height: 1.3;
+}
+
+.demo__fix-line del {
+  color: var(--muted);
+  text-decoration-color: #d33a3d;
+  text-decoration-thickness: 2px;
+}
+
+.demo__fix-line ins {
+  text-decoration: none;
+  color: var(--gold-ink);
+  font-weight: 700;
+}
+
+.demo__fix-why {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.demo__script {
+  display: none;
+  position: absolute;
+  right: -8px;
+  bottom: 22%;
+  width: 90px;
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--gold-ink);
+  transform: rotate(-12deg);
+}
+
+.demo__script span {
+  color: var(--gold);
+}
+
+@media (min-width: 1280px) {
+  .demo__script {
+    display: block;
+  }
+}
+
+@media (max-width: 520px) {
+  .demo__frame {
+    border-radius: 22px;
+    padding: 10px 10px 0;
+  }
+  .demo__screen {
+    aspect-ratio: auto;
+    min-height: 340px;
+  }
+  .demo__chip strong {
+    font-size: var(--fs-sm);
+  }
+  .demo__voice {
+    top: 36%;
+  }
+}
+
+/* ------------------------------------------------------------ lộ trình */
+
+.home-path {
+  padding-top: var(--s-10);
+}
+
+.home-path__head {
+  display: grid;
+  gap: var(--s-4);
+  margin-bottom: var(--s-8);
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .home-path__head {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.home-kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  margin: 0;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.home-kicker::before {
+  content: "";
+  width: 64px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.home-levels {
+  display: grid;
+  gap: var(--s-5);
+}
+
+@media (min-width: 640px) {
+  .home-levels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1180px) {
+  .home-levels {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.home-level {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-7) var(--s-6) var(--s-6);
+  border-radius: 20px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  min-height: 290px;
+  overflow: hidden;
+  transition:
+    transform var(--motion) var(--ease),
+    box-shadow var(--motion) var(--ease);
+}
+
+@media (hover: hover) {
+  .home-level:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-2);
+  }
+}
+
+/* Thẻ A1 đậm màu: "bắt đầu tại đây" phải là thẻ nổi nhất. */
+.home-level[data-first] {
+  background: var(--frame);
+  color: var(--on-frame);
+  border-color: var(--frame);
+}
+
+/* Đêm: khung xanh đậm gần màu trang, nên thẻ cần viền vàng mới tách ra. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .home-level[data-first] {
+    border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+  }
+}
+:root[data-theme="dark"] .home-level[data-first] {
+  border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+}
+
+.level-art {
+  position: absolute;
+  top: var(--s-5);
+  right: var(--s-4);
+  width: 42%;
+  max-width: 140px;
+  height: auto;
+  color: var(--gold);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.home-level[data-first] .level-art {
+  color: var(--gold-light);
+}
+
+/* Mã cấp độ và tiêu đề ở nửa trái; tranh vẽ giữ nửa phải phía trên. */
+.home-level__top,
+.home-level__title {
+  max-width: 58%;
+}
+
+.home-level__top {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.home-level__code {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  font-weight: 700;
+  font-size: 2.75rem;
+  line-height: 1;
+  color: inherit;
+}
+
+.home-level[data-first] .home-level__code {
+  color: var(--gold-light);
+}
+
+.home-level__badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: var(--gold-light);
+  color: #14223d;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.home-level__title {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-xl);
+  margin: var(--s-3) 0 var(--s-4);
+}
+
+.home-level__body {
+  position: relative;
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0 0 var(--s-5);
+  max-width: none;
+  /* Chữ không chui dưới hình vẽ ở góc phải: hình chiếm nửa trên của thẻ, chữ
+     mô tả bắt đầu dưới tiêu đề nên chỉ cần né ở màn hẹp nhất. */
+}
+
+.home-level[data-first] .home-level__body {
+  color: var(--on-frame-muted);
+}
+
+.home-level__more {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.home-level__more::before {
+  /* Cả thẻ bấm được, không chỉ dòng chữ nhỏ ở đáy. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.home-level__more:hover {
+  color: var(--gold-ink);
+}
+
+.home-level[data-first] .home-level__more {
+  color: var(--gold-light);
+}
+
+/* ---------------------------------------------------------- hành trình */
+
+.home-journey {
+  background: var(--paper-sunken);
+}
+
+.home-steps {
+  list-style: none;
+  margin: var(--s-9) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-6);
+}
+
+@media (min-width: 720px) {
+  .home-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1180px) {
+  .home-steps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+}
+
+.home-steps li {
+  padding-top: var(--s-5);
+  border-top: 1.5px solid var(--gold);
+}
+
+.home-steps__n {
+  display: block;
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--gold-ink);
+  margin-bottom: var(--s-3);
+}
+
+.home-steps h3 {
+  font-size: var(--fs-lg);
+  margin: 0 0 var(--s-2);
+}
+
+.home-steps p {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ------------------------------------------------------------ nói thẳng */
+
+.home-honest__grid {
+  margin-top: var(--s-8);
+  display: grid;
+  gap: var(--s-5);
+}
+
+@media (min-width: 900px) {
+  .home-honest__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.home-card {
+  padding: var(--s-7) var(--s-6);
+  border-radius: 20px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold);
+}
+
+.home-card h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--s-3);
+}
+
+.home-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ FAQ */
+
+.home-faq {
+  display: grid;
+  gap: var(--s-6);
+}
+
+@media (min-width: 960px) {
+  .home-faq {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--s-10);
+    align-items: start;
+  }
+  .home-faq .faq {
+    margin-top: 0;
+  }
+}
+
+.site .faq__item summary::after {
+  color: var(--gold-ink);
+}
+
+/* ------------------------------------------------------------------ CTA */
+
+.home-cta {
+  position: relative;
+  overflow: hidden;
+  background: var(--band);
+  color: var(--on-band);
+  padding-block: var(--s-13) calc(var(--s-13) + 70px);
+  text-align: center;
+}
+
+/* Đường chân trời Berlin chạy dọc đáy dải, cùng nét vẽ với hero. */
+.home-cta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 110px;
+  opacity: 0.35;
+  pointer-events: none;
+  background: repeat-x bottom center / auto 110px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 110' fill='none' stroke='%23D8B06A' stroke-width='1.3' stroke-linejoin='round'%3E%3Cpath d='M0 110V92h40V78h26v14h30V64h24v46M130 110V84h20V70h30v40M196 110V70h120v40M226 70V56h60v14M222 56c3-28 18-38 34-38s31 10 34 38M252 18V6h8v12M330 110V20l3-8 3 8v90M322 32h22M334 12V0M360 110V80h40v-18h30v48M440 110V88h36V72h40v38M530 110V60h26v50M566 110V90h74'/%3E%3C/svg%3E");
+}
+
+.home-cta__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+}
+
+.home-cta .home-h2 {
+  color: var(--on-band);
+}
+
+.home-cta .home-lede {
+  text-wrap: balance;
+  color: var(--on-band-muted);
+  max-width: 44em;
+  margin-bottom: var(--s-7);
+}
+
+.home-cta__fine {
+  max-width: 58ch;
+  text-wrap: balance;
+  margin: var(--s-5) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--on-band-muted);
+}
+
+/* Chân trang liền ngay dải CTA cùng màu: bỏ khoảng hở giữa hai dải. */
+.home + * .site-footer,
+.site main:has(.home-cta) + .site-footer {
+  margin-top: 0;
+}
+
+.site main:has(.home-cta) + .site-footer .site-footer__office {
+  border-top: 1px solid color-mix(in srgb, var(--on-band) 10%, transparent);
+}
