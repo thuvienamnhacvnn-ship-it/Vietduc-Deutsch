@@ -89,9 +89,21 @@ export async function POST(request: Request) {
 
   // Tắt xác minh thì KHÔNG sinh token và KHÔNG gửi thư: một token nằm đó không
   // ai dùng chỉ là một chìa khóa thừa nằm trong cơ sở dữ liệu.
-  const mail = config.requireEmailVerification
-    ? await sendMail(verifyEmailMail(email, name, await issueAuthToken(userId, "verify_email")))
-    : null;
+  //
+  // Tài khoản đã được tạo ở trên. Thư hỏng thì KHÔNG được làm hỏng cả lượt đăng
+  // ký - trả 500 lúc này là để người dùng với một tài khoản đã có mà không có
+  // phiên. Họ vẫn vào học được và bấm "gửi lại thư xác minh" sau.
+  let mail: { mode: string } | null = null;
+  if (config.requireEmailVerification) {
+    try {
+      mail = await sendMail(
+        verifyEmailMail(email, name, await issueAuthToken(userId, "verify_email")),
+      );
+    } catch (err) {
+      console.error("[dang-ky] không gửi được thư xác minh", err);
+      mail = { mode: "failed" };
+    }
+  }
 
   await createSession(userId);
   await audit({ actorUserId: userId, action: "auth.register", entity: "users", entityId: userId, ip });

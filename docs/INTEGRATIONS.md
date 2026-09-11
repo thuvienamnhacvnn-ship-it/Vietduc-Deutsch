@@ -100,11 +100,35 @@ một tài khoản Google trên máy thì bấm một lần là vào thẳng, kh
 
 ## Email giao dịch
 
-- Adapter: `src/lib/adapters/mail.ts`
-- Biến: `LINGORA_MAIL_PROVIDER`, `LINGORA_MAIL_KEY`, `LINGORA_MAIL_FROM`
-- Bản mock ghi email ra `data/outbox/` và in đường dẫn xác minh ra console, để
-  luồng đăng ký chạy được end-to-end khi phát triển.
-- Không gửi email hàng loạt cho tới khi chủ dự án cho phép.
+Tự gửi từ VPS (chủ dự án chọn 11/09/2026): postfix chỉ để GỬI + opendkim ký
+DKIM. Không có tài khoản dịch vụ bên ngoài nào.
+
+- Adapter: `src/lib/adapters/mail.ts`, provider `sendmail` - gọi
+  `/usr/sbin/sendmail`, postfix nhận vào hàng đợi rồi tự gửi và tự thử lại.
+- Dựng máy chủ thư: `scripts/vps/may-chu-thu.sh` (chạy lại được, giữ khoá cũ).
+  Postfix chỉ nghe trên 127.0.0.1 - không ai ngoài Internet dùng nó chuyển thư
+  được. Gửi bằng IPv4 duy nhất.
+- Biến: `LINGORA_MAIL_PROVIDER=sendmail`,
+  `LINGORA_MAIL_FROM=Việt Đức Lingua <no-reply@vietduc-lingua.com>`.
+- Không có provider thì là mock: thư ghi ra `data/outbox/`, không gửi đi đâu.
+
+**Thư chỉ tới hộp thư chính khi đủ bốn thứ sau** - thiếu một là Gmail từ chối
+hoặc xếp vào Spam:
+
+| Bản ghi | Tên | Giá trị |
+|---|---|---|
+| A | `mail` | `57.129.45.199` |
+| TXT (SPF) | `@` | `v=spf1 ip4:57.129.45.199 -all` |
+| TXT (DKIM) | `vd2026._domainkey` | `v=DKIM1; k=rsa; p=…` (lấy từ `/etc/opendkim/keys/vietduc-lingua.com/vd2026.txt`) |
+| TXT (DMARC) | `_dmarc` | `v=DMARC1; p=none` |
+| PTR (bảng OVH) | `57.129.45.199` | `mail.vietduc-lingua.com` |
+
+Kiểm tra sau khi thêm DNS: `sudo opendkim-testkey -d vietduc-lingua.com -s vd2026 -vvv`
+phải báo `key OK`.
+
+SPF dùng `-all`: chỉ VPS được gửi thư mang tên miền này. Sau này nếu dùng thêm
+hộp thư doanh nghiệp cho `@vietduc-lingua.com` thì PHẢI thêm máy chủ của nhà
+cung cấp đó vào SPF, không thì thư của họ bị từ chối.
 
 ## Object storage cho audio
 

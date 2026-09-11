@@ -63,6 +63,11 @@ export function adapterMode(
       // v1 avatar chạy cục bộ; "live" ở đây nghĩa là có dịch vụ đồng bộ khẩu hình.
       return has("LINGORA_AVATAR_PROVIDER", "LINGORA_AVATAR_KEY") ? "live" : "mock";
     case "mail":
+      // "sendmail" là máy chủ thư của chính VPS: không có khoá API nào để khai.
+      // Nhà cung cấp gửi qua API thì vẫn phải có khoá.
+      if (process.env.LINGORA_MAIL_PROVIDER === "sendmail") {
+        return has("LINGORA_MAIL_FROM") ? "live" : "mock";
+      }
       return has("LINGORA_MAIL_PROVIDER", "LINGORA_MAIL_KEY", "LINGORA_MAIL_FROM") ? "live" : "mock";
     case "payments":
       return has("PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET", "PAYPAL_WEBHOOK_ID") ? "live" : "mock";
